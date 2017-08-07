@@ -1,0 +1,29 @@
+#never commit node_modules
+node_modules
+
+#never commit packed files
+www/game
+www/assets
+
+.vscode/
+typings/
+
+# Mac
+.DS_Store
+
+# Node
+npm-debug.log
+/node_modules
+
+# Cordova
+/platforms
+/plugins
+
+# Android
+.gradle/
+
+# res
+resources/signing
+
+# environment
+.env
