@@ -8,14 +8,15 @@ before_install:
     - gradle --version
 install:
     - npm install
-    - npm install -g codecov
+    # - npm install -g codecov
     - echo y | android --silent update sdk --no-ui --all --filter platform-tools,tools,build-tools-26.0.0,android-26,android-25,extra-google-m2repository,extra-android-m2repository
 android:
     components:
       - tools
 script:
-    - npm test
-    - npm run cover
+    - npm build
+    # - npm test
+    # - npm run cover
 after_script:
-    - codecov
+    # - codecov
     
