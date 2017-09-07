@@ -15,7 +15,7 @@ android:
       - tools
 script:
     - npm build
-    # - npm test
+    - npm test
     # - npm run cover
 after_script:
     # - codecov
