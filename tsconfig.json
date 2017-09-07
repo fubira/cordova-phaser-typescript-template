@@ -2,16 +2,12 @@
   "compilerOptions": {
     "module": "commonjs",
     "target": "es5",
-    "sourceMap": true,
-    "types": [
-      "node",
-      "cordova"
-    ]
+    "sourceMap": true
   },
   "files": [
-    "./src/globals.d.ts",
     "./src/app.ts",
+    "./src/globals.d.ts",
     "./node_modules/phaser-ce/typescript/phaser.comments.d.ts",
-    "./plugins/cordova-plugin-admobpro/typescript/AdMob.d.ts"
+    "./node_modules/cordova-plugin-admobpro/typescript/AdMob.d.ts"
   ]
 }

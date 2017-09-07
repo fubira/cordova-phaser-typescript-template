@@ -12,6 +12,7 @@ module.exports = {
     },
     resolve: {
         extensions: ['.ts', '.js'],
+        modules: ['node_modules'],
         alias: {
             pixi: path.join(__dirname, 'node_modules/phaser-ce/build/custom/pixi.js'),
             phaser: path.join(__dirname, 'node_modules/phaser-ce/build/custom/phaser-split.js'),
