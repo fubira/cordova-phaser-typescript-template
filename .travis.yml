@@ -1,0 +1,22 @@
+language: android
+sudo: false
+jdk:
+    - oraclejdk8
+before_install:
+    - nvm install 8
+    - node --version
+    - gradle --version
+install:
+    - npm install
+    # - npm install -g codecov
+    - echo y | android --silent update sdk --no-ui --all --filter platform-tools,tools,build-tools-26.0.0,android-26,android-25,extra-google-m2repository,extra-android-m2repository
+android:
+    components:
+      - tools
+script:
+    - npm build
+    # - npm test
+    # - npm run cover
+after_script:
+    # - codecov
+    
