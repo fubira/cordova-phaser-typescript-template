@@ -24,7 +24,7 @@
     "@types/cordova": "0.0.34",
     "@types/i18next": "^8.4.2",
     "@types/noisejs": "0.0.28",
-    "cordova-android": "^6.2.3",
+    "cordova-android": "^6.3.0",
     "cordova-ios": "^4.4.0",
     "cordova-plugin-admobpro": "^2.29.22",
     "cordova-plugin-console": "^1.0.7",
@@ -52,9 +52,9 @@
       "cordova-plugin-splashscreen": {}
     },
     "platforms": [
-      "android",
       "ios",
-      "windows"
+      "windows",
+      "android"
     ]
   },
   "devDependencies": {
