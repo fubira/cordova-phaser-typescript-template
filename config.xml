@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="jp.codearts.cordova-phaser-typescript" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget id="jp.codearts.cordovaphasertypescript" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>Cordova Phaser TypeScript</name>
     <description>
         Cordova Phaser TypeScript
@@ -25,11 +25,10 @@
     </platform>
     <preference name="Orientation" value="portrait" />
     <preference name="BackgroundColor" value="0xff202020" />
-    <engine name="android" spec="^6.2.3" />
-    <engine name="browser" />
-    <engine name="ios" spec="^4.4.0" />
     <engine name="windows" />
-    <plugin name="cordova-plugin-admobpro" spec="^2.29.21" />
+    <engine name="android" spec="^6.2.3" />
+    <engine name="ios" spec="^4.4.0" />
+    <plugin name="cordova-plugin-whitelist" spec="^1.3.2" />
     <plugin name="cordova-plugin-console" spec="^1.0.7" />
     <plugin name="cordova-plugin-crosswalk-webview" spec="^2.3.0">
         <variable name="XWALK_VERSION" value="23+" />
@@ -38,6 +37,7 @@
         <variable name="XWALK_MODE" value="embedded" />
         <variable name="XWALK_MULTIPLEAPK" value="true" />
     </plugin>
-    <plugin name="cordova-plugin-whitelist" spec="^1.3.2" />
     <plugin name="cordova-plugin-wkwebview-engine" spec="^1.1.3" />
+    <plugin name="cordova-plugin-admobpro" spec="^2.29.22" />
+    <plugin name="cordova-plugin-splashscreen" spec="^4.0.3" />
 </widget>
