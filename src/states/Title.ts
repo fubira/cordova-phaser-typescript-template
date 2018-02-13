@@ -6,12 +6,12 @@ export default class Title extends Phaser.State {
     private tapToStartText: Phaser.Text = null;
 
     public init(): void {
-        this.game.stage.backgroundColor = '#FFAA77';
+        this.game.stage.backgroundColor = '#000000';
         this.game.time.advancedTiming = true;
     }
 
     public create(): void {
-        this.game.camera.flash(0x000000, 200);
+        this.game.camera.flash(0x000000, 400);
         this.game.physics.startSystem(Phaser.Physics.ARCADE);
         this.game.input.onDown.add(
             (pointer) => {
