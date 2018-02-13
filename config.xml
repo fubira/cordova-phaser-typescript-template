@@ -32,13 +32,6 @@
     <preference name="ShowSplashScreenSpinner" value="false" />
     <plugin name="cordova-plugin-whitelist" spec="^1.3.3" />
     <plugin name="cordova-plugin-console" spec="^1.1.0" />
-    <plugin name="cordova-plugin-crosswalk-webview" spec="^2.3.0">
-        <variable name="XWALK_VERSION" value="23+" />
-        <variable name="XWALK_LITEVERSION" value="xwalk_core_library_canary:17+" />
-        <variable name="XWALK_COMMANDLINE" value="--disable-pull-to-refresh-effect" />
-        <variable name="XWALK_MODE" value="embedded" />
-        <variable name="XWALK_MULTIPLEAPK" value="true" />
-    </plugin>
     <plugin name="cordova-plugin-dialogs" spec="^2.0.1" />
     <plugin name="cordova-plugin-globalization" spec="^1.0.9" />
     <plugin name="cordova-plugin-appversion" spec="^1.0.0" />
@@ -52,5 +45,5 @@
     </plugin>
     <engine name="windows" />
     <engine name="ios" spec="^4.5.4" />
-    <engine name="android" spec="~6.4.0" />
+    <engine name="android" spec="^6.4.0" />
 </widget>

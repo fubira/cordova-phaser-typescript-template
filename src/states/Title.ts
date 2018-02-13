@@ -18,6 +18,10 @@ export default class Title extends Phaser.State {
                 this.startGame();
             }, this);
 
+        if (window.cordova) {
+            SpinnerDialog.hide();
+        }
+
         this.titleText = this.game.add.text(this.game.world.centerX, this.game.world.centerY - 60, 'Cordova Phaser Template', {
             font: '54px ' + Assets.CustomWebFonts.FontsK8x12.getFamily()
         });

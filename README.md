@@ -17,7 +17,7 @@ application.
 - Mobile platform support (cordova)
 - AdMob implementation (lycwed-cordova-plugin-admob-free)
 - GameService/GameCenter support (lycwed-cordova-plugin-game-services)
-- HW Acceleration Webview (CrossWalk/WKWebView)
+- ~~HW Acceleration Webview (CrossWalk/WKWebView)~~
 - Logger (js-logger)
 - Globalization (i18n)
 - Testing framework (karma)

@@ -28,7 +28,7 @@ export default class Preloader extends Phaser.State {
     private startGame(): void {
         this.game.state.start('Title');
         this.game.sound.boot();
-        GameService.auth();
+        // GameService.auth();
 
         BgmPlayer.instance.init();
         BgmPlayer.instance.play([Assets.Audio.AudioBgm.getMP3(), Assets.Audio.AudioBgm.getOGG()]);
