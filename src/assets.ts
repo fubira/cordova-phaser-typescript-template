@@ -13,7 +13,12 @@ export namespace Atlases {
 }
 
 export namespace Audio {
-    class IExistSoTypeScriptWillNotComplainAboutAnEmptyNamespace {}
+    export class AudioBgm {
+        static getName(): string { return 'bgm'; }
+
+        static getMP3(): string { return require('assets/audio/bgm.mp3'); }
+        static getOGG(): string { return require('assets/audio/bgm.ogg'); }
+    }
 }
 
 export namespace Audiosprites {

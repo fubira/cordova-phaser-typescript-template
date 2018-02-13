@@ -359,7 +359,7 @@ if (!Object.keys(loaderTypes.font).length) {
         shell.ShellString('\n        static getName(): string { return \'' + i.split('/').pop() + '\'; }\n').toEnd(assetsClassFile);
 
         var cssFileData = fs.readFileSync(('assets/' + i + '.css'), 'ascii');
-        var family = /font-family:(\s)*('|")(\w*\W*)('|")/g.exec(cssFileData)[3];
+        var family = /font-family:(\s)*('|")([\w-]*\W*)('|")/g.exec(cssFileData)[3];
         shell.ShellString('\n        static getFamily(): string { return \'' + family + '\'; }\n').toEnd(assetsClassFile);
 
         for (var t in loaderTypes.font[i]) {

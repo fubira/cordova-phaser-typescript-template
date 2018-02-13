@@ -2,12 +2,16 @@ import 'p2';
 import 'pixi';
 import 'phaser';
 import * as Logger from 'js-logger';
-
+import * as i18n from 'i18next';
+import * as i18nXHRBackend from 'i18next-xhr-backend';
+import * as i18nBrowserLanguageDetector from 'i18next-browser-languagedetector';
 import * as WebFontLoader from 'webfontloader';
 import * as Assets from './assets';
 import Boot from './states/Boot';
 import Preloader from './states/Preloader';
 import Title from './states/Title';
+import AdBanner from './utils/AdBanner';
+import AdInterstitial from './utils/AdInterstitial';
 
 class App extends Phaser.Game {
     constructor(config: Phaser.IGameConfig) {
@@ -24,7 +28,8 @@ function startApp(): void {
     let gameHeight: number = GAME_HEIGHT;
 
     let gameConfig: Phaser.IGameConfig = {
-        enableDebug: false,
+        antialias: false,
+        enableDebug: DEBUG,
         width: gameWidth,
         height: gameHeight,
         renderer: Phaser.AUTO,
@@ -59,27 +64,65 @@ function loadWebFont(callback: () => any): void {
     }
 }
 
+function loadLocales() {
+    i18n.use(i18nBrowserLanguageDetector)
+        .use(i18nXHRBackend)
+        .init({
+            fallbackLng: 'en',
+            backend: {
+                loadPath: 'locales/{{lng}}/{{ns}}.json'
+            },
+            debug: DEBUG
+        });
+}
+
 Logger.useDefaults();
 Logger.setLevel((DEBUG) ? Logger.DEBUG : Logger.ERROR);
 
-if (window.cordova) {
-    document.addEventListener('deviceready', () => {
-        try {
-            Logger.debug('adId => ' + process.env.ADMOB_ID);
-            AdMob.createBanner({
-                adId: process.env.ADMOB_ID,
-                position: AdMob.AD_POSITION.BOTTOM_CENTER,
-                overlap: true,
-                autoShow: true
-            });
-        } catch (e) {
-            Logger.error('AdMob.createBanner failed: ' + e);
-        }
-   });
-}
-
 window.onload = () => {
+    loadLocales();
     loadWebFont(() => {
         startApp();
     });
 };
+
+document.addEventListener('deviceready', () => {
+    if (window.cordova) {
+        SpinnerDialog.show(null, 'loading ...');
+        AdBanner.init();
+        AdInterstitial.init();
+
+        window.StatusBar.styleDefault();
+        if (window.cordova.platformId === 'android') {
+            window.StatusBar.overlaysWebView(true);
+            window.StatusBar.backgroundColorByHexString('#A0000000');
+            window.StatusBar.styleBlackTranslucent();
+        }
+        if (window.cordova.platformId === 'ios') {
+            window.StatusBar.overlaysWebView(true);
+            window.StatusBar.backgroundColorByHexString('#A0000000');
+            window.StatusBar.styleBlackTranslucent();
+        }
+
+        // Setup localization for cordova devices
+        navigator.globalization.getPreferredLanguage((language) => {
+            Logger.info('ChangeLanguage: [' + language.value + ']');
+            i18n.changeLanguage(language.value);
+        }, (error: GlobalizationError) => {
+            Logger.error('ChangeLanguage Error: ' + error);
+        });
+
+        document.addEventListener('backbutton', () => {
+            navigator.notification.confirm(
+                i18n.t('close_dialog_message'),
+                (choice) => {
+                    if (choice === 1) {
+                        Logger.info('exitApp');
+                        navigator.app.exitApp();
+                    }
+                },
+                i18n.t('close_dialog_title'));
+            },
+            false);
+    }
+});

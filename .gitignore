@@ -4,6 +4,7 @@ node_modules
 #never commit packed files
 www/game
 www/assets
+www/locales
 
 .vscode/
 typings/
@@ -18,6 +19,7 @@ npm-debug.log
 # Cordova
 /platforms
 /plugins
+build.json
 
 # Android
 .gradle/

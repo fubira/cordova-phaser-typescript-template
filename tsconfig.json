@@ -4,10 +4,15 @@
     "target": "es5",
     "sourceMap": true
   },
+  "include": [
+    "./src/**/*",
+    "./types/**/*",
+    "./plugins/**/*"
+  ],
   "files": [
-    "./src/app.ts",
-    "./src/globals.d.ts",
-    "./node_modules/phaser-ce/typescript/phaser.comments.d.ts",
-    "./node_modules/cordova-plugin-admobpro/typescript/AdMob.d.ts"
+    "./node_modules/cordova-plugin-dialogs/types/index.d.ts",
+    "./node_modules/cordova-plugin-globalization/types/index.d.ts",
+    "./node_modules/cordova-plugin-statusbar/types/index.d.ts",
+    "./node_modules/phaser-ce/typescript/phaser.comments.d.ts"
   ]
 }

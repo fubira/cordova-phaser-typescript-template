@@ -1,6 +1,7 @@
 var webpack = require('webpack');
 var path = require('path');
 var CleanWebpackPlugin = require('clean-webpack-plugin');
+var CopyWebpackPlugin = require('copy-webpack-plugin');
 var WebpackShellPlugin = require('webpack-shell-plugin');
 var DotEnvPlugin = require('dotenv-webpack');
 
@@ -22,12 +23,15 @@ module.exports = {
     },
     plugins: [
         new WebpackShellPlugin({
-            onBuildStart: ['npm run assets:dist']
+            onBuildStart: ['node ./scripts/generateAssetsClass.js']
         }),
+        new CopyWebpackPlugin([{
+            from: 'locales', to: 'locales'
+        }]),
         new webpack.DefinePlugin({
             'DEBUG': false,
-            'GAME_WIDTH': 480,
-            'GAME_HEIGHT': 600
+            'GAME_WIDTH': 435,
+            'GAME_HEIGHT': 720
         }),
         new DotEnvPlugin(),
         new webpack.optimize.UglifyJsPlugin({
@@ -53,6 +57,7 @@ module.exports = {
     module: {
         loaders: [
             { test: /\.ts$/, enforce: 'pre', loader: 'tslint-loader' },
+            { test: /assets(\/|\\)/, loader: 'file-loader?name=assets/[hash].[ext]' },
             { test: /pixi\.js$/, loader: 'expose-loader?PIXI' },
             { test: /phaser-split\.js$/, loader: 'expose-loader?Phaser' },
             { test: /p2\.js$/, loader: 'expose-loader?p2' },

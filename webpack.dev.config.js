@@ -1,6 +1,7 @@
 var webpack = require('webpack');
 var path = require('path');
 var CleanWebpackPlugin = require('clean-webpack-plugin');
+var CopyWebpackPlugin = require('copy-webpack-plugin');
 var WebpackShellPlugin = require('webpack-shell-plugin');
 var DotEnvPlugin = require('dotenv-webpack');
 
@@ -22,12 +23,15 @@ module.exports = {
     },
     plugins: [
         new WebpackShellPlugin({
-            onBuildStart: ['npm run assets']
+            onBuildStart: ['node ./scripts/generateAssetsClass.js --dev']
         }),
+        new CopyWebpackPlugin([{
+            from: 'locales', to: 'locales'
+        }]),
         new webpack.DefinePlugin({
             'DEBUG': true,
-            'GAME_WIDTH': 480,
-            'GAME_HEIGHT': 600
+            'GAME_WIDTH': 435,
+            'GAME_HEIGHT': 720
         }),
         new DotEnvPlugin()
     ],
