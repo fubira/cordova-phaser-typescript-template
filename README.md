@@ -10,13 +10,17 @@ application.
 
 ## Features
 
-- Phaser-CE 2.8.3 (npm module)
+- Phaser-CE 2.10.0
 - TypeScript + TSLint
 - Live server (builds and reloads the browser on changes)
-- Mobile platform support by cordova
-- Mobile Ad banner implementation
+- BGM Manager (Howler.js)
+- Mobile platform support (cordova)
+- AdMob implementation (lycwed-cordova-plugin-admob-free)
+- GameService/GameCenter support (lycwed-cordova-plugin-game-services)
 - HW Acceleration Webview (CrossWalk/WKWebView)
-- Logger
+- Logger (js-logger)
+- Globalization (i18n)
+- Testing framework (karma)
 
 ## Setup
 
@@ -26,13 +30,13 @@ npm install
 npm run webpack
 ```
 
-## Live server
+## Run live server
 
 ```
 npm start
 ```
 
-## Building for Android
+## Build for Android
 
 ```
 cordova platform add android
