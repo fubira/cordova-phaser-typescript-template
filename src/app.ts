@@ -12,6 +12,7 @@ import Preloader from './states/Preloader';
 import Title from './states/Title';
 import AdBanner from './utils/AdBanner';
 import AdInterstitial from './utils/AdInterstitial';
+import Tracking from './utils/Tracking';
 
 class App extends Phaser.Game {
     constructor(config: Phaser.IGameConfig) {
@@ -78,6 +79,7 @@ function loadLocales() {
 
 Logger.useDefaults();
 Logger.setLevel((DEBUG) ? Logger.DEBUG : Logger.ERROR);
+Tracking.auth();
 
 window.onload = () => {
     loadLocales();

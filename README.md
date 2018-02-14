@@ -15,6 +15,7 @@ application.
 - Live server (builds and reloads the browser on changes)
 - BGM Manager (Howler.js)
 - Mobile platform support (cordova)
+- Firebase analytics (cordova-plugin-firebase)
 - AdMob implementation (lycwed-cordova-plugin-admob-free)
 - GameService/GameCenter support (lycwed-cordova-plugin-game-services)
 - ~~HW Acceleration Webview (CrossWalk/WKWebView)~~

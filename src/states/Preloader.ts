@@ -2,8 +2,6 @@ import { AssetLoader } from '../utils/AssetLoader';
 import * as Assets from '../assets';
 import * as Logger from 'js-logger';
 import BgmPlayer from '../utils/BgmPlayer';
-import GameService from '../utils/GameService';
-
 
 export default class Preloader extends Phaser.State {
     private preloadBarSprite: Phaser.Sprite = null;
@@ -28,7 +26,6 @@ export default class Preloader extends Phaser.State {
     private startGame(): void {
         this.game.state.start('Title');
         this.game.sound.boot();
-        // GameService.auth();
 
         BgmPlayer.instance.init();
         BgmPlayer.instance.play([Assets.Audio.AudioBgm.getMP3(), Assets.Audio.AudioBgm.getOGG()]);
