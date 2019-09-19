@@ -95,14 +95,10 @@ document.addEventListener('deviceready', () => {
         AdInterstitial.init();
 
         window.StatusBar.styleDefault();
-        if (window.cordova.platformId === 'android') {
+        if (window.cordova.platformId === 'android' ||
+            window.cordova.platformId === 'ios') {
             window.StatusBar.overlaysWebView(true);
-            window.StatusBar.backgroundColorByHexString('#A0000000');
-            window.StatusBar.styleBlackTranslucent();
-        }
-        if (window.cordova.platformId === 'ios') {
-            window.StatusBar.overlaysWebView(true);
-            window.StatusBar.backgroundColorByHexString('#A0000000');
+            window.StatusBar.backgroundColorByHexString('#A0483C46');
             window.StatusBar.styleBlackTranslucent();
         }
 

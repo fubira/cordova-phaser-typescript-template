@@ -16,7 +16,6 @@ export default class BgmPlayer {
     public volume: number = 0.8;
     private audioPlaying: Howl;
     private audioFading: Howl;
-    private saveSeek: number;
 
     public init() {
         document.addEventListener('pause', () => {

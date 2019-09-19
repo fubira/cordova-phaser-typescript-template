@@ -1,6 +1,5 @@
 import * as Logger from 'js-logger';
 import * as firebase from 'firebase';
-import { isNullOrUndefined, isUndefined } from 'util';
 
 export default class Tracking {
     public static auth() {

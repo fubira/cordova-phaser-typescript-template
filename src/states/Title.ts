@@ -6,7 +6,7 @@ export default class Title extends Phaser.State {
     private tapToStartText: Phaser.Text = null;
 
     public init(): void {
-        this.game.stage.backgroundColor = '#000000';
+        this.game.stage.backgroundColor = '#483C46';
         this.game.time.advancedTiming = true;
     }
 
@@ -14,7 +14,7 @@ export default class Title extends Phaser.State {
         this.game.camera.flash(0x000000, 400);
         this.game.physics.startSystem(Phaser.Physics.ARCADE);
         this.game.input.onDown.add(
-            (pointer) => {
+            () => {
                 this.startGame();
             }, this);
 
@@ -22,11 +22,14 @@ export default class Title extends Phaser.State {
             SpinnerDialog.hide();
         }
 
-        this.titleText = this.game.add.text(this.game.world.centerX, this.game.world.centerY - 60, 'Cordova Phaser Template', {
-            font: '54px ' + Assets.CustomWebFonts.FontsK8x12.getFamily()
-        });
+        this.titleText = this.game.add.text(
+            this.game.world.centerX,
+            this.game.world.centerY - 60,
+            'Cordova Phaser Template',
+            { font: '50px ' + Assets.CustomWebFonts.FontsK8x12.getFamily() }
+        );
         this.titleText.anchor.setTo(0.5);
-        this.titleText.fill = '#ee8855';
+        this.titleText.fill = '#EE8855';
         this.titleText.stroke = '#000000';
         this.titleText.strokeThickness = 5;
         this.titleText.shadowStroke = true;
@@ -36,11 +39,14 @@ export default class Title extends Phaser.State {
         this.titleText.shadowOffsetX = 4;
         this.titleText.shadowOffsetY = 4;
 
-        this.subtitleText = this.game.add.text(this.game.world.centerX, this.game.world.centerY + 0, 'SubTile', {
-            font: '26px ' + Assets.CustomWebFonts.FontsK8x12.getFamily()
-        });
+        this.subtitleText = this.game.add.text(
+            this.game.world.centerX,
+            this.game.world.centerY + 0,
+            'SubTile',
+            { font: '32px ' + Assets.CustomWebFonts.FontsK8x12.getFamily() }
+        );
         this.subtitleText.anchor.setTo(0.5);
-        this.subtitleText.fill = '#ffffff';
+        this.subtitleText.fill = '#EE8855';
         this.subtitleText.stroke = '#000000';
         this.subtitleText.strokeThickness = 5;
         this.subtitleText.shadowStroke = true;
@@ -50,11 +56,14 @@ export default class Title extends Phaser.State {
         this.subtitleText.shadowOffsetX = 4;
         this.subtitleText.shadowOffsetY = 4;
 
-        this.tapToStartText = this.game.add.text(this.game.world.centerX, this.game.world.centerY + 100, 'Tap to start', {
-            font: '26px ' + Assets.CustomWebFonts.FontsK8x12.getFamily()
-        });
+        this.tapToStartText = this.game.add.text(
+            this.game.world.centerX,
+            this.game.world.centerY + 100,
+            'Tap to start',
+            { font: '32px ' + Assets.CustomWebFonts.FontsK8x12.getFamily() }
+        );
         this.tapToStartText.anchor.setTo(0.5);
-        this.tapToStartText.fill = '#ffffff';
+        this.tapToStartText.fill = '#BEEE62';
         this.tapToStartText.stroke = '#000000';
         this.tapToStartText.strokeThickness = 5;
         this.tapToStartText.shadowStroke = true;
@@ -71,5 +80,6 @@ export default class Title extends Phaser.State {
     }
 
     private startGame(): void {
+        this.game.camera.flash(0xffffff, 400);
     }
 }
