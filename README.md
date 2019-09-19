@@ -8,9 +8,14 @@
 Cordova + Phaser + Typescript template focused on development of mobile
 application.
 
+## Dependency
+
+- node-js 12.x
+
+
 ## Features
 
-- Phaser-CE 2.10.0
+- Phaser-CE 2.13.0
 - TypeScript + TSLint
 - Live server (builds and reloads the browser on changes)
 - BGM Manager (Howler.js)
@@ -52,3 +57,17 @@ cordova platform add ios
 npm run webpack
 cordova build ios
 ```
+
+## When fail in installation of nodegyp/grpc
+
+When you fail in installation of nodegyp/grpc, please install 
+nodegyp/grpc using LTS version node-js at first.
+
+```
+nodebrew use v9.11.2
+npm install -g nodegyp
+npm install --save grpc
+nodebrew use latest
+npm install
+```
+
