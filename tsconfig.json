@@ -1,8 +1,24 @@
 {
+  "compileOnSave": false,
   "compilerOptions": {
-    "module": "commonjs",
-    "target": "es5",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "target": "es2015",
+    "typeRoots": [
+      "node_modules/@types"
+    ],
+    "lib": [
+      "es2018",
+      "dom"
+    ],
     "sourceMap": true
+  },
+  "angularCompilerOptions": {
+    "fullTemplateTypeCheck": true,
+    "strictInjectionParameters": true
   },
   "include": [
     "./src/**/*",
@@ -12,7 +28,6 @@
   "files": [
     "./node_modules/cordova-plugin-dialogs/types/index.d.ts",
     "./node_modules/cordova-plugin-globalization/types/index.d.ts",
-    "./node_modules/cordova-plugin-statusbar/types/index.d.ts",
-    "./node_modules/phaser-ce/typescript/phaser.comments.d.ts"
+    "./node_modules/cordova-plugin-statusbar/types/index.d.ts"
   ]
 }

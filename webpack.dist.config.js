@@ -1,6 +1,5 @@
 var webpack = require('webpack');
 var path = require('path');
-var CleanWebpackPlugin = require('clean-webpack-plugin');
 var CopyWebpackPlugin = require('copy-webpack-plugin');
 var WebpackShellPlugin = require('webpack-shell-plugin');
 var DotEnvPlugin = require('dotenv-webpack');
