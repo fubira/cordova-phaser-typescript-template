@@ -10,9 +10,9 @@ commander
     .parse(process.argv);
 
 if (commander.dev) {
-    webpackConfig = require('../webpack.dev.config.js');
+    webpackConfig = require('../webpack/base.js');
 } else {
-    webpackConfig = require('../webpack.dist.config.js');
+    webpackConfig = require('../webpack/prod.js');
 }
 
 function toCamelCase(string) {

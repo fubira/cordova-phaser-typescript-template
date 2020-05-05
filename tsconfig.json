@@ -3,6 +3,7 @@
   "compilerOptions": {
     "module": "esnext",
     "moduleResolution": "node",
+    "esModuleInterop": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "importHelpers": true,
@@ -21,13 +22,17 @@
     "strictInjectionParameters": true
   },
   "include": [
-    "./src/**/*",
-    "./types/**/*",
-    "./plugins/**/*"
+    "src/**/*",
+    "types/**/*",
+    "test/**/*",
+    "plugins/**/*",
+  ],
+  "exclude": [
+    "webpack/*",
   ],
   "files": [
     "./node_modules/cordova-plugin-dialogs/types/index.d.ts",
     "./node_modules/cordova-plugin-globalization/types/index.d.ts",
-    "./node_modules/cordova-plugin-statusbar/types/index.d.ts"
+    "./node_modules/cordova-plugin-statusbar/types/index.d.ts",
   ]
 }

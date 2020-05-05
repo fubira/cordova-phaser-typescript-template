@@ -1,24 +1,29 @@
-import * as Logger from 'js-logger';
-import { isNullOrUndefined } from 'util';
+import * as Logger from "js-logger";
+import { isNullOrUndefined } from "util";
 
 export default class GameService {
   private static isSignedIn = false;
 
   public static get isActive(): boolean {
-    return (!isNullOrUndefined(window.cordova) && !isNullOrUndefined(window.gamesServices));
+    return (
+      !isNullOrUndefined(window.cordova) &&
+      !isNullOrUndefined(window.gamesServices)
+    );
   }
 
   private static getLeaderBoardId(): string {
-    if (window.cordova.platformId === 'ios') {
+    if (window.cordova.platformId === "ios") {
       return process.env.IOS_GAMECENTER_LEADERBOARD_ID;
     } else {
       return process.env.ANDROID_GAMESERVICES_LEADERBOARD_ID;
     }
   }
 
-  public static auth() {
+  public static auth(): void {
     if (!GameService.isActive) {
-      Logger.warn('GameService disabled. You can use this api on cordova platform only.');
+      Logger.warn(
+        "GameService disabled. You can use this api on cordova platform only."
+      );
       return;
     }
 
@@ -27,11 +32,11 @@ export default class GameService {
         this.isSignedIn = true;
       });
     } catch (e) {
-      Logger.error('GameService:auth failed: ' + e);
+      Logger.error("GameService:auth failed: " + e);
     }
   }
 
-  public static showLeaderBoard() {
+  public static showLeaderBoard(): void {
     if (!GameService.isActive) {
       return;
     }
@@ -41,13 +46,15 @@ export default class GameService {
     }
 
     try {
-      window.gamesServices.showLeaderboard(undefined, undefined, { leaderboardId: this.getLeaderBoardId() });
+      window.gamesServices.showLeaderboard(undefined, undefined, {
+        leaderboardId: this.getLeaderBoardId(),
+      });
     } catch (e) {
-      Logger.error('GameService:showLeaderBoard failed: ' + e);
+      Logger.error("GameService:showLeaderBoard failed: " + e);
     }
   }
 
-  public static submitScore(value: number) {
+  public static submitScore(value: number): void {
     if (!GameService.isActive) {
       return;
     }
@@ -55,24 +62,26 @@ export default class GameService {
     try {
       this.submitScoreInternal(value);
     } catch (e) {
-      Logger.error('GameService:submitScore failed: ' + e);
+      Logger.error("GameService:submitScore failed: " + e);
     }
   }
 
-  private static submitScoreInternal(value: number) {
+  private static submitScoreInternal(value: number): void {
     const option = { leaderboardId: this.getLeaderBoardId(), score: value };
 
-    if (isNullOrUndefined(option.leaderboardId) ) {
-      Logger.warn('GameService: LeaderboardID undefined.');
+    if (isNullOrUndefined(option.leaderboardId)) {
+      Logger.warn("GameService: LeaderboardID undefined.");
       return;
     }
 
     window.gamesServices.submitScore(
       () => {
-        Logger.debug('GameService: submitScore completed. (' + value + ')');
+        Logger.debug("GameService: submitScore completed. (" + value + ")");
       },
-      (result) => {
-        Logger.error('GameService: submitScore failed. :' + result + '');
-      }, option);
-    }
+      (result: string) => {
+        Logger.error("GameService: submitScore failed. :" + result + "");
+      },
+      option
+    );
   }
+}
