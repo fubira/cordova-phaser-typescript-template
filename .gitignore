@@ -2,9 +2,9 @@
 node_modules
 
 #never commit packed files
-www/game
 www/assets
 www/locales
+www/bundle*
 
 .vscode/
 typings/

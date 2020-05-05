@@ -28,7 +28,8 @@
     "plugins/**/*",
   ],
   "exclude": [
-    "webpack/*",
+    "www",
+    "node_modules",
   ],
   "files": [
     "./node_modules/cordova-plugin-dialogs/types/index.d.ts",

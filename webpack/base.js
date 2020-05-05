@@ -2,7 +2,6 @@ const webpack = require("webpack");
 const path = require("path");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
-const WebpackShellPlugin = require("webpack-shell-plugin");
 const DotEnvPlugin = require("dotenv-webpack");
 
 console.log(__dirname);
@@ -10,7 +9,7 @@ console.log(__dirname);
 module.exports = {
   mode: "development",
   output: {
-    path: path.join(__dirname, "../dist"),
+    path: path.join(__dirname, "../www"),
     filename: "bundle.js",
   },
   devtool: "source-map",
@@ -30,7 +29,7 @@ module.exports = {
     new DotEnvPlugin(),
   ],
   devServer: {
-    contentBase: path.join(__dirname, "dist/"),
+    contentBase: path.join(__dirname, "../www/"),
     filename: "bundle.js",
     compress: true,
     port: 9000,

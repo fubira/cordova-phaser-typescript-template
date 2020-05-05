@@ -4,7 +4,7 @@
   "productName": "cordova-phaser-typescript",
   "version": "0.1.0",
   "description": "Phaser game template with cordova.",
-  "main": "main.js",
+  "main": "bundle.js",
   "scripts": {
     "test": "jest",
     "start": "webpack-dev-server --config webpack/base.js",
