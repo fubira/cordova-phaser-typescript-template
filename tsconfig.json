@@ -28,7 +28,6 @@
     "plugins/**/*",
   ],
   "exclude": [
-    "www",
     "node_modules",
   ],
   "files": [
