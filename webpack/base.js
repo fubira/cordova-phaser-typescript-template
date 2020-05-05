@@ -4,12 +4,10 @@ const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const DotEnvPlugin = require("dotenv-webpack");
 
-console.log(__dirname);
-
 module.exports = {
   mode: "development",
   output: {
-    path: path.join(__dirname, "../www"),
+    path: path.join(__dirname, "../www/"),
     filename: "bundle.js",
   },
   devtool: "source-map",
@@ -17,7 +15,7 @@ module.exports = {
     extensions: [".ts", ".js"],
     modules: ["node_modules"],
     alias: {
-      assets: path.join(__dirname, "assets/"),
+      assets: path.join(__dirname, "../assets/"),
     },
   },
   plugins: [
@@ -29,7 +27,7 @@ module.exports = {
     new DotEnvPlugin(),
   ],
   devServer: {
-    contentBase: path.join(__dirname, "../www/"),
+    contentBase: "www",
     filename: "bundle.js",
     compress: true,
     port: 9000,
