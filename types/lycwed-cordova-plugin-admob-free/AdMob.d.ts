@@ -1,27 +1,27 @@
 declare class Banner {
-	config(options: Object);
-	prepare();
-	show(); 
-	hide();
-	remove();
+  config(options: Record<string, any>);
+  prepare();
+  show();
+  hide();
+  remove();
 }
 
 declare class Interstitial {
-	config(options: Object);
-	prepare();
-	show();
+  config(options: Record<string, any>);
+  prepare();
+  show();
 }
 
 declare class RewardVideo {
-	config(options: Object);
-	prepare();
-	show();
+  config(options: Record<string, any>);
+  prepare();
+  show();
 }
 
 declare interface AdMob {
-	banner: Banner;
-	interstitial: Interstitial;
-	rewardvideo: RewardVideo;
+  banner: Banner;
+  interstitial: Interstitial;
+  rewardvideo: RewardVideo;
 }
 
-declare var admob: AdMob;
+declare const admob: AdMob;

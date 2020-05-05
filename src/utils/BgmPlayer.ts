@@ -1,5 +1,5 @@
-import { Howl } from 'howler';
-import { isNullOrUndefined } from 'util';
+import { Howl } from "howler";
+import { isNullOrUndefined } from "util";
 
 export default class BgmPlayer {
   public static instance_: BgmPlayer;
@@ -10,20 +10,18 @@ export default class BgmPlayer {
     return this.instance_;
   }
 
-  private constructor() {}
-
-  public volume: number = 0.8;
+  public volume = 0.8;
   private audioPlaying: Howl;
   private audioFading: Howl;
 
-  private static playAudio(src: Array<string>, volume: number = 1.0): Howl {
+  private static playAudio(src: Array<string>, volume = 1.0): Howl {
     const audio = new Howl({ src, loop: true, autoplay: true, volume: 0 });
-      audio.fade(0.0, volume, 500);
-      return audio;
-    }
+    audio.fade(0.0, volume, 500);
+    return audio;
+  }
 
-  public init() {
-    document.addEventListener('pause', () => {
+  public init(): void {
+    document.addEventListener("pause", () => {
       if (!isNullOrUndefined(this.audioPlaying)) {
         this.audioPlaying.pause();
       }
@@ -31,25 +29,28 @@ export default class BgmPlayer {
         this.audioFading.stop();
       }
     });
-    document.addEventListener('resume', () => {
-      if (!isNullOrUndefined(this.audioPlaying) && !this.audioPlaying.playing()) {
+    document.addEventListener("resume", () => {
+      if (
+        !isNullOrUndefined(this.audioPlaying) &&
+        !this.audioPlaying.playing()
+      ) {
         this.audioPlaying.play();
       }
     });
   }
 
-  public play(src: Array<string>) {
+  public play(src: Array<string>): void {
     this.fadeOut();
     this.audioPlaying = BgmPlayer.playAudio(src, this.volume);
   }
 
-  private fadeOut() {
+  private fadeOut(): void {
     this.audioFading = this.audioPlaying;
     this.audioPlaying = undefined;
 
     if (!isNullOrUndefined(this.audioFading) && this.audioFading.playing()) {
       this.audioFading.fade(this.audioFading.volume(), 0.0, 800);
-      this.audioFading.once('fade', (id) => {
+      this.audioFading.once("fade", () => {
         this.audioFading.stop();
         this.audioFading = undefined;
       });
