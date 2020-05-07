@@ -1,7 +1,7 @@
 const webpack = require("webpack");
 const path = require("path");
-const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
+const WebpackShellPlugin = require('webpack-shell-plugin');
 const DotEnvPlugin = require("dotenv-webpack");
 
 module.exports = {
@@ -19,7 +19,13 @@ module.exports = {
     },
   },
   plugins: [
-    new webpack.DefinePlugin({
+    new WebpackShellPlugin({
+      onBuildStart: ['node ./scripts/generateAssetsClass.js --dev']
+    }),
+    new CopyWebpackPlugin([{
+      from: 'locales', to: 'locales'
+  }]),
+new webpack.DefinePlugin({
       DEBUG: true,
       GAME_WIDTH: 435,
       GAME_HEIGHT: 720,
@@ -45,6 +51,11 @@ module.exports = {
         test: /\.ts$/,
         enforce: "pre",
         loader: "eslint-loader"
+      },
+      {
+        test: /\.json$/,
+        loader: "raw-loader",
+        type: "javascript/auto"
       },
       {
         test: /assets(\/|\\)/,

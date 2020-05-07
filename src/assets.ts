@@ -5,6 +5,14 @@ export namespace Images {
     static getName(): string { return "logo2"; }
     static getPNG(): string { return require("assets/images/logo2.png"); }
   }
+  export class ImagesProgressBar {
+    static getName(): string { return "progress_bar"; }
+    static getPNG(): string { return require("assets/images/progress_bar.png"); }
+  }
+  export class ImagesProgressFrame {
+    static getName(): string { return "progress_frame"; }
+    static getPNG(): string { return require("assets/images/progress_frame.png"); }
+  }
 }
 
 export namespace Spritesheets {

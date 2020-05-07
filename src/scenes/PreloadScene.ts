@@ -1,3 +1,4 @@
+import * as Assets from "../assets";
 import BgmPlayer from "../utils/BgmPlayer";
 
 export default class PreloadScene extends Phaser.Scene {
@@ -9,7 +10,30 @@ export default class PreloadScene extends Phaser.Scene {
   }
 
   public preload(): void {
-    this.onCompleteLoadAll();
+    this.preloadBarSprite = this.add.sprite(
+      this.cameras.main.centerX,
+      this.cameras.main.centerY,
+      Assets.Images.ImagesProgressBar.getName()
+    );
+    this.preloadBarSprite.setOrigin(0, 0.5);
+    this.preloadBarSprite.x -= this.preloadBarSprite.width * 0.5;
+
+    this.preloadFrameSprite = this.add.sprite(
+      this.cameras.main.centerX,
+      this.cameras.main.centerY,
+      Assets.Images.ImagesProgressFrame.getName()
+    );
+
+    this.preloadFrameSprite.setOrigin(0.5);
+
+    this.load.on("progress", (value) => {
+      console.log(value);
+      this.preloadBarSprite.setScale(value, 1.0);
+    });
+
+    this.load.on("complete", () => {
+      this.onCompleteLoadAll();
+    });
   }
 
   public create(): void {
