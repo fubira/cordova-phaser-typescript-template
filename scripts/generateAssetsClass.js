@@ -82,24 +82,24 @@ function decideAssetType(name, exts) {
 }
 
 
-function generateAssetParameterSpriteSheet(fileName, extensions) {
-  const prop = fileName.replace('[', '').replace(']', '').split(',');
+function generateAssetOptionsSpriteSheet(assetName, extensions) {
+  const prop = assetName.replace('[', '').replace(']', '').split(',');
   if (prop.length < 2 || prop.length > 5) {
     console.error('Invalid number of Spritesheet properties provided for \'' + i + '\'. Must have between 2 and 5; [frameWidth, frameHeight, frameMax, margin, spacing] frameWidth and frameHeight are required');
   }
 
   return {
-    members: {
-      'FrameWidth': parseInt(prop[0] ? prop[0] : -1),
-      'FrameHeight': parseInt(prop[1] ? prop[1] : -1),
-      'FrameMax': parseInt(prop[2] ? prop[2] : -1),
-      'Margin': parseInt(prop[3] ? prop[3] : 0),
-      'Spacing': parseInt(prop[4] ? prop[4] : 0),
-    }
+    options: [
+      { name: 'FrameWidth', value: parseInt(prop[0] ? prop[0] : -1) },
+      { name: 'FrameHeight', value: parseInt(prop[1] ? prop[1] : -1) },
+      { name: 'FrameMax', value: parseInt(prop[2] ? prop[2] : -1) },
+      { name: 'Margin', value: parseInt(prop[3] ? prop[3] : -1) },
+      { name: 'Spacing', value: parseInt(prop[4] ? prop[4] : -1) },
+    ]
   };
 }
 
-function generateAssetParameterAtlas(fileName, extensions) {
+function generateAssetOptionsAtlas(assetName, extensions) {
   var frames = []
 
   const parseFrame = (frameFull) => {
@@ -111,7 +111,7 @@ function generateAssetParameterAtlas(fileName, extensions) {
   }
 
   for (const extName of extensions) {
-    const dataFile = `${fileName}.${extName}`;
+    const dataFile = `${assetName}.${extName}`;
     if (findExtension([extName], ASSET_TYPE_EXTENSIONS.json)) {
       try {
         const json = JSON.parse(fs.readFileSync(dataFile, 'ascii'));
@@ -149,17 +149,17 @@ function generateAssetParameterAtlas(fileName, extensions) {
   return {
     enum: {
       type: 'Frames',
-      name: toPascalCase(fileName.split('/')),
+      name: toPascalCase(assetName.split('/')),
       values: frames
     }
   }
 }
 
-function generateAssetParameterAudioSprite(fileName, extensions) {
+function generateAssetOptionsAudioSprite(assetName, extensions) {
   var audioSprite = []
 
   for (const extName of extensions) {
-    const dataFile = `${fileName}.${extName}`;
+    const dataFile = `${assetName}.${extName}`;
     if (findExtension([extName], ASSET_TYPE_EXTENSIONS.json)) {
       try {
         const json = JSON.parse(fs.readFileSync(dataFile, 'ascii'));
@@ -176,10 +176,59 @@ function generateAssetParameterAudioSprite(fileName, extensions) {
   return {
     enum: {
       type: 'Sprites',
-      name: toPascalCase(fileName.split('/')),
+      name: toPascalCase(assetName.split('/')),
       values: audioSprite
     }
   }
+}
+
+
+function generateAssetOptionsCustomWebFont(assetName, extensions) {
+  var family = "";
+
+  const dataFile = `${assetName}.css`;
+  try {
+    const css = fs.readFileSync(dataFile, 'ascii');
+    family = /font-family:(\s)*('|")([\w-]*\W*)('|")/g.exec(css)[3];
+  }
+  catch (err) {
+    console.log('Atlas Data File Error: ' + err);
+  }
+
+  return {
+    pathPrefix: '!file-loader?name=assets/fonts/[name].[ext]!',
+    options: [{ name: 'Family', value: `"${family}"`, }]
+  }
+}
+
+function generateAssetOptions(type, assetName, extensions) {
+  switch(type) {
+    case 'spritesheet': {
+      return generateAssetOptionsSpriteSheet(assetName, extensions);
+    }
+    case 'atlas': {
+      return generateAssetOptionsAtlas(assetName, extensions);
+    }
+    case 'audiosprites': {
+      return generateAssetOptionsAudioSprite(assetName, extensions);
+    }
+    case 'font': {
+      return generateAssetOptionsCustomWebFont(assetName, extensions);
+    }
+  }
+  return {};
+}
+
+function generateAssetFileDefinition(assetName, extensions) {
+  const files = [];
+  const external = undefined;
+
+  for (const extName of extensions) {
+    files.push({ 
+      extName: extName, assetName: assetName,
+    });
+  }
+  return { files };
 }
 
 /**
@@ -187,74 +236,58 @@ function generateAssetParameterAudioSprite(fileName, extensions) {
  * @param { string } name file name
  * @param { Array<string> } extensions file extensions
  */
-function generateAssetObject(fileName, extensions) {
-  const className = toPascalCase(fileName.split('/'));
-  const type = decideAssetType(fileName, extensions);
+function generateAssetClassDefinition(assetName, extensions) {
+  const className = toPascalCase(assetName.split('/'));
+  const type = decideAssetType(assetName, extensions);
 
-  const value = { fileName, className, extensions };
-  let properties = undefined;
-  console.log(type);
-
-  switch(type) {
-    case 'spritesheet': {
-      properties = generateAssetParameterSpriteSheet(fileName, extensions);
-      break;
-    }
-    case 'atlas': {
-      properties = generateAssetParameterAtlas(fileName, extensions);
-      break;
-    }
-    case 'audiosprites': {
-      properties = generateAssetParameterAudioSprite(fileName, extensions);
-      break;
-    }
-  }
-  return { type, ...value, properties };
+  return {
+    type,
+    assetName,
+    className,
+    ...generateAssetFileDefinition(assetName, extensions),
+    ...generateAssetOptions(type, assetName, extensions),
+  };
 }
 
-function generateAssetObjectClassString(className, assets) {
+function dumpAssetClassCode(className, assets) {
   const s = [];
   s.push(`export namespace ${className} {`);
   if (!assets.length) {
     s.push('  class IExistSoTypeScriptWillNotComplainAboutAnEmptyNamespace {}');
   } else {
     for (const asset of assets) {
-      const properties = asset.properties;
-      if (properties && properties.enum) {
+      if (asset.enum) {
         s.push('');
-        s.push(`  enum ${properties.enum.name}${properties.enum.type} {`);
-        for (const value of properties.enum.values) {
+        s.push(`  enum ${asset.enum.name}${asset.enum.type} {`);
+        for (const value of asset.enum.values) {
           s.push(`    ${value.name} = <any>'${value.value}',`);
         }
         s.push('  }');
         s.push('');
       }
     }
-    for (const asset of assets) {
-        const fileName = asset.fileName;
-      const className = asset.className;
-      const extensions = asset.extensions;
-      const properties = asset.properties;
-      
-      s.push(`  export class ${className} {`);
-      s.push(`    static getName(): string { return "${fileName.split('/').pop()}"; }`);
-      
-      for (const extName of extensions) {
-        s.push(`    static get${extName.toUpperCase()}(): string { return require("assets/${fileName}.${extName}"); }`);
-      }
 
-      if (properties && properties.members) {
-        s.push('');
-        for (const memberName of Object.keys(properties.members)) {
-          s.push(`    static get${memberName}(): ${typeof properties.members[memberName]} { return ${properties.members[memberName]}; }`)
+    for (const asset of assets) {
+      const pathPrefix = asset.pathPrefix || ''; 
+      
+      s.push(`  export class ${asset.className} {`);
+      s.push(`    static getName(): string { return "${asset.assetName.split('/').pop()}"; }`);
+
+      if (asset.options) {
+        for (const option of asset.options) {
+          s.push(`    static get${option.name}(): ${typeof option.value} { return ${option.value}; }`);
         }
       }
-      if (properties && properties.enum) {
-        s.push('');
-        s.push(`    static ${properties.enum.type} = ${properties.enum.name}${properties.enum.type}`);
+      if (asset.files) {
+          for (const file of asset.files) {
+          s.push(`    static get${file.extName.toUpperCase()}(): string { return require("${pathPrefix}assets/${file.assetName}.${file.extName}"); }`);
+        }
       }
 
-
+      if (asset.enum) {
+        s.push('');
+        s.push(`    static ${asset.enum.type} = ${asset.enum.name}${asset.enum.type}`);
+      }
       s.push('  }');
     }
   }
@@ -263,238 +296,33 @@ function generateAssetObjectClassString(className, assets) {
   return s;
 }
 
+// get /asset files with extensions
+const pwd = shell.pwd();
+shell.cd('assets');
+const assetFiles = shell.ls('**/*.*');
+const assetTypeList = findAssetTypeList(assetFiles);
 
-function main() {
-  // get /asset files with extensions
-  shell.cd('assets');
-  const assetFiles = shell.ls('**/*.*');
-  const assetTypeList = findAssetTypeList(assetFiles);
-
-  // generate asset values for export
-  const assets = [];
-  for (const key of Object.keys(assetTypeList)) {
-    assets.push(generateAssetObject(key, assetTypeList[key]));
-  }
-
-  const result = [];
-  result.push("/* AUTO GENERATED FILE. DO NOT MODIFY. YOU WILL LOSE YOUR CHANGES ON BUILD. */");
-  result.push("");
-  result.push(... generateAssetObjectClassString('Images', assets.filter((asset) => asset.type === 'image')));
-  result.push(... generateAssetObjectClassString('Spritesheets', assets.filter((asset) => asset.type === 'spritesheet')));
-  result.push(... generateAssetObjectClassString('Atlases', assets.filter((asset) => asset.type === 'atlas')));
-  result.push(... generateAssetObjectClassString('Audio', assets.filter((asset) => asset.type === 'audio')));
-  result.push(... generateAssetObjectClassString('Audiosprites', assets.filter((asset) => asset.type === 'audiosprites')));
-  result.push(... generateAssetObjectClassString('CustomWebFonts', assets.filter((asset) => asset.type === 'font')));
-  result.push(... generateAssetObjectClassString('BitmapFonts', assets.filter((asset) => asset.type === 'bitmapfont')));
-  result.push(... generateAssetObjectClassString('JSON', assets.filter((asset) => asset.type === 'json')));
-  result.push(... generateAssetObjectClassString('Text', assets.filter((asset) => asset.type === 'text')));
-  result.push(... generateAssetObjectClassString('Scripts', assets.filter((asset) => asset.type === 'script')));
-  result.push(... generateAssetObjectClassString('Shaders', assets.filter((asset) => asset.type === 'shader')));
-  result.push("");
-  
-  console.log(result);  
+// generate asset values for export
+const assets = [];
+for (const key of Object.keys(assetTypeList)) {
+  assets.push(generateAssetClassDefinition(key, assetTypeList[key]));
 }
 
-main();
-return;
+const result = [];
+result.push(... dumpAssetClassCode('Images', assets.filter((asset) => asset.type === 'image')));
+result.push(... dumpAssetClassCode('Spritesheets', assets.filter((asset) => asset.type === 'spritesheet')));
+result.push(... dumpAssetClassCode('Atlases', assets.filter((asset) => asset.type === 'atlas')));
+result.push(... dumpAssetClassCode('Audio', assets.filter((asset) => asset.type === 'audio')));
+result.push(... dumpAssetClassCode('Audiosprites', assets.filter((asset) => asset.type === 'audiosprites')));
+result.push(... dumpAssetClassCode('CustomWebFonts', assets.filter((asset) => asset.type === 'font')));
+result.push(... dumpAssetClassCode('BitmapFonts', assets.filter((asset) => asset.type === 'bitmapfont')));
+result.push(... dumpAssetClassCode('JSON', assets.filter((asset) => asset.type === 'json')));
+result.push(... dumpAssetClassCode('Text', assets.filter((asset) => asset.type === 'text')));
+result.push(... dumpAssetClassCode('Scripts', assets.filter((asset) => asset.type === 'script')));
+result.push(... dumpAssetClassCode('Shaders', assets.filter((asset) => asset.type === 'shader')));
+result.push("");
 
-
+shell.cd(pwd);
 shell.rm('-f', ASSET_CLASS_FILE);
 shell.ShellString('/* AUTO GENERATED FILE. DO NOT MODIFY. YOU WILL LOSE YOUR CHANGES ON BUILD. */\n\n').to(ASSET_CLASS_FILE);
-shell.ShellString('export namespace Spritesheets {').toEnd(ASSET_CLASS_FILE);
-
-
-
-shell.ShellString('export namespace Audiosprites {').toEnd(assetsClassFile);
-if (!Object.keys(loaderTypes.audiosprite).length) {
-  shell.ShellString('\n    class IExistSoTypeScriptWillNotComplainAboutAnEmptyNamespace {}').toEnd(assetsClassFile);
-} else {
-  for (var i in loaderTypes.audiosprite) {
-    for (var t in loaderTypes.audiosprite[i]) {
-      var dataFile = ('assets/' + i + '.' + loaderTypes.audiosprite[i][t]);
-      var fileData = null;
-      var json = null;
-      var sprite = null;
-      
-      if (jsonExtensions.indexOf(loaderTypes.audiosprite[i][t]) !== -1) {
-        shell.ShellString('\n    enum ' + toPascalCase(i) + 'Sprites {').toEnd(assetsClassFile);
-        
-        try {
-          fileData = fs.readFileSync(dataFile, 'ascii');
-          json = JSON.parse(fileData);
-          
-          for (var h in json['spritemap']) {
-            sprite = (h);
-            shell.ShellString('\n        ' + toPascalCase(sprite) + ' = <any>\'' + sprite + '\',').toEnd(assetsClassFile);
-          }
-        } catch (e) {
-          console.log('Audiosprite Data File Error: ', e);
-        }
-        
-        shell.ShellString('\n    }').toEnd(assetsClassFile);
-      }
-    }
-    
-    shell.ShellString('\n    export class ' + toPascalCase(i) + ' {').toEnd(assetsClassFile);
-    shell.ShellString('\n        static getName(): string { return \'' + i.split('/').pop() + '\'; }\n').toEnd(assetsClassFile);
-    for (var t in loaderTypes.audiosprite[i]) {
-      shell.ShellString('\n        static get' + loaderTypes.audiosprite[i][t].toUpperCase() + '(): string { return require(\'assets/' + i + '.' + loaderTypes.audiosprite[i][t] + '\'); }').toEnd(assetsClassFile);
-    }
-    shell.ShellString('\n\n        static Sprites = ' + toPascalCase(i) + 'Sprites;').toEnd(assetsClassFile);
-    shell.ShellString('\n    }').toEnd(assetsClassFile);
-  }
-}
-shell.ShellString('\n}\n\n').toEnd(assetsClassFile);
-
-/*
-shell.ShellString('export namespace GoogleWebFonts {').toEnd(assetsClassFile);
-var webFontsToUse = JSON.parse(webpackConfig.plugins[webpackConfig.plugins.findIndex(function(element) { return (element instanceof webpack.DefinePlugin); })].definitions.GOOGLE_WEB_FONTS);
-if (!webFontsToUse.length) {
-  shell.ShellString('\n    class IExistSoTypeScriptWillNotComplainAboutAnEmptyNamespace {}').toEnd(assetsClassFile);
-} else {
-  for (var i in webFontsToUse) {
-    shell.ShellString('\n    export const ' + toPascalCase(webFontsToUse[i]) + ': string = \'' + webFontsToUse[i] + '\';').toEnd(assetsClassFile);
-  }
-}
-shell.ShellString('\n}\n\n').toEnd(assetsClassFile);
-*/
-
-shell.ShellString('export namespace CustomWebFonts {').toEnd(assetsClassFile);
-if (!Object.keys(loaderTypes.font).length) {
-  shell.ShellString('\n    class IExistSoTypeScriptWillNotComplainAboutAnEmptyNamespace {}').toEnd(assetsClassFile);
-} else {
-  for (var i in loaderTypes.font) {
-    shell.ShellString('\n    export class ' + toPascalCase(i) + ' {').toEnd(assetsClassFile);
-    shell.ShellString('\n        static getName(): string { return \'' + i.split('/').pop() + '\'; }\n').toEnd(assetsClassFile);
-    
-    var cssFileData = fs.readFileSync(('assets/' + i + '.css'), 'ascii');
-    var family = /font-family:(\s)*('|")([\w-]*\W*)('|")/g.exec(cssFileData)[3];
-    shell.ShellString('\n        static getFamily(): string { return \'' + family + '\'; }\n').toEnd(assetsClassFile);
-    
-    for (var t in loaderTypes.font[i]) {
-      shell.ShellString('\n        static get' + loaderTypes.font[i][t].toUpperCase() + '(): string { return require(\'!file-loader?name=assets/fonts/[name].[ext]!assets/' + i + '.' + loaderTypes.font[i][t] + '\'); }').toEnd(assetsClassFile);
-    }
-    
-    shell.ShellString('\n    }').toEnd(assetsClassFile);
-  }
-}
-shell.ShellString('\n}\n\n').toEnd(assetsClassFile);
-
-shell.ShellString('export namespace BitmapFonts {').toEnd(assetsClassFile);
-if (!Object.keys(loaderTypes.bitmap_font).length) {
-  shell.ShellString('\n    class IExistSoTypeScriptWillNotComplainAboutAnEmptyNamespace {}').toEnd(assetsClassFile);
-} else {
-  for (var i in loaderTypes.bitmap_font) {
-    shell.ShellString('\n    export class ' + toPascalCase(i) + ' {').toEnd(assetsClassFile);
-    shell.ShellString('\n        static getName(): string { return \'' + i.split('/').pop() + '\'; }\n').toEnd(assetsClassFile);
-    
-    for (var t in loaderTypes.bitmap_font[i]) {
-      shell.ShellString('\n        static get' + loaderTypes.bitmap_font[i][t].toUpperCase() + '(): string { return require(\'assets/' + i + '.' + loaderTypes.bitmap_font[i][t] + '\'); }').toEnd(assetsClassFile);
-    }
-    
-    shell.ShellString('\n    }').toEnd(assetsClassFile);
-  }
-}
-shell.ShellString('\n}\n\n').toEnd(assetsClassFile);
-
-shell.ShellString('export namespace JSON {').toEnd(assetsClassFile);
-if (!Object.keys(loaderTypes.json).length) {
-  shell.ShellString('\n    class IExistSoTypeScriptWillNotComplainAboutAnEmptyNamespace {}').toEnd(assetsClassFile);
-} else {
-  for (var i in loaderTypes.json) {
-    shell.ShellString('\n    export class ' + toPascalCase(i) + ' {').toEnd(assetsClassFile);
-    shell.ShellString('\n        static getName(): string { return \'' + i.split('/').pop() + '\'; }\n').toEnd(assetsClassFile);
-    
-    for (var t in loaderTypes.json[i]) {
-      shell.ShellString('\n        static get' + loaderTypes.json[i][t].toUpperCase() + '(): string { return require(\'assets/' + i + '.' + loaderTypes.json[i][t] + '\'); }').toEnd(assetsClassFile);
-    }
-    
-    shell.ShellString('\n    }').toEnd(assetsClassFile);
-  }
-}
-shell.ShellString('\n}\n\n').toEnd(assetsClassFile);
-
-shell.ShellString('export namespace XML {').toEnd(assetsClassFile);
-if (!Object.keys(loaderTypes.xml).length) {
-  shell.ShellString('\n    class IExistSoTypeScriptWillNotComplainAboutAnEmptyNamespace {}').toEnd(assetsClassFile);
-} else {
-  for (var i in loaderTypes.xml) {
-    shell.ShellString('\n    export class ' + toPascalCase(i) + ' {').toEnd(assetsClassFile);
-    shell.ShellString('\n        static getName(): string { return \'' + i.split('/').pop() + '\'; }\n').toEnd(assetsClassFile);
-    
-    for (var t in loaderTypes.xml[i]) {
-      shell.ShellString('\n        static get' + loaderTypes.xml[i][t].toUpperCase() + '(): string { return require(\'assets/' + i + '.' + loaderTypes.xml[i][t] + '\'); }').toEnd(assetsClassFile);
-    }
-    
-    shell.ShellString('\n    }').toEnd(assetsClassFile);
-  }
-}
-shell.ShellString('\n}\n\n').toEnd(assetsClassFile);
-
-shell.ShellString('export namespace Text {').toEnd(assetsClassFile);
-if (!Object.keys(loaderTypes.text).length) {
-  shell.ShellString('\n    class IExistSoTypeScriptWillNotComplainAboutAnEmptyNamespace {}').toEnd(assetsClassFile);
-} else {
-  for (var i in loaderTypes.text) {
-    shell.ShellString('\n    export class ' + toPascalCase(i) + ' {').toEnd(assetsClassFile);
-    shell.ShellString('\n        static getName(): string { return \'' + i.split('/').pop() + '\'; }\n').toEnd(assetsClassFile);
-    
-    for (var t in loaderTypes.text[i]) {
-      shell.ShellString('\n        static get' + loaderTypes.text[i][t].toUpperCase() + '(): string { return require(\'assets/' + i + '.' + loaderTypes.text[i][t] + '\'); }').toEnd(assetsClassFile);
-    }
-    
-    shell.ShellString('\n    }').toEnd(assetsClassFile);
-  }
-}
-shell.ShellString('\n}\n\n').toEnd(assetsClassFile);
-
-shell.ShellString('export namespace Scripts {').toEnd(assetsClassFile);
-if (!Object.keys(loaderTypes.script).length) {
-  shell.ShellString('\n    class IExistSoTypeScriptWillNotComplainAboutAnEmptyNamespace {}').toEnd(assetsClassFile);
-} else {
-  for (var i in loaderTypes.script) {
-    shell.ShellString('\n    export class ' + toPascalCase(i) + ' {').toEnd(assetsClassFile);
-    shell.ShellString('\n        static getName(): string { return \'' + i.split('/').pop() + '\'; }\n').toEnd(assetsClassFile);
-    
-    for (var t in loaderTypes.script[i]) {
-      shell.ShellString('\n        static get' + loaderTypes.script[i][t].toUpperCase() + '(): string { return require(\'assets/' + i + '.' + loaderTypes.script[i][t] + '\'); }').toEnd(assetsClassFile);
-    }
-    
-    shell.ShellString('\n    }').toEnd(assetsClassFile);
-  }
-}
-shell.ShellString('\n}\n').toEnd(assetsClassFile);
-
-shell.ShellString('export namespace Shaders {').toEnd(assetsClassFile);
-if (!Object.keys(loaderTypes.shader).length) {
-  shell.ShellString('\n    class IExistSoTypeScriptWillNotComplainAboutAnEmptyNamespace {}').toEnd(assetsClassFile);
-} else {
-  for (var i in loaderTypes.shader) {
-    shell.ShellString('\n    export class ' + toPascalCase(i) + ' {').toEnd(assetsClassFile);
-    shell.ShellString('\n        static getName(): string { return \'' + i.split('/').pop() + '\'; }\n').toEnd(assetsClassFile);
-    
-    for (var t in loaderTypes.shader[i]) {
-      shell.ShellString('\n        static get' + loaderTypes.shader[i][t].toUpperCase() + '(): string { return require(\'assets/' + i + '.' + loaderTypes.shader[i][t] + '\'); }').toEnd(assetsClassFile);
-    }
-    
-    shell.ShellString('\n    }').toEnd(assetsClassFile);
-  }
-}
-shell.ShellString('\n}\n').toEnd(assetsClassFile);
-
-shell.ShellString('export namespace Misc {').toEnd(assetsClassFile);
-if (!Object.keys(loaderTypes.misc).length) {
-  shell.ShellString('\n    class IExistSoTypeScriptWillNotComplainAboutAnEmptyNamespace {}').toEnd(assetsClassFile);
-} else {
-  for (var i in loaderTypes.misc) {
-    shell.ShellString('\n    export class ' + toPascalCase(i) + ' {').toEnd(assetsClassFile);
-    shell.ShellString('\n        static getName(): string { return \'' + i.split('/').pop() + '\'; }\n').toEnd(assetsClassFile);
-    
-    for (var t in loaderTypes.misc[i]) {
-      shell.ShellString('\n        static get' + loaderTypes.misc[i][t].toUpperCase() + '(): string { return require(\'assets/' + i + '.' + loaderTypes.misc[i][t] + '\'); }').toEnd(assetsClassFile);
-    }
-    
-    shell.ShellString('\n    }').toEnd(assetsClassFile);
-  }
-}
-shell.ShellString('\n}\n').toEnd(assetsClassFile);
+shell.ShellString(result.join('\n')).toEnd(ASSET_CLASS_FILE);

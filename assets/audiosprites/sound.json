@@ -1,0 +1,125 @@
+{
+  "resources": [
+    "sound.ogg",
+    "sound.m4a",
+    "sound.mp3",
+    "sound.ac3"
+  ],
+  "spritemap": {
+    "se_button_over": {
+      "start": 0,
+      "end": 0.04353741496598639,
+      "loop": false
+    },
+    "se_failure": {
+      "start": 2,
+      "end": 2.5369614512471657,
+      "loop": false
+    },
+    "se_game_over": {
+      "start": 4,
+      "end": 13.382312925170067,
+      "loop": false
+    },
+    "se_laser_1": {
+      "start": 15,
+      "end": 16.156643990929705,
+      "loop": false
+    },
+    "se_laser_2": {
+      "start": 18,
+      "end": 18.79673469387755,
+      "loop": false
+    },
+    "se_mech_press1": {
+      "start": 20,
+      "end": 20.35845804988662,
+      "loop": false
+    },
+    "se_mech_press2": {
+      "start": 22,
+      "end": 22.342494331065758,
+      "loop": false
+    },
+    "se_metal_hit1": {
+      "start": 24,
+      "end": 24.43392290249433,
+      "loop": false
+    },
+    "se_metal_hit2": {
+      "start": 26,
+      "end": 26.275736961451248,
+      "loop": false
+    },
+    "se_select": {
+      "start": 28,
+      "end": 28.608072562358277,
+      "loop": false
+    },
+    "se_shot_b1": {
+      "start": 30,
+      "end": 30.471655328798185,
+      "loop": false
+    },
+    "se_shot_b2": {
+      "start": 32,
+      "end": 32.61387755102041,
+      "loop": false
+    },
+    "se_shot_p1": {
+      "start": 34,
+      "end": 34.70095238095238,
+      "loop": false
+    },
+    "se_shot_pd1": {
+      "start": 36,
+      "end": 37.197278911564624,
+      "loop": false
+    },
+    "se_shot_pd2": {
+      "start": 39,
+      "end": 39.82866213151927,
+      "loop": false
+    },
+    "se_shot_pd3": {
+      "start": 41,
+      "end": 41.999909297052156,
+      "loop": false
+    },
+    "se_shot_z1": {
+      "start": 43,
+      "end": 43.46294784580499,
+      "loop": false
+    },
+    "se_shot_z2": {
+      "start": 45,
+      "end": 45.64580498866213,
+      "loop": false
+    },
+    "se_shot_z3": {
+      "start": 47,
+      "end": 47.608072562358274,
+      "loop": false
+    },
+    "se_shot_z4": {
+      "start": 49,
+      "end": 49.58485260770975,
+      "loop": false
+    },
+    "se_shot_z5": {
+      "start": 51,
+      "end": 51.45424036281179,
+      "loop": false
+    },
+    "se_shot_zs1": {
+      "start": 53,
+      "end": 53.27138321995465,
+      "loop": false
+    },
+    "se_shot_zs2": {
+      "start": 55,
+      "end": 55.364263038548756,
+      "loop": false
+    }
+  }
+}
