@@ -68,7 +68,7 @@ function decideAssetType(name, exts) {
     return 'bitmapfont';
   }
   if (type.audio && type.json) {
-    return 'audiosprite';
+    return 'audiosprites';
   }
   if (type.image) {
     if (type.json || type.xml) {
@@ -100,7 +100,6 @@ function generateAssetParameterSpriteSheet(fileName, extensions) {
 }
 
 function generateAssetParameterAtlas(fileName, extensions) {
-  let dataType = "";
   var frames = []
 
   const parseFrame = (frameFull) => {
@@ -151,11 +150,37 @@ function generateAssetParameterAtlas(fileName, extensions) {
     enum: {
       type: 'Frames',
       name: toPascalCase(fileName.split('/')),
-      frames
+      values: frames
     }
   }
 }
 
+function generateAssetParameterAudioSprite(fileName, extensions) {
+  var audioSprite = []
+
+  for (const extName of extensions) {
+    const dataFile = `${fileName}.${extName}`;
+    if (findExtension([extName], ASSET_TYPE_EXTENSIONS.json)) {
+      try {
+        const json = JSON.parse(fs.readFileSync(dataFile, 'ascii'));
+        for (const key of Object.keys(json['spritemap'])) {
+          audioSprite.push({ name: toPascalCase(key), value: key });
+        }
+      }
+      catch (err) {
+        console.log('Atlas Data File Error: ' + err);
+      }
+    }
+  }
+
+  return {
+    enum: {
+      type: 'Sprites',
+      name: toPascalCase(fileName.split('/')),
+      values: audioSprite
+    }
+  }
+}
 
 /**
  * generate asset information object for class export 
@@ -168,6 +193,7 @@ function generateAssetObject(fileName, extensions) {
 
   const value = { fileName, className, extensions };
   let properties = undefined;
+  console.log(type);
 
   switch(type) {
     case 'spritesheet': {
@@ -176,6 +202,10 @@ function generateAssetObject(fileName, extensions) {
     }
     case 'atlas': {
       properties = generateAssetParameterAtlas(fileName, extensions);
+      break;
+    }
+    case 'audiosprites': {
+      properties = generateAssetParameterAudioSprite(fileName, extensions);
       break;
     }
   }
@@ -189,7 +219,19 @@ function generateAssetObjectClassString(className, assets) {
     s.push('  class IExistSoTypeScriptWillNotComplainAboutAnEmptyNamespace {}');
   } else {
     for (const asset of assets) {
-      const fileName = asset.fileName;
+      const properties = asset.properties;
+      if (properties && properties.enum) {
+        s.push('');
+        s.push(`  enum ${properties.enum.name}${properties.enum.type} {`);
+        for (const value of properties.enum.values) {
+          s.push(`    ${value.name} = <any>'${value.value}',`);
+        }
+        s.push('  }');
+        s.push('');
+      }
+    }
+    for (const asset of assets) {
+        const fileName = asset.fileName;
       const className = asset.className;
       const extensions = asset.extensions;
       const properties = asset.properties;
@@ -201,25 +243,18 @@ function generateAssetObjectClassString(className, assets) {
         s.push(`    static get${extName.toUpperCase()}(): string { return require("assets/${fileName}.${extName}"); }`);
       }
 
-      if (properties) {
-        if (properties.members) {
-          s.push('');
-          for (const memberName of Object.keys(properties.members)) {
-            s.push(`    static get${memberName}(): ${typeof properties.members[memberName]} { return ${properties.members[memberName]}; }`)
-          }
-        }
-        if (properties.enum) {
-          s.push('');
-          s.push(`    static ${properties.enum.type} = ${properties.enum.name}${properties.enum.type}`);
-          s.push('');
-          s.push(`    enum ${properties.enum.name}${properties.enum.type} {`);
-          for (const frame of properties.enum.frames) {
-            s.push(`      ${frame.name} = <any>'${frame.value}',`);
-          }
-          s.push('    }');
+      if (properties && properties.members) {
+        s.push('');
+        for (const memberName of Object.keys(properties.members)) {
+          s.push(`    static get${memberName}(): ${typeof properties.members[memberName]} { return ${properties.members[memberName]}; }`)
         }
       }
-      
+      if (properties && properties.enum) {
+        s.push('');
+        s.push(`    static ${properties.enum.type} = ${properties.enum.name}${properties.enum.type}`);
+      }
+
+
       s.push('  }');
     }
   }
@@ -248,7 +283,7 @@ function main() {
   result.push(... generateAssetObjectClassString('Spritesheets', assets.filter((asset) => asset.type === 'spritesheet')));
   result.push(... generateAssetObjectClassString('Atlases', assets.filter((asset) => asset.type === 'atlas')));
   result.push(... generateAssetObjectClassString('Audio', assets.filter((asset) => asset.type === 'audio')));
-  result.push(... generateAssetObjectClassString('AudioSprites', assets.filter((asset) => asset.type === 'audiosprites')));
+  result.push(... generateAssetObjectClassString('Audiosprites', assets.filter((asset) => asset.type === 'audiosprites')));
   result.push(... generateAssetObjectClassString('CustomWebFonts', assets.filter((asset) => asset.type === 'font')));
   result.push(... generateAssetObjectClassString('BitmapFonts', assets.filter((asset) => asset.type === 'bitmapfont')));
   result.push(... generateAssetObjectClassString('JSON', assets.filter((asset) => asset.type === 'json')));
