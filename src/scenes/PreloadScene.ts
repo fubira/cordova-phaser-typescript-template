@@ -5,9 +5,7 @@ export default class PreloadScene extends Phaser.Scene {
   private preloadFrameSprite: Phaser.GameObjects.Sprite = null;
 
   public init(): void {
-    this.cameras.main.backgroundColor = Phaser.Display.Color.HexStringToColor(
-      "#000000"
-    );
+    /* */
   }
 
   public preload(): void {

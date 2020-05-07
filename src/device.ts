@@ -3,6 +3,20 @@ import i18next from "i18next";
 import AdBanner from "./utils/AdBanner";
 import AdInterstitial from "./utils/AdInterstitial";
 import Tracking from "./utils/Tracking";
+
+function showExitAppDialog(): void {
+  navigator.notification.confirm(
+    i18next.t("close_dialog_message"),
+    (choice) => {
+      if (choice === 1) {
+        Logger.info("exitApp");
+        navigator.app.exitApp();
+      }
+    },
+    i18next.t("close_dialog_title")
+  );
+}
+
 function setDeviceReady(resolve): void {
   document.addEventListener("deviceready", () => {
     SpinnerDialog.show(null, "loading ...");
@@ -36,17 +50,8 @@ function setDeviceReady(resolve): void {
     // hook backbutton event
     document.addEventListener(
       "backbutton",
-      () => {
-        navigator.notification.confirm(
-          i18next.t("close_dialog_message"),
-          (choice) => {
-            if (choice === 1) {
-              Logger.info("exitApp");
-              navigator.app.exitApp();
-            }
-          },
-          i18next.t("close_dialog_title")
-        );
+      (): void => {
+        showExitAppDialog();
       },
       false
     );

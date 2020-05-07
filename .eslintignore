@@ -1,3 +1,5 @@
 webpack/
 www/
+scripts/
 *.config.js
+src/assets.ts

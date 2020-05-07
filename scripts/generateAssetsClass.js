@@ -1,339 +1,313 @@
-var shell = require('shelljs');
-var fs = require('fs');
-var xml2js = require('xml2js');
-var commander = require('commander');
-var webpack = require('webpack');
-var webpackConfig;
+const shell = require("shelljs");
+const fs = require("fs");
+const xml2js = require("xml2js");
+const commander = require("commander");
+const camelCase = require('camelcase');
 
-commander
-    .option('--dev', 'Use webpack.dev.config.js for some values, excluding this will use webpack.dist.config.js (currently only GOOGLE_WEB_FONTS is being used).')
-    .parse(process.argv);
-
-if (commander.dev) {
-    webpackConfig = require('../webpack/base.js');
-} else {
-    webpackConfig = require('../webpack/prod.js');
+const ASSET_CLASS_FILE = "src/assets.ts";
+const ASSET_TYPE_EXTENSIONS = {
+  audio: [ 'flac', 'mp3', 'ogg', 'wav', 'webm' ],
+  image: [ 'gif', 'jpg', 'jpeg', 'png', 'webp' ],
+  font: [ 'eot', 'otf', 'svg', 'ttf', 'woff', 'woff2' ],
+  bitmapFont: ['xml', 'fnt'],
+  json: ['json'],
+  xml: ['xml'],
+  text: ['txt'],
+  script: ['js'],
+  shader: ['frag'],
 }
 
-function toCamelCase(string) {
-    return string.replace(/[^A-Za-z0-9]/g, ' ').replace(/^\w|[A-Z]|\b\w|\s+/g, function (match, index) {
-        if (+match === 0 || match === '-' || match === '.') {
-            return "";
-        }
-        return index === 0 ? match.toLowerCase() : match.toUpperCase();
-    });
+function toPascalCase(str) {
+  return camelCase(str, { pascalCase: true });
 }
 
-function toPascalCase(string) {
-    var camelCase = toCamelCase(string);
-
-    return camelCase[0].toUpperCase() + camelCase.substr(1);
+/**
+ * Get asset filename and extensions
+ * 
+ * @returns {
+  *   name: [ 'ext1', 'ext2', ... ]
+  * } 
+  */
+ function findAssetTypeList(files) {
+  const assets = {};
+  files.forEach((fileName) => {
+    const fileNameParts = fileName.split('.');
+    const ext = fileNameParts.pop();
+    const name = fileNameParts.join();
+    assets[name] = (assets[name] || []).concat(ext);
+  });
+  return assets;
 }
 
-function findExtension(haystack, arr) {
-    return arr.some(function (v) {
-        return haystack.indexOf(v) >= 0;
-    });
-}
+const findExtension = (haystack, typeExts) => typeExts.some((v) => haystack.indexOf(v) >= 0);
 
-var gameAssets = {};
+/**
+ * Decide asset type from file name and extensions
+ * 
+ * @param {string} name file name
+ * @param {Array<string>} exts file extensions
+ * @results asset type by string
+ */
+function decideAssetType(name, exts) {
+  let type = {
+    image: findExtension(exts, ASSET_TYPE_EXTENSIONS.image),
+    audio: findExtension(exts, ASSET_TYPE_EXTENSIONS.audio),
+    font: findExtension(exts, ASSET_TYPE_EXTENSIONS.font),
+    bitmapfont: findExtension(exts, ASSET_TYPE_EXTENSIONS.bitmapFont),
+    json: findExtension(exts, ASSET_TYPE_EXTENSIONS.json),
+    xml: findExtension(exts, ASSET_TYPE_EXTENSIONS.xml),
+    text: findExtension(exts, ASSET_TYPE_EXTENSIONS.text),
+    script: findExtension(exts, ASSET_TYPE_EXTENSIONS.script),
+    shader: findExtension(exts, ASSET_TYPE_EXTENSIONS.shader),
+  };
 
-var loaderTypes = {
-    image: {},
-    spritesheet: {},
-    atlas: {},
-    audio: {},
-    audiosprite: {},
-    font: {},
-    bitmap_font: {},
-    json: {},
-    xml: {},
-    text: {},
-    script: {},
-    shader: {},
-    misc: {}
-};
-
-var audioExtensions = ['aac', 'ac3', 'caf', 'flac', 'm4a', 'mp3', 'mp4', 'ogg', 'wav', 'webm'];
-var imageExtensions = ['bmp', 'gif', 'jpg', 'jpeg', 'png', 'webp'];
-var fontExtensions = ['eot', 'otf', 'svg', 'ttf', 'woff', 'woff2'];
-var bitmapFontExtensions = ['xml', 'fnt'];
-var jsonExtensions = ['json'];
-var xmlExtensions = ['xml'];
-var textExtensions = ['txt'];
-var scriptExtensions = ['js'];
-var shaderExtensions = ['frag'];
-
-shell.ls('assets/**/*.*').forEach(function (file) {
-    var filePath = file.replace('assets/', '').split('.');
-
-    gameAssets[filePath[0]] = gameAssets[filePath[0]] || [];
-    gameAssets[filePath[0]] = gameAssets[filePath[0]].concat(filePath.slice(1));
-});
-
-for (var i in gameAssets) {
-    var imageType = findExtension(gameAssets[i], imageExtensions);
-    var audioType = findExtension(gameAssets[i], audioExtensions);
-    var fontType = findExtension(gameAssets[i], fontExtensions);
-    var bitmapFontType = findExtension(gameAssets[i], bitmapFontExtensions);
-    var jsonType = findExtension(gameAssets[i], jsonExtensions);
-    var xmlType = findExtension(gameAssets[i], xmlExtensions);
-    var textType = findExtension(gameAssets[i], textExtensions);
-    var scriptType = findExtension(gameAssets[i], scriptExtensions);
-    var shaderType = findExtension(gameAssets[i], shaderExtensions);
-
-    if (bitmapFontType) {
-        var isItActuallyAFont = false;
-
-        for (var ext in gameAssets[i]) {
-            if (((shell.grep(/^[\s\S]*?<font>/g, ('assets/' + i + '.' + gameAssets[i][ext]))).length > 1)) {
-                isItActuallyAFont = true;
-                break;
-            }
-        }
-
-        bitmapFontType = isItActuallyAFont;
+  if (type.bitmapFont) {
+    type.bitmapFont = (exts.findIndex((ext) => shell.grep(/^[\s\S]*?<font>/g, `${key}.${ext}`).length > 1) >= 0);
+  }
+  if (type.bitmapFont && type.image) {
+    return 'bitmapfont';
+  }
+  if (type.audio && type.json) {
+    return 'audiosprite';
+  }
+  if (type.image) {
+    if (type.json || type.xml) {
+      return 'atlas';
+    } else if (name.match(/\[(-?[0-9],?)*]/)) {
+      return 'spritesheet';
     }
+    return 'image';
+  }
+  return Object.keys(type).find((key) => type[key]) || 'misc';
+}
 
-    if (bitmapFontType && imageType) {
-        loaderTypes.bitmap_font[i] = gameAssets[i];
-    } else if (audioType) {
-        if (jsonType) {
-            loaderTypes.audiosprite[i] = gameAssets[i];
+
+function generateAssetParameterSpriteSheet(fileName, extensions) {
+  const prop = fileName.replace('[', '').replace(']', '').split(',');
+  if (prop.length < 2 || prop.length > 5) {
+    console.error('Invalid number of Spritesheet properties provided for \'' + i + '\'. Must have between 2 and 5; [frameWidth, frameHeight, frameMax, margin, spacing] frameWidth and frameHeight are required');
+  }
+
+  return {
+    members: {
+      'FrameWidth': parseInt(prop[0] ? prop[0] : -1),
+      'FrameHeight': parseInt(prop[1] ? prop[1] : -1),
+      'FrameMax': parseInt(prop[2] ? prop[2] : -1),
+      'Margin': parseInt(prop[3] ? prop[3] : 0),
+      'Spacing': parseInt(prop[4] ? prop[4] : 0),
+    }
+  };
+}
+
+function generateAssetParameterAtlas(fileName, extensions) {
+  let dataType = "";
+  var frames = []
+
+  const parseFrame = (frameFull) => {
+    const [frame] = frameFull.split('.');
+    return {
+      name: toPascalCase(frame),
+      value: frameFull,
+    };
+  }
+
+  for (const extName of extensions) {
+    const dataFile = `${fileName}.${extName}`;
+    if (findExtension([extName], ASSET_TYPE_EXTENSIONS.json)) {
+      try {
+        const json = JSON.parse(fs.readFileSync(dataFile, 'ascii'));
+        const jsonFrames = json['frames'];
+        if (Array.isArray(jsonFrames)) {
+          dataType = 'Array';
+          for (const v of jsonFrames) {
+            frames.push(parseFrame(v.filename));
+          }
         } else {
-            loaderTypes.audio[i] = gameAssets[i];
+          dataType = 'Hash';
+          for (const v of Object.keys(jsonFrames)) {
+            frames.push(parseFrame(jsonFrames[v]));
+          }
         }
-    } else if (imageType) {
-        if (jsonType || xmlType) {
-            loaderTypes.atlas[i] = gameAssets[i];
-        } else {
-            var spritesheetData = gameAssets[i][0].match(/\[(-?[0-9],?)*]/);
-            if (spritesheetData && spritesheetData.length > 0) {
-                loaderTypes.spritesheet[i] = gameAssets[i];
-            } else {
-                loaderTypes.image[i] = gameAssets[i];
-            }
-        }
-    } else if (fontType) {
-        loaderTypes.font[i] = gameAssets[i];
-    } else if (jsonType) {
-        loaderTypes.json[i] = gameAssets[i];
-    } else if (xmlType) {
-        loaderTypes.xml[i] = gameAssets[i];
-    } else if (textType) {
-        loaderTypes.text[i] = gameAssets[i];
-    } else if (scriptType) {
-        loaderTypes.script[i] = gameAssets[i];
-    }  else if (shaderType) {
-        loaderTypes.shader[i] = gameAssets[i];
-    } else {
-        loaderTypes.misc[i] = gameAssets[i];
+      }
+      catch (err) {
+        console.log('Atlas Data File Error: ' + err);
+      }
+    } else if (findExtension([extName], ASSET_TYPE_EXTENSIONS.xml)) {
+      try {
+        const parser = new xml2js.Parser();
+        parser.parseString(fs.readFileSync(dataFile, 'ascii'), (err, result) => {
+          for (var x of result['TextureAtlas']['SubTexture']) {
+            frames.push(parseFrame(x.$.name));
+          }
+        });
+      }
+      catch (err) {
+        console.log('Atlas Data File Error: ', err);
+      }
     }
+  }
+
+  return {
+    enum: {
+      type: 'Frames',
+      name: toPascalCase(fileName.split('/')),
+      frames
+    }
+  }
 }
 
-var assetsClassFile = 'src/assets.ts';
-shell.rm('-f', assetsClassFile);
 
-shell.ShellString('/* AUTO GENERATED FILE. DO NOT MODIFY. YOU WILL LOSE YOUR CHANGES ON BUILD. */\n\n').to(assetsClassFile);
+/**
+ * generate asset information object for class export 
+ * @param { string } name file name
+ * @param { Array<string> } extensions file extensions
+ */
+function generateAssetObject(fileName, extensions) {
+  const className = toPascalCase(fileName.split('/'));
+  const type = decideAssetType(fileName, extensions);
 
-shell.ShellString('export namespace Images {').toEnd(assetsClassFile);
-if (!Object.keys(loaderTypes.image).length) {
-    shell.ShellString('\n    class IExistSoTypeScriptWillNotComplainAboutAnEmptyNamespace {}').toEnd(assetsClassFile);
-} else {
-    for (var i in loaderTypes.image) {
-        shell.ShellString('\n    export class ' + toPascalCase(i) + ' {').toEnd(assetsClassFile);
-        shell.ShellString('\n        static getName(): string { return \'' + i.split('/').pop() + '\'; }\n').toEnd(assetsClassFile);
+  const value = { fileName, className, extensions };
+  let properties = undefined;
 
-        for (var t in loaderTypes.image[i]) {
-            shell.ShellString('\n        static get' + loaderTypes.image[i][t].toUpperCase() + '(): string { return require(\'assets/' + i + '.' + loaderTypes.image[i][t] + '\'); }').toEnd(assetsClassFile);
-        }
-
-        shell.ShellString('\n    }').toEnd(assetsClassFile);
+  switch(type) {
+    case 'spritesheet': {
+      properties = generateAssetParameterSpriteSheet(fileName, extensions);
+      break;
     }
-}
-shell.ShellString('\n}\n\n').toEnd(assetsClassFile);
-
-shell.ShellString('export namespace Spritesheets {').toEnd(assetsClassFile);
-if (!Object.keys(loaderTypes.spritesheet).length) {
-    shell.ShellString('\n    class IExistSoTypeScriptWillNotComplainAboutAnEmptyNamespace {}').toEnd(assetsClassFile);
-} else {
-    for (var i in loaderTypes.spritesheet) {
-        shell.ShellString('\n    export class ' + toPascalCase(i) + ' {').toEnd(assetsClassFile);
-        shell.ShellString('\n        static getName(): string { return \'' + i.split('/').pop() + '\'; }\n').toEnd(assetsClassFile);
-
-        shell.ShellString('\n        static get' + loaderTypes.spritesheet[i][1].toUpperCase() + '(): string { return require(\'assets/' + i + '.' + loaderTypes.spritesheet[i][0] + '.' + loaderTypes.spritesheet[i][1] + '\'); }').toEnd(assetsClassFile);
-
-        var spritesheetProperties = loaderTypes.spritesheet[i][0].replace('[', '').replace(']', '').split(',');
-        if (spritesheetProperties.length < 2 || spritesheetProperties.length > 5) {
-            console.log('Invalid number of Spritesheet properties provided for \'' + i + '\'. Must have between 2 and 5; [frameWidth, frameHeight, frameMax, margin, spacing] frameWidth and frameHeight are required');
-        }
-
-        shell.ShellString('\n        static getFrameWidth(): number { return ' + parseInt(spritesheetProperties[0] ? spritesheetProperties[0] : -1) + '; }').toEnd(assetsClassFile);
-        shell.ShellString('\n        static getFrameHeight(): number { return ' + parseInt(spritesheetProperties[1] ? spritesheetProperties[1] : -1) + '; }').toEnd(assetsClassFile);
-        shell.ShellString('\n        static getFrameMax(): number { return ' + parseInt(spritesheetProperties[2] ? spritesheetProperties[2] : -1) + '; }').toEnd(assetsClassFile);
-        shell.ShellString('\n        static getMargin(): number { return ' + parseInt(spritesheetProperties[3] ? spritesheetProperties[3] : 0) + '; }').toEnd(assetsClassFile);
-        shell.ShellString('\n        static getSpacing(): number { return ' + parseInt(spritesheetProperties[4] ? spritesheetProperties[4] : 0) + '; }').toEnd(assetsClassFile);
-
-        shell.ShellString('\n    }').toEnd(assetsClassFile);
+    case 'atlas': {
+      properties = generateAssetParameterAtlas(fileName, extensions);
+      break;
     }
+  }
+  return { type, ...value, properties };
 }
-shell.ShellString('\n}\n\n').toEnd(assetsClassFile);
 
-shell.ShellString('export namespace Atlases {').toEnd(assetsClassFile);
-if (!Object.keys(loaderTypes.atlas).length) {
-    shell.ShellString('\n    class IExistSoTypeScriptWillNotComplainAboutAnEmptyNamespace {}').toEnd(assetsClassFile);
-} else {
-    for (var i in loaderTypes.atlas) {
-        var dataExtensions = [];
-        var dataTypes = [];
+function generateAssetObjectClassString(className, assets) {
+  const s = [];
+  s.push(`export namespace ${className} {`);
+  if (!assets.length) {
+    s.push('  class IExistSoTypeScriptWillNotComplainAboutAnEmptyNamespace {}');
+  } else {
+    for (const asset of assets) {
+      const fileName = asset.fileName;
+      const className = asset.className;
+      const extensions = asset.extensions;
+      const properties = asset.properties;
+      
+      s.push(`  export class ${className} {`);
+      s.push(`    static getName(): string { return "${fileName.split('/').pop()}"; }`);
+      
+      for (const extName of extensions) {
+        s.push(`    static get${extName.toUpperCase()}(): string { return require("assets/${fileName}.${extName}"); }`);
+      }
 
-        for (var t in loaderTypes.atlas[i]) {
-            var dataFile = ('assets/' + i + '.' + loaderTypes.atlas[i][t]);
-            var fileData = null;
-            var json = null;
-            var parser = null;
-            var frameFull = '';
-            var frame = '';
-            var indexOfExtension = -1;
-
-            dataExtensions.push(loaderTypes.atlas[i][t]);
-
-            if (jsonExtensions.indexOf(loaderTypes.atlas[i][t]) !== -1) {
-                shell.ShellString('\n    enum ' + toPascalCase(i) + 'Frames {').toEnd(assetsClassFile);
-
-                try {
-                    fileData = fs.readFileSync(dataFile, 'ascii');
-                    json = JSON.parse(fileData);
-
-                    if (Array.isArray(json['frames'])) {
-                        dataTypes.push('Array');
-
-                        for (var a in json['frames']) {
-                            frameFull = (json['frames'][a]['filename']);
-                            indexOfExtension = frameFull.lastIndexOf('.');
-                            if (indexOfExtension === -1) {
-                                frame = frameFull;
-                            } else {
-                                frame = frameFull.substring(0, indexOfExtension);
-                            }
-                            shell.ShellString('\n        ' + toPascalCase(frame) + ' = <any>\'' + frameFull + '\',').toEnd(assetsClassFile);
-                        }
-                    } else {
-                        dataTypes.push('Hash');
-
-                        for (var h in json['frames']) {
-                            frameFull = (h);
-                            indexOfExtension = frameFull.lastIndexOf('.');
-                            if (indexOfExtension === -1) {
-                                frame = frameFull;
-                            } else {
-                                frame = frameFull.substring(0, indexOfExtension);
-                            }
-                            shell.ShellString('\n        ' + toPascalCase(frame) + ' = <any>\'' + frameFull + '\',').toEnd(assetsClassFile);
-                        }
-                    }
-                } catch (e) {
-                    console.log('Atlas Data File Error: ', e);
-                }
-
-                shell.ShellString('\n    }').toEnd(assetsClassFile);
-            } else if (xmlExtensions.indexOf(loaderTypes.atlas[i][t]) !== -1) {
-                dataTypes.push('');
-
-                shell.ShellString('\n    enum ' + toPascalCase(i) + 'Frames {').toEnd(assetsClassFile);
-
-                try {
-                    fileData = fs.readFileSync(dataFile, 'ascii');
-                    parser = new xml2js.Parser();
-
-                    parser.parseString(fileData.substring(0, fileData.length), function (err, result) {
-                        for (var x in result['TextureAtlas']['SubTexture']) {
-                            frameFull = (result['TextureAtlas']['SubTexture'][x]['$']['name']);
-                            indexOfExtension = frameFull.lastIndexOf('.');
-                            if (indexOfExtension === -1) {
-                                frame = frameFull;
-                            } else {
-                                frame = frameFull.substring(0, indexOfExtension);
-                            }
-                            shell.ShellString('\n        ' + toPascalCase(frame) + ' = <any>\'' + frameFull + '\',').toEnd(assetsClassFile);
-                        }
-                    });
-                } catch (e) {
-                    console.log('Atlas Data File Error: ', e);
-                }
-
-                shell.ShellString('\n    }').toEnd(assetsClassFile);
-            } else {
-                dataTypes.push('');
-            }
+      if (properties) {
+        if (properties.members) {
+          s.push('');
+          for (const memberName of Object.keys(properties.members)) {
+            s.push(`    static get${memberName}(): ${typeof properties.members[memberName]} { return ${properties.members[memberName]}; }`)
+          }
         }
-
-        shell.ShellString('\n    export class ' + toPascalCase(i) + ' {').toEnd(assetsClassFile);
-        shell.ShellString('\n        static getName(): string { return \'' + i.split('/').pop() + '\'; }').toEnd(assetsClassFile);
-        for (var e in dataExtensions) {
-            shell.ShellString('\n\n        static get' + dataExtensions[e].toUpperCase() + dataTypes[e] + '(): string { return require(\'assets/' + i + '.' + dataExtensions[e] + '\'); }').toEnd(assetsClassFile);
+        if (properties.enum) {
+          s.push('');
+          s.push(`    static ${properties.enum.type} = ${properties.enum.name}${properties.enum.type}`);
+          s.push('');
+          s.push(`    enum ${properties.enum.name}${properties.enum.type} {`);
+          for (const frame of properties.enum.frames) {
+            s.push(`      ${frame.name} = <any>'${frame.value}',`);
+          }
+          s.push('    }');
         }
-        shell.ShellString('\n\n        static Frames = ' + toPascalCase(i) + 'Frames;').toEnd(assetsClassFile);
-        shell.ShellString('\n    }').toEnd(assetsClassFile);
+      }
+      
+      s.push('  }');
     }
+  }
+  s.push('}');
+  s.push('');
+  return s;
 }
-shell.ShellString('\n}\n\n').toEnd(assetsClassFile);
 
-shell.ShellString('export namespace Audio {').toEnd(assetsClassFile);
-if (!Object.keys(loaderTypes.audio).length) {
-    shell.ShellString('\n    class IExistSoTypeScriptWillNotComplainAboutAnEmptyNamespace {}').toEnd(assetsClassFile);
-} else {
-    for (var i in loaderTypes.audio) {
-        shell.ShellString('\n    export class ' + toPascalCase(i) + ' {').toEnd(assetsClassFile);
-        shell.ShellString('\n        static getName(): string { return \'' + i.split('/').pop() + '\'; }\n').toEnd(assetsClassFile);
 
-        for (var t in loaderTypes.audio[i]) {
-            shell.ShellString('\n        static get' + loaderTypes.audio[i][t].toUpperCase() + '(): string { return require(\'assets/' + i + '.' + loaderTypes.audio[i][t] + '\'); }').toEnd(assetsClassFile);
-        }
+function main() {
+  // get /asset files with extensions
+  shell.cd('assets');
+  const assetFiles = shell.ls('**/*.*');
+  const assetTypeList = findAssetTypeList(assetFiles);
 
-        shell.ShellString('\n    }').toEnd(assetsClassFile);
-    }
+  // generate asset values for export
+  const assets = [];
+  for (const key of Object.keys(assetTypeList)) {
+    assets.push(generateAssetObject(key, assetTypeList[key]));
+  }
+
+  const result = [];
+  result.push("/* AUTO GENERATED FILE. DO NOT MODIFY. YOU WILL LOSE YOUR CHANGES ON BUILD. */");
+  result.push("");
+  result.push(... generateAssetObjectClassString('Images', assets.filter((asset) => asset.type === 'image')));
+  result.push(... generateAssetObjectClassString('Spritesheets', assets.filter((asset) => asset.type === 'spritesheet')));
+  result.push(... generateAssetObjectClassString('Atlases', assets.filter((asset) => asset.type === 'atlas')));
+  result.push(... generateAssetObjectClassString('Audio', assets.filter((asset) => asset.type === 'audio')));
+  result.push(... generateAssetObjectClassString('AudioSprites', assets.filter((asset) => asset.type === 'audiosprites')));
+  result.push(... generateAssetObjectClassString('CustomWebFonts', assets.filter((asset) => asset.type === 'font')));
+  result.push(... generateAssetObjectClassString('BitmapFonts', assets.filter((asset) => asset.type === 'bitmapfont')));
+  result.push(... generateAssetObjectClassString('JSON', assets.filter((asset) => asset.type === 'json')));
+  result.push(... generateAssetObjectClassString('Text', assets.filter((asset) => asset.type === 'text')));
+  result.push(... generateAssetObjectClassString('Scripts', assets.filter((asset) => asset.type === 'script')));
+  result.push(... generateAssetObjectClassString('Shaders', assets.filter((asset) => asset.type === 'shader')));
+  result.push("");
+  
+  console.log(result);  
 }
-shell.ShellString('\n}\n\n').toEnd(assetsClassFile);
+
+main();
+return;
+
+
+shell.rm('-f', ASSET_CLASS_FILE);
+shell.ShellString('/* AUTO GENERATED FILE. DO NOT MODIFY. YOU WILL LOSE YOUR CHANGES ON BUILD. */\n\n').to(ASSET_CLASS_FILE);
+shell.ShellString('export namespace Spritesheets {').toEnd(ASSET_CLASS_FILE);
+
+
 
 shell.ShellString('export namespace Audiosprites {').toEnd(assetsClassFile);
 if (!Object.keys(loaderTypes.audiosprite).length) {
-    shell.ShellString('\n    class IExistSoTypeScriptWillNotComplainAboutAnEmptyNamespace {}').toEnd(assetsClassFile);
+  shell.ShellString('\n    class IExistSoTypeScriptWillNotComplainAboutAnEmptyNamespace {}').toEnd(assetsClassFile);
 } else {
-    for (var i in loaderTypes.audiosprite) {
-        for (var t in loaderTypes.audiosprite[i]) {
-            var dataFile = ('assets/' + i + '.' + loaderTypes.audiosprite[i][t]);
-            var fileData = null;
-            var json = null;
-            var sprite = null;
-
-            if (jsonExtensions.indexOf(loaderTypes.audiosprite[i][t]) !== -1) {
-                shell.ShellString('\n    enum ' + toPascalCase(i) + 'Sprites {').toEnd(assetsClassFile);
-
-                try {
-                    fileData = fs.readFileSync(dataFile, 'ascii');
-                    json = JSON.parse(fileData);
-
-                    for (var h in json['spritemap']) {
-                        sprite = (h);
-                        shell.ShellString('\n        ' + toPascalCase(sprite) + ' = <any>\'' + sprite + '\',').toEnd(assetsClassFile);
-                    }
-                } catch (e) {
-                    console.log('Audiosprite Data File Error: ', e);
-                }
-
-                shell.ShellString('\n    }').toEnd(assetsClassFile);
-            }
+  for (var i in loaderTypes.audiosprite) {
+    for (var t in loaderTypes.audiosprite[i]) {
+      var dataFile = ('assets/' + i + '.' + loaderTypes.audiosprite[i][t]);
+      var fileData = null;
+      var json = null;
+      var sprite = null;
+      
+      if (jsonExtensions.indexOf(loaderTypes.audiosprite[i][t]) !== -1) {
+        shell.ShellString('\n    enum ' + toPascalCase(i) + 'Sprites {').toEnd(assetsClassFile);
+        
+        try {
+          fileData = fs.readFileSync(dataFile, 'ascii');
+          json = JSON.parse(fileData);
+          
+          for (var h in json['spritemap']) {
+            sprite = (h);
+            shell.ShellString('\n        ' + toPascalCase(sprite) + ' = <any>\'' + sprite + '\',').toEnd(assetsClassFile);
+          }
+        } catch (e) {
+          console.log('Audiosprite Data File Error: ', e);
         }
-
-        shell.ShellString('\n    export class ' + toPascalCase(i) + ' {').toEnd(assetsClassFile);
-        shell.ShellString('\n        static getName(): string { return \'' + i.split('/').pop() + '\'; }\n').toEnd(assetsClassFile);
-        for (var t in loaderTypes.audiosprite[i]) {
-            shell.ShellString('\n        static get' + loaderTypes.audiosprite[i][t].toUpperCase() + '(): string { return require(\'assets/' + i + '.' + loaderTypes.audiosprite[i][t] + '\'); }').toEnd(assetsClassFile);
-        }
-        shell.ShellString('\n\n        static Sprites = ' + toPascalCase(i) + 'Sprites;').toEnd(assetsClassFile);
+        
         shell.ShellString('\n    }').toEnd(assetsClassFile);
+      }
     }
+    
+    shell.ShellString('\n    export class ' + toPascalCase(i) + ' {').toEnd(assetsClassFile);
+    shell.ShellString('\n        static getName(): string { return \'' + i.split('/').pop() + '\'; }\n').toEnd(assetsClassFile);
+    for (var t in loaderTypes.audiosprite[i]) {
+      shell.ShellString('\n        static get' + loaderTypes.audiosprite[i][t].toUpperCase() + '(): string { return require(\'assets/' + i + '.' + loaderTypes.audiosprite[i][t] + '\'); }').toEnd(assetsClassFile);
+    }
+    shell.ShellString('\n\n        static Sprites = ' + toPascalCase(i) + 'Sprites;').toEnd(assetsClassFile);
+    shell.ShellString('\n    }').toEnd(assetsClassFile);
+  }
 }
 shell.ShellString('\n}\n\n').toEnd(assetsClassFile);
 
@@ -341,151 +315,151 @@ shell.ShellString('\n}\n\n').toEnd(assetsClassFile);
 shell.ShellString('export namespace GoogleWebFonts {').toEnd(assetsClassFile);
 var webFontsToUse = JSON.parse(webpackConfig.plugins[webpackConfig.plugins.findIndex(function(element) { return (element instanceof webpack.DefinePlugin); })].definitions.GOOGLE_WEB_FONTS);
 if (!webFontsToUse.length) {
-    shell.ShellString('\n    class IExistSoTypeScriptWillNotComplainAboutAnEmptyNamespace {}').toEnd(assetsClassFile);
+  shell.ShellString('\n    class IExistSoTypeScriptWillNotComplainAboutAnEmptyNamespace {}').toEnd(assetsClassFile);
 } else {
-    for (var i in webFontsToUse) {
-        shell.ShellString('\n    export const ' + toPascalCase(webFontsToUse[i]) + ': string = \'' + webFontsToUse[i] + '\';').toEnd(assetsClassFile);
-    }
+  for (var i in webFontsToUse) {
+    shell.ShellString('\n    export const ' + toPascalCase(webFontsToUse[i]) + ': string = \'' + webFontsToUse[i] + '\';').toEnd(assetsClassFile);
+  }
 }
 shell.ShellString('\n}\n\n').toEnd(assetsClassFile);
 */
 
 shell.ShellString('export namespace CustomWebFonts {').toEnd(assetsClassFile);
 if (!Object.keys(loaderTypes.font).length) {
-    shell.ShellString('\n    class IExistSoTypeScriptWillNotComplainAboutAnEmptyNamespace {}').toEnd(assetsClassFile);
+  shell.ShellString('\n    class IExistSoTypeScriptWillNotComplainAboutAnEmptyNamespace {}').toEnd(assetsClassFile);
 } else {
-    for (var i in loaderTypes.font) {
-        shell.ShellString('\n    export class ' + toPascalCase(i) + ' {').toEnd(assetsClassFile);
-        shell.ShellString('\n        static getName(): string { return \'' + i.split('/').pop() + '\'; }\n').toEnd(assetsClassFile);
-
-        var cssFileData = fs.readFileSync(('assets/' + i + '.css'), 'ascii');
-        var family = /font-family:(\s)*('|")([\w-]*\W*)('|")/g.exec(cssFileData)[3];
-        shell.ShellString('\n        static getFamily(): string { return \'' + family + '\'; }\n').toEnd(assetsClassFile);
-
-        for (var t in loaderTypes.font[i]) {
-            shell.ShellString('\n        static get' + loaderTypes.font[i][t].toUpperCase() + '(): string { return require(\'!file-loader?name=assets/fonts/[name].[ext]!assets/' + i + '.' + loaderTypes.font[i][t] + '\'); }').toEnd(assetsClassFile);
-        }
-
-        shell.ShellString('\n    }').toEnd(assetsClassFile);
+  for (var i in loaderTypes.font) {
+    shell.ShellString('\n    export class ' + toPascalCase(i) + ' {').toEnd(assetsClassFile);
+    shell.ShellString('\n        static getName(): string { return \'' + i.split('/').pop() + '\'; }\n').toEnd(assetsClassFile);
+    
+    var cssFileData = fs.readFileSync(('assets/' + i + '.css'), 'ascii');
+    var family = /font-family:(\s)*('|")([\w-]*\W*)('|")/g.exec(cssFileData)[3];
+    shell.ShellString('\n        static getFamily(): string { return \'' + family + '\'; }\n').toEnd(assetsClassFile);
+    
+    for (var t in loaderTypes.font[i]) {
+      shell.ShellString('\n        static get' + loaderTypes.font[i][t].toUpperCase() + '(): string { return require(\'!file-loader?name=assets/fonts/[name].[ext]!assets/' + i + '.' + loaderTypes.font[i][t] + '\'); }').toEnd(assetsClassFile);
     }
+    
+    shell.ShellString('\n    }').toEnd(assetsClassFile);
+  }
 }
 shell.ShellString('\n}\n\n').toEnd(assetsClassFile);
 
 shell.ShellString('export namespace BitmapFonts {').toEnd(assetsClassFile);
 if (!Object.keys(loaderTypes.bitmap_font).length) {
-    shell.ShellString('\n    class IExistSoTypeScriptWillNotComplainAboutAnEmptyNamespace {}').toEnd(assetsClassFile);
+  shell.ShellString('\n    class IExistSoTypeScriptWillNotComplainAboutAnEmptyNamespace {}').toEnd(assetsClassFile);
 } else {
-    for (var i in loaderTypes.bitmap_font) {
-        shell.ShellString('\n    export class ' + toPascalCase(i) + ' {').toEnd(assetsClassFile);
-        shell.ShellString('\n        static getName(): string { return \'' + i.split('/').pop() + '\'; }\n').toEnd(assetsClassFile);
-
-        for (var t in loaderTypes.bitmap_font[i]) {
-            shell.ShellString('\n        static get' + loaderTypes.bitmap_font[i][t].toUpperCase() + '(): string { return require(\'assets/' + i + '.' + loaderTypes.bitmap_font[i][t] + '\'); }').toEnd(assetsClassFile);
-        }
-
-        shell.ShellString('\n    }').toEnd(assetsClassFile);
+  for (var i in loaderTypes.bitmap_font) {
+    shell.ShellString('\n    export class ' + toPascalCase(i) + ' {').toEnd(assetsClassFile);
+    shell.ShellString('\n        static getName(): string { return \'' + i.split('/').pop() + '\'; }\n').toEnd(assetsClassFile);
+    
+    for (var t in loaderTypes.bitmap_font[i]) {
+      shell.ShellString('\n        static get' + loaderTypes.bitmap_font[i][t].toUpperCase() + '(): string { return require(\'assets/' + i + '.' + loaderTypes.bitmap_font[i][t] + '\'); }').toEnd(assetsClassFile);
     }
+    
+    shell.ShellString('\n    }').toEnd(assetsClassFile);
+  }
 }
 shell.ShellString('\n}\n\n').toEnd(assetsClassFile);
 
 shell.ShellString('export namespace JSON {').toEnd(assetsClassFile);
 if (!Object.keys(loaderTypes.json).length) {
-    shell.ShellString('\n    class IExistSoTypeScriptWillNotComplainAboutAnEmptyNamespace {}').toEnd(assetsClassFile);
+  shell.ShellString('\n    class IExistSoTypeScriptWillNotComplainAboutAnEmptyNamespace {}').toEnd(assetsClassFile);
 } else {
-    for (var i in loaderTypes.json) {
-        shell.ShellString('\n    export class ' + toPascalCase(i) + ' {').toEnd(assetsClassFile);
-        shell.ShellString('\n        static getName(): string { return \'' + i.split('/').pop() + '\'; }\n').toEnd(assetsClassFile);
-
-        for (var t in loaderTypes.json[i]) {
-            shell.ShellString('\n        static get' + loaderTypes.json[i][t].toUpperCase() + '(): string { return require(\'assets/' + i + '.' + loaderTypes.json[i][t] + '\'); }').toEnd(assetsClassFile);
-        }
-
-        shell.ShellString('\n    }').toEnd(assetsClassFile);
+  for (var i in loaderTypes.json) {
+    shell.ShellString('\n    export class ' + toPascalCase(i) + ' {').toEnd(assetsClassFile);
+    shell.ShellString('\n        static getName(): string { return \'' + i.split('/').pop() + '\'; }\n').toEnd(assetsClassFile);
+    
+    for (var t in loaderTypes.json[i]) {
+      shell.ShellString('\n        static get' + loaderTypes.json[i][t].toUpperCase() + '(): string { return require(\'assets/' + i + '.' + loaderTypes.json[i][t] + '\'); }').toEnd(assetsClassFile);
     }
+    
+    shell.ShellString('\n    }').toEnd(assetsClassFile);
+  }
 }
 shell.ShellString('\n}\n\n').toEnd(assetsClassFile);
 
 shell.ShellString('export namespace XML {').toEnd(assetsClassFile);
 if (!Object.keys(loaderTypes.xml).length) {
-    shell.ShellString('\n    class IExistSoTypeScriptWillNotComplainAboutAnEmptyNamespace {}').toEnd(assetsClassFile);
+  shell.ShellString('\n    class IExistSoTypeScriptWillNotComplainAboutAnEmptyNamespace {}').toEnd(assetsClassFile);
 } else {
-    for (var i in loaderTypes.xml) {
-        shell.ShellString('\n    export class ' + toPascalCase(i) + ' {').toEnd(assetsClassFile);
-        shell.ShellString('\n        static getName(): string { return \'' + i.split('/').pop() + '\'; }\n').toEnd(assetsClassFile);
-
-        for (var t in loaderTypes.xml[i]) {
-            shell.ShellString('\n        static get' + loaderTypes.xml[i][t].toUpperCase() + '(): string { return require(\'assets/' + i + '.' + loaderTypes.xml[i][t] + '\'); }').toEnd(assetsClassFile);
-        }
-
-        shell.ShellString('\n    }').toEnd(assetsClassFile);
+  for (var i in loaderTypes.xml) {
+    shell.ShellString('\n    export class ' + toPascalCase(i) + ' {').toEnd(assetsClassFile);
+    shell.ShellString('\n        static getName(): string { return \'' + i.split('/').pop() + '\'; }\n').toEnd(assetsClassFile);
+    
+    for (var t in loaderTypes.xml[i]) {
+      shell.ShellString('\n        static get' + loaderTypes.xml[i][t].toUpperCase() + '(): string { return require(\'assets/' + i + '.' + loaderTypes.xml[i][t] + '\'); }').toEnd(assetsClassFile);
     }
+    
+    shell.ShellString('\n    }').toEnd(assetsClassFile);
+  }
 }
 shell.ShellString('\n}\n\n').toEnd(assetsClassFile);
 
 shell.ShellString('export namespace Text {').toEnd(assetsClassFile);
 if (!Object.keys(loaderTypes.text).length) {
-    shell.ShellString('\n    class IExistSoTypeScriptWillNotComplainAboutAnEmptyNamespace {}').toEnd(assetsClassFile);
+  shell.ShellString('\n    class IExistSoTypeScriptWillNotComplainAboutAnEmptyNamespace {}').toEnd(assetsClassFile);
 } else {
-    for (var i in loaderTypes.text) {
-        shell.ShellString('\n    export class ' + toPascalCase(i) + ' {').toEnd(assetsClassFile);
-        shell.ShellString('\n        static getName(): string { return \'' + i.split('/').pop() + '\'; }\n').toEnd(assetsClassFile);
-
-        for (var t in loaderTypes.text[i]) {
-            shell.ShellString('\n        static get' + loaderTypes.text[i][t].toUpperCase() + '(): string { return require(\'assets/' + i + '.' + loaderTypes.text[i][t] + '\'); }').toEnd(assetsClassFile);
-        }
-
-        shell.ShellString('\n    }').toEnd(assetsClassFile);
+  for (var i in loaderTypes.text) {
+    shell.ShellString('\n    export class ' + toPascalCase(i) + ' {').toEnd(assetsClassFile);
+    shell.ShellString('\n        static getName(): string { return \'' + i.split('/').pop() + '\'; }\n').toEnd(assetsClassFile);
+    
+    for (var t in loaderTypes.text[i]) {
+      shell.ShellString('\n        static get' + loaderTypes.text[i][t].toUpperCase() + '(): string { return require(\'assets/' + i + '.' + loaderTypes.text[i][t] + '\'); }').toEnd(assetsClassFile);
     }
+    
+    shell.ShellString('\n    }').toEnd(assetsClassFile);
+  }
 }
 shell.ShellString('\n}\n\n').toEnd(assetsClassFile);
 
 shell.ShellString('export namespace Scripts {').toEnd(assetsClassFile);
 if (!Object.keys(loaderTypes.script).length) {
-    shell.ShellString('\n    class IExistSoTypeScriptWillNotComplainAboutAnEmptyNamespace {}').toEnd(assetsClassFile);
+  shell.ShellString('\n    class IExistSoTypeScriptWillNotComplainAboutAnEmptyNamespace {}').toEnd(assetsClassFile);
 } else {
-    for (var i in loaderTypes.script) {
-        shell.ShellString('\n    export class ' + toPascalCase(i) + ' {').toEnd(assetsClassFile);
-        shell.ShellString('\n        static getName(): string { return \'' + i.split('/').pop() + '\'; }\n').toEnd(assetsClassFile);
-
-        for (var t in loaderTypes.script[i]) {
-            shell.ShellString('\n        static get' + loaderTypes.script[i][t].toUpperCase() + '(): string { return require(\'assets/' + i + '.' + loaderTypes.script[i][t] + '\'); }').toEnd(assetsClassFile);
-        }
-
-        shell.ShellString('\n    }').toEnd(assetsClassFile);
+  for (var i in loaderTypes.script) {
+    shell.ShellString('\n    export class ' + toPascalCase(i) + ' {').toEnd(assetsClassFile);
+    shell.ShellString('\n        static getName(): string { return \'' + i.split('/').pop() + '\'; }\n').toEnd(assetsClassFile);
+    
+    for (var t in loaderTypes.script[i]) {
+      shell.ShellString('\n        static get' + loaderTypes.script[i][t].toUpperCase() + '(): string { return require(\'assets/' + i + '.' + loaderTypes.script[i][t] + '\'); }').toEnd(assetsClassFile);
     }
+    
+    shell.ShellString('\n    }').toEnd(assetsClassFile);
+  }
 }
 shell.ShellString('\n}\n').toEnd(assetsClassFile);
 
 shell.ShellString('export namespace Shaders {').toEnd(assetsClassFile);
 if (!Object.keys(loaderTypes.shader).length) {
-    shell.ShellString('\n    class IExistSoTypeScriptWillNotComplainAboutAnEmptyNamespace {}').toEnd(assetsClassFile);
+  shell.ShellString('\n    class IExistSoTypeScriptWillNotComplainAboutAnEmptyNamespace {}').toEnd(assetsClassFile);
 } else {
-    for (var i in loaderTypes.shader) {
-        shell.ShellString('\n    export class ' + toPascalCase(i) + ' {').toEnd(assetsClassFile);
-        shell.ShellString('\n        static getName(): string { return \'' + i.split('/').pop() + '\'; }\n').toEnd(assetsClassFile);
-
-        for (var t in loaderTypes.shader[i]) {
-            shell.ShellString('\n        static get' + loaderTypes.shader[i][t].toUpperCase() + '(): string { return require(\'assets/' + i + '.' + loaderTypes.shader[i][t] + '\'); }').toEnd(assetsClassFile);
-        }
-
-        shell.ShellString('\n    }').toEnd(assetsClassFile);
+  for (var i in loaderTypes.shader) {
+    shell.ShellString('\n    export class ' + toPascalCase(i) + ' {').toEnd(assetsClassFile);
+    shell.ShellString('\n        static getName(): string { return \'' + i.split('/').pop() + '\'; }\n').toEnd(assetsClassFile);
+    
+    for (var t in loaderTypes.shader[i]) {
+      shell.ShellString('\n        static get' + loaderTypes.shader[i][t].toUpperCase() + '(): string { return require(\'assets/' + i + '.' + loaderTypes.shader[i][t] + '\'); }').toEnd(assetsClassFile);
     }
+    
+    shell.ShellString('\n    }').toEnd(assetsClassFile);
+  }
 }
 shell.ShellString('\n}\n').toEnd(assetsClassFile);
 
 shell.ShellString('export namespace Misc {').toEnd(assetsClassFile);
 if (!Object.keys(loaderTypes.misc).length) {
-    shell.ShellString('\n    class IExistSoTypeScriptWillNotComplainAboutAnEmptyNamespace {}').toEnd(assetsClassFile);
+  shell.ShellString('\n    class IExistSoTypeScriptWillNotComplainAboutAnEmptyNamespace {}').toEnd(assetsClassFile);
 } else {
-    for (var i in loaderTypes.misc) {
-        shell.ShellString('\n    export class ' + toPascalCase(i) + ' {').toEnd(assetsClassFile);
-        shell.ShellString('\n        static getName(): string { return \'' + i.split('/').pop() + '\'; }\n').toEnd(assetsClassFile);
-
-        for (var t in loaderTypes.misc[i]) {
-            shell.ShellString('\n        static get' + loaderTypes.misc[i][t].toUpperCase() + '(): string { return require(\'assets/' + i + '.' + loaderTypes.misc[i][t] + '\'); }').toEnd(assetsClassFile);
-        }
-
-        shell.ShellString('\n    }').toEnd(assetsClassFile);
+  for (var i in loaderTypes.misc) {
+    shell.ShellString('\n    export class ' + toPascalCase(i) + ' {').toEnd(assetsClassFile);
+    shell.ShellString('\n        static getName(): string { return \'' + i.split('/').pop() + '\'; }\n').toEnd(assetsClassFile);
+    
+    for (var t in loaderTypes.misc[i]) {
+      shell.ShellString('\n        static get' + loaderTypes.misc[i][t].toUpperCase() + '(): string { return require(\'assets/' + i + '.' + loaderTypes.misc[i][t] + '\'); }').toEnd(assetsClassFile);
     }
+    
+    shell.ShellString('\n    }').toEnd(assetsClassFile);
+  }
 }
 shell.ShellString('\n}\n').toEnd(assetsClassFile);

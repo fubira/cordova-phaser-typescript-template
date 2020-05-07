@@ -9,6 +9,7 @@
     "test": "jest",
     "start": "webpack-dev-server --config webpack/base.js",
     "assets": "node ./scripts/generateAssetsClass.js --dev",
+    "assetsold": "node ./scripts/generateAssetsClassOld.js --dev",
     "webpack": "webpack --config webpack/base.js --colors",
     "webpack:prod": "webpack --config webpack/prod.js --colors",
     "deploy": "webpack --config webpack/base.js --colors && node ./node_modules/netlify-cli/bin/cli.js deploy",
@@ -25,6 +26,7 @@
     "@types/jest": "^25.2.1",
     "cordova-admob-sdk": "^0.18.0",
     "cordova-android": "^8.1.0",
+    "cordova-electron": "^1.1.1",
     "cordova-ios": "^5.1.1",
     "cordova-plugin-appversion": "^1.0.0",
     "cordova-plugin-dialogs": "^2.0.2",
@@ -73,6 +75,7 @@
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^2.31.0",
     "@typescript-eslint/parser": "^2.31.0",
+    "camelcase": "^6.0.0",
     "clean-webpack-plugin": "^3.0.0",
     "copy-webpack-plugin": "^5.1.1",
     "crypto-js": "^3.1.9-1",
@@ -101,6 +104,7 @@
     "webpack": "^4.43.0",
     "webpack-cli": "^3.3.11",
     "webpack-dev-server": "^3.10.3",
-    "webpack-merge": "^4.2.2"
+    "webpack-merge": "^4.2.2",
+    "xml2js": "^0.4.23"
   }
 }

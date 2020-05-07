@@ -41,9 +41,27 @@ module.exports = {
   },
   module: {
     rules: [
-      { test: /\.ts$/, enforce: "pre", loader: "eslint-loader" },
-      { test: /assets(\/|\\)/, loader: "file-loader?name=assets/[hash].[ext]" },
-      { test: /\.ts$/, loader: "ts-loader", exclude: "/node_modules/" }
+      {
+        test: /\.ts$/,
+        enforce: "pre",
+        loader: "eslint-loader"
+      },
+      {
+        test: /assets(\/|\\)/,
+        use: [{
+          loader: "file-loader",
+          options: {
+            name: "assets/[hash].[ext]"
+          }
+        }]
+      },
+      {
+        test: /\.ts$/,
+        exclude: "/node_modules/",
+        use: [{
+          loader: "ts-loader"
+        }]
+      }
     ],
   },
 };
