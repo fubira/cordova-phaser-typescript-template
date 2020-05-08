@@ -256,6 +256,15 @@ function dumpAssetClassCode(className, assets) {
     s.push('  class IExistSoTypeScriptWillNotComplainAboutAnEmptyNamespace {}');
   } else {
     for (const asset of assets) {
+      const pathPrefix = asset.pathPrefix || ''; 
+      if (asset.files) {
+        for (const file of asset.files) {
+          s.push(`  const ${asset.className}${file.extName.toUpperCase()} = require("${pathPrefix}assets/${file.assetName}.${file.extName}");`);
+        }
+      }
+    }
+
+    for (const asset of assets) {
       if (asset.enum) {
         s.push('');
         s.push(`  enum ${asset.enum.name}${asset.enum.type} {`);
@@ -268,8 +277,6 @@ function dumpAssetClassCode(className, assets) {
     }
 
     for (const asset of assets) {
-      const pathPrefix = asset.pathPrefix || ''; 
-      
       s.push(`  export class ${asset.className} {`);
       s.push(`    static getName(): string { return "${asset.assetName.split('/').pop()}"; }`);
 
@@ -278,9 +285,10 @@ function dumpAssetClassCode(className, assets) {
           s.push(`    static get${option.name}(): ${typeof option.value} { return ${option.value}; }`);
         }
       }
+
       if (asset.files) {
-          for (const file of asset.files) {
-          s.push(`    static get${file.extName.toUpperCase()}(): string { return require("${pathPrefix}assets/${file.assetName}.${file.extName}"); }`);
+        for (const file of asset.files) {
+          s.push(`    static get${file.extName.toUpperCase()}(): string { return ${asset.className}${file.extName.toUpperCase()}.default; }`);
         }
       }
 

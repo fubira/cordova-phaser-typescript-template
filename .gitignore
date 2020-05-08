@@ -5,6 +5,7 @@ node_modules
 www/assets
 www/locales
 www/bundle*
+src/assets.ts
 
 .vscode/
 typings/

@@ -6,7 +6,10 @@ export default class BootScene extends Phaser.Scene {
   }
 
   public preload(): void {
-    console.log(Assets.Audio.AudioBgm.getOGG());
+    console.log(
+      Assets.Audio.AudioBgm.getName(),
+      Assets.Audio.AudioBgm.getOGG()
+    );
     this.load.audio(
       Assets.Audio.AudioBgm.getName(),
       Assets.Audio.AudioBgm.getOGG()
@@ -14,6 +17,10 @@ export default class BootScene extends Phaser.Scene {
     this.load.image(
       Assets.Images.ImagesProgressBar.getName(),
       Assets.Images.ImagesProgressBar.getPNG()
+    );
+    this.load.image(
+      Assets.Images.ImagesProgressFrame.getName(),
+      Assets.Images.ImagesProgressFrame.getPNG()
     );
   }
 

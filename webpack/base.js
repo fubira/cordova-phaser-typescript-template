@@ -25,7 +25,7 @@ module.exports = {
     new CopyWebpackPlugin([{
       from: 'locales', to: 'locales'
   }]),
-new webpack.DefinePlugin({
+  new webpack.DefinePlugin({
       DEBUG: true,
       GAME_WIDTH: 435,
       GAME_HEIGHT: 720,
@@ -53,11 +53,6 @@ new webpack.DefinePlugin({
         loader: "eslint-loader"
       },
       {
-        test: /\.json$/,
-        loader: "raw-loader",
-        type: "javascript/auto"
-      },
-      {
         test: /assets(\/|\\)/,
         use: [{
           loader: "file-loader",
@@ -65,6 +60,11 @@ new webpack.DefinePlugin({
             name: "assets/[hash].[ext]"
           }
         }]
+      },
+      {
+        test: /\.json$/,
+        loader: "raw-loader",
+        type: "javascript/auto"
       },
       {
         test: /\.ts$/,

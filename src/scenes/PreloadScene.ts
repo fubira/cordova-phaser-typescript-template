@@ -27,11 +27,12 @@ export default class PreloadScene extends Phaser.Scene {
     this.preloadFrameSprite.setOrigin(0.5);
 
     this.load.on("progress", (value) => {
-      console.log(value);
+      console.log("progress: ", value);
       this.preloadBarSprite.setScale(value, 1.0);
     });
 
     this.load.on("complete", () => {
+      console.log("complete: ");
       this.onCompleteLoadAll();
     });
   }
