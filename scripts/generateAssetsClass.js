@@ -259,10 +259,11 @@ function dumpAssetClassCode(className, assets) {
       const pathPrefix = asset.pathPrefix || ''; 
       if (asset.files) {
         for (const file of asset.files) {
-          s.push(`  const ${asset.className}${file.extName.toUpperCase()} = require("${pathPrefix}assets/${file.assetName}.${file.extName}");`);
+          s.push(`  const ${asset.className}${file.extName.toUpperCase()} = require("${pathPrefix}assets/${file.assetName}.${file.extName}").default;`);
         }
       }
     }
+    s.push('');
 
     for (const asset of assets) {
       if (asset.enum) {
@@ -288,7 +289,7 @@ function dumpAssetClassCode(className, assets) {
 
       if (asset.files) {
         for (const file of asset.files) {
-          s.push(`    static get${file.extName.toUpperCase()}(): string { return ${asset.className}${file.extName.toUpperCase()}.default; }`);
+          s.push(`    static get${file.extName.toUpperCase()}(): string { return ${asset.className}${file.extName.toUpperCase()}; }`);
         }
       }
 

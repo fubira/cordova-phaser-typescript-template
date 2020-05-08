@@ -1,20 +1,20 @@
 /* AUTO GENERATED FILE. DO NOT MODIFY. YOU WILL LOSE YOUR CHANGES ON BUILD. */
 
 export namespace Images {
-  const ImagesLogo2PNG = require("assets/images/logo2.png");
-  const ImagesProgressBarPNG = require("assets/images/progress_bar.png");
-  const ImagesProgressFramePNG = require("assets/images/progress_frame.png");
+  const ImagesLogo2PNG = require("assets/images/logo2.png").default;
+  const ImagesProgressBarPNG = require("assets/images/progress_bar.png").default;
+  const ImagesProgressFramePNG = require("assets/images/progress_frame.png").default;
   export class ImagesLogo2 {
     static getName(): string { return "logo2"; }
-    static getPNG(): string { return ImagesLogo2PNG.default; }
+    static getPNG(): string { return ImagesLogo2PNG; }
   }
   export class ImagesProgressBar {
     static getName(): string { return "progress_bar"; }
-    static getPNG(): string { return ImagesProgressBarPNG.default; }
+    static getPNG(): string { return ImagesProgressBarPNG; }
   }
   export class ImagesProgressFrame {
     static getName(): string { return "progress_frame"; }
-    static getPNG(): string { return ImagesProgressFramePNG.default; }
+    static getPNG(): string { return ImagesProgressFramePNG; }
   }
 }
 
@@ -27,21 +27,21 @@ export namespace Atlases {
 }
 
 export namespace Audio {
-  const AudioBgmMP3 = require("assets/audio/bgm.mp3");
-  const AudioBgmOGG = require("assets/audio/bgm.ogg");
+  const AudioBgmMP3 = require("assets/audio/bgm.mp3").default;
+  const AudioBgmOGG = require("assets/audio/bgm.ogg").default;
   export class AudioBgm {
     static getName(): string { return "bgm"; }
-    static getMP3(): string { return AudioBgmMP3.default; }
-    static getOGG(): string { return AudioBgmOGG.default; }
+    static getMP3(): string { return AudioBgmMP3; }
+    static getOGG(): string { return AudioBgmOGG; }
   }
 }
 
 export namespace Audiosprites {
-  const AudiospritesSoundAC3 = require("assets/audiosprites/sound.ac3");
-  const AudiospritesSoundJSON = require("assets/audiosprites/sound.json");
-  const AudiospritesSoundM4A = require("assets/audiosprites/sound.m4a");
-  const AudiospritesSoundMP3 = require("assets/audiosprites/sound.mp3");
-  const AudiospritesSoundOGG = require("assets/audiosprites/sound.ogg");
+  const AudiospritesSoundAC3 = require("assets/audiosprites/sound.ac3").default;
+  const AudiospritesSoundJSON = require("assets/audiosprites/sound.json").default;
+  const AudiospritesSoundM4A = require("assets/audiosprites/sound.m4a").default;
+  const AudiospritesSoundMP3 = require("assets/audiosprites/sound.mp3").default;
+  const AudiospritesSoundOGG = require("assets/audiosprites/sound.ogg").default;
 
   enum AudiospritesSoundSprites {
     SeButtonOver = <any>'se_button_over',
@@ -71,24 +71,24 @@ export namespace Audiosprites {
 
   export class AudiospritesSound {
     static getName(): string { return "sound"; }
-    static getAC3(): string { return AudiospritesSoundAC3.default; }
-    static getJSON(): string { return AudiospritesSoundJSON.default; }
-    static getM4A(): string { return AudiospritesSoundM4A.default; }
-    static getMP3(): string { return AudiospritesSoundMP3.default; }
-    static getOGG(): string { return AudiospritesSoundOGG.default; }
+    static getAC3(): string { return AudiospritesSoundAC3; }
+    static getJSON(): string { return AudiospritesSoundJSON; }
+    static getM4A(): string { return AudiospritesSoundM4A; }
+    static getMP3(): string { return AudiospritesSoundMP3; }
+    static getOGG(): string { return AudiospritesSoundOGG; }
 
     static Sprites = AudiospritesSoundSprites
   }
 }
 
 export namespace CustomWebFonts {
-  const FontsK8X12CSS = require("!file-loader?name=assets/fonts/[name].[ext]!assets/fonts/k8x12.css");
-  const FontsK8X12TTF = require("!file-loader?name=assets/fonts/[name].[ext]!assets/fonts/k8x12.ttf");
+  const FontsK8X12CSS = require("!file-loader?name=assets/fonts/[name].[ext]!assets/fonts/k8x12.css").default;
+  const FontsK8X12TTF = require("!file-loader?name=assets/fonts/[name].[ext]!assets/fonts/k8x12.ttf").default;
   export class FontsK8X12 {
     static getName(): string { return "k8x12"; }
     static getFamily(): string { return "k8x12"; }
-    static getCSS(): string { return FontsK8X12CSS.default; }
-    static getTTF(): string { return FontsK8X12TTF.default; }
+    static getCSS(): string { return FontsK8X12CSS; }
+    static getTTF(): string { return FontsK8X12TTF; }
   }
 }
 
