@@ -163,7 +163,7 @@ export class AssetLoader {
       this.loadScripts();
       this.loadShaders();
 
-      this.loader.once("complete", () => {
+      this.loader.on("complete", () => {
         resolve();
       });
     });
