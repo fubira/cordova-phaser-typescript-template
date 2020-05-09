@@ -117,14 +117,12 @@ export class AssetLoader {
     }
   }
 
-  /*
   private static loadXML(): void {
     for (const key of Object.keys(Assets.XML)) {
       const asset = Assets.XML[key];
       this.loader.xml(asset.getName(), asset.getXML());
     }
   }
-  */
 
   private static loadText(): void {
     for (const key of Object.keys(Assets.Text)) {
@@ -160,7 +158,7 @@ export class AssetLoader {
       this.loadAudiosprites();
       this.loadBitmapFonts();
       this.loadJSON();
-      // this.loadXML();
+      this.loadXML();
       this.loadText();
       this.loadScripts();
       this.loadShaders();

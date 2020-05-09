@@ -4,6 +4,7 @@ export namespace Images {
   const ImagesLogo2PNG = require("assets/images/logo2.png").default;
   const ImagesProgressBarPNG = require("assets/images/progress_bar.png").default;
   const ImagesProgressFramePNG = require("assets/images/progress_frame.png").default;
+
   export class ImagesLogo2 {
     static getName(): string { return "logo2"; }
     static getPNG(): string { return ImagesLogo2PNG; }
@@ -29,6 +30,7 @@ export namespace Atlases {
 export namespace Audio {
   const AudioBgmMP3 = require("assets/audio/bgm.mp3").default;
   const AudioBgmOGG = require("assets/audio/bgm.ogg").default;
+
   export class AudioBgm {
     static getName(): string { return "bgm"; }
     static getMP3(): string { return AudioBgmMP3; }
@@ -42,6 +44,7 @@ export namespace Audiosprites {
   const AudiospritesSoundM4A = require("assets/audiosprites/sound.m4a").default;
   const AudiospritesSoundMP3 = require("assets/audiosprites/sound.mp3").default;
   const AudiospritesSoundOGG = require("assets/audiosprites/sound.ogg").default;
+
 
   enum AudiospritesSoundSprites {
     SeButtonOver = <any>'se_button_over',
@@ -84,6 +87,7 @@ export namespace Audiosprites {
 export namespace CustomWebFonts {
   const FontsK8X12CSS = require("!file-loader?name=assets/fonts/[name].[ext]!assets/fonts/k8x12.css").default;
   const FontsK8X12TTF = require("!file-loader?name=assets/fonts/[name].[ext]!assets/fonts/k8x12.ttf").default;
+
   export class FontsK8X12 {
     static getName(): string { return "k8x12"; }
     static getFamily(): string { return "k8x12"; }
@@ -97,6 +101,10 @@ export namespace BitmapFonts {
 }
 
 export namespace JSON {
+  class IExistSoTypeScriptWillNotComplainAboutAnEmptyNamespace {}
+}
+
+export namespace XML {
   class IExistSoTypeScriptWillNotComplainAboutAnEmptyNamespace {}
 }
 

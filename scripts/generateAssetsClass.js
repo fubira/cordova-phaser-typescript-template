@@ -326,6 +326,7 @@ result.push(... dumpAssetClassCode('Audiosprites', assets.filter((asset) => asse
 result.push(... dumpAssetClassCode('CustomWebFonts', assets.filter((asset) => asset.type === 'font')));
 result.push(... dumpAssetClassCode('BitmapFonts', assets.filter((asset) => asset.type === 'bitmapfont')));
 result.push(... dumpAssetClassCode('JSON', assets.filter((asset) => asset.type === 'json')));
+result.push(... dumpAssetClassCode('XML', assets.filter((asset) => asset.type === 'xml')));
 result.push(... dumpAssetClassCode('Text', assets.filter((asset) => asset.type === 'text')));
 result.push(... dumpAssetClassCode('Scripts', assets.filter((asset) => asset.type === 'script')));
 result.push(... dumpAssetClassCode('Shaders', assets.filter((asset) => asset.type === 'shader')));
