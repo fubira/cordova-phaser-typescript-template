@@ -1,5 +1,6 @@
 import * as Assets from "../assets";
 import BgmPlayer from "../utils/BgmPlayer";
+import { AssetLoader } from "../utils/AssetLoader";
 
 export default class PreloadScene extends Phaser.Scene {
   private preloadBarSprite: Phaser.GameObjects.Sprite = null;
@@ -23,8 +24,11 @@ export default class PreloadScene extends Phaser.Scene {
       this.cameras.main.centerY,
       Assets.Images.ImagesProgressFrame.getName()
     );
-
     this.preloadFrameSprite.setOrigin(0.5);
+
+    AssetLoader.loadAllAssets(this.load).then(() => {
+      this.onCompleteLoadAll();
+    });
 
     this.load.on("progress", (value) => {
       console.log("progress: ", value);

@@ -19,94 +19,93 @@ export class AssetLoader {
   private static loadImages(): void {
     for (const key of Object.keys(Assets.Images)) {
       const asset = Assets.Images[key];
-      Object.keys(asset).map((method) => {
-        console.log(asset[method]);
-        if (asset[method] instanceof String) {
-          this.loader.image(asset.getName(), asset[method]);
-        }
-      });
+      const types = Object.getOwnPropertyNames(asset).filter(
+        (method) => asset[method] instanceof Function && method !== "getName"
+      );
+      for (const type of types) {
+        this.loader.image(asset.getName(), asset[type]());
+      }
     }
   }
 
   private static loadSpritesheets(): void {
     for (const key of Object.keys(Assets.Spritesheets)) {
       const asset = Assets.Spritesheets[key];
-
-      Object.keys(asset).map((method) => {
-        console.log(asset[method]);
-        if (asset[method] instanceof String) {
-          this.loader.spritesheet(asset.getName(), asset[method], {
-            frameWidth: asset.getFrameWidth(),
-            frameHeight: asset.getFrameHeight(),
-            startFrame: 0,
-            endFrame: asset.getFrameMax(),
-            margin: asset.getMargin(),
-            spacing: asset.getSpacing(),
-          });
-        }
-      });
+      const types = Object.getOwnPropertyNames(asset).filter(
+        (method) => asset[method] instanceof Function && method !== "getName"
+      );
+      for (const type of types) {
+        this.loader.spritesheet(asset.getName(), asset[type](), {
+          frameWidth: asset.getFrameWidth(),
+          frameHeight: asset.getFrameHeight(),
+          startFrame: 0,
+          endFrame: asset.getFrameMax(),
+          margin: asset.getMargin(),
+          spacing: asset.getSpacing(),
+        });
+      }
     }
   }
 
   private static loadAtlases(): void {
     for (const key of Object.keys(Assets.Atlases)) {
       const asset = Assets.Atlases[key];
-
-      Object.keys(asset).map((method) => {
-        console.log(asset[method]);
-        if (asset[method] instanceof String) {
-          this.loader.atlas(asset.getName(), asset[method]);
-        }
-      });
+      const types = Object.getOwnPropertyNames(asset).filter(
+        (method) => asset[method] instanceof Function && method !== "getName"
+      );
+      for (const type of types) {
+        this.loader.atlas(asset.getName(), asset[type]());
+      }
     }
   }
 
   private static loadAudio(): void {
     for (const key of Object.keys(Assets.Audio)) {
       const asset = Assets.Audio[key];
-
-      Object.keys(asset).map((method) => {
-        console.log(asset[method]);
-        if (asset[method] instanceof String) {
-          this.loader.audio(asset.getName(), asset[method]);
-        }
-      });
+      const types = Object.getOwnPropertyNames(asset).filter(
+        (method) => asset[method] instanceof Function && method !== "getName"
+      );
+      for (const type of types) {
+        this.loader.audio(asset.getName(), asset[type]());
+      }
     }
   }
 
   private static loadAudiosprites(): void {
     for (const key of Object.keys(Assets.Audiosprites)) {
       const asset = Assets.Audiosprites[key];
-
-      Object.keys(asset).map((method) => {
-        console.log(asset[method]);
-        const audio: Array<string> = [];
-
-        if (asset[method] instanceof String) {
-          if (!`${asset[method]}`.endsWith("json")) {
-            audio.push(asset[method]);
-          }
+      const types = Object.getOwnPropertyNames(asset).filter(
+        (method) => asset[method] instanceof Function && method !== "getName"
+      );
+      const audio: Array<string> = [];
+      for (const type of types) {
+        if (!`${asset[type]}`.endsWith("json")) {
+          audio.push(asset[type]());
         }
-        this.loader.audioSprite(asset.getName(), asset.getJSON(), audio);
-      });
+      }
+      // eslint-disable-next-line
+      const json = require("assets/audiosprites/sound.json");
+      console.log(json);
+      this.loader.audioSprite(asset.getName(), asset.getJSON(), audio);
     }
   }
 
   private static loadBitmapFonts(): void {
-    for (const key of Object.keys(Assets.Audiosprites)) {
-      const asset = Assets.Audiosprites[key];
+    for (const key of Object.keys(Assets.BitmapFonts)) {
+      const asset = Assets.BitmapFonts[key];
+      const types = Object.getOwnPropertyNames(asset).filter(
+        (method) => asset[method] instanceof Function && method !== "getName"
+      );
 
-      Object.keys(asset).map((method) => {
-        console.log(asset[method]);
-        const texture: Array<string> = [];
+      const texture: Array<string> = [];
 
-        if (asset[method] instanceof String) {
-          if (!`${asset[method]}`.endsWith("fnt")) {
-            texture.push(asset[method]);
-          }
+      for (const type of types) {
+        if (!`${asset[type]}`.endsWith("fnt")) {
+          texture.push(asset[type]());
         }
-        this.loader.bitmapFont(asset.getName(), texture, asset.getFNT());
-      });
+      }
+
+      this.loader.bitmapFont(asset.getName(), texture, asset.getFNT());
     }
   }
 
@@ -151,6 +150,12 @@ export class AssetLoader {
     this.loader = loader;
 
     return new Promise((resolve) => {
+      const listener = function (): void {
+        console.log("loader.complete");
+        resolve();
+      };
+      this.loader.on("complete", listener);
+
       this.loadImages();
       this.loadSpritesheets();
       this.loadAtlases();
@@ -162,10 +167,6 @@ export class AssetLoader {
       this.loadText();
       this.loadScripts();
       this.loadShaders();
-
-      this.loader.on("complete", () => {
-        resolve();
-      });
     });
   }
 }
