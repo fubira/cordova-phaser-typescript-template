@@ -142,29 +142,19 @@ export class AssetLoader {
     }
   }
 
-  public static loadAllAssets(
-    loader: Phaser.Loader.LoaderPlugin
-  ): Promise<void> {
+  public static loadAllAssets(loader: Phaser.Loader.LoaderPlugin): void {
     this.loader = loader;
-
-    return new Promise((resolve) => {
-      const listener = function (): void {
-        console.log("loader.complete");
-        resolve();
-      };
-      this.loader.on("complete", listener);
-
-      this.loadImages();
-      this.loadSpritesheets();
-      this.loadAtlases();
-      this.loadAudio();
-      this.loadAudiosprites();
-      this.loadBitmapFonts();
-      this.loadJSON();
-      this.loadXML();
-      this.loadText();
-      this.loadScripts();
-      this.loadShaders();
-    });
+    this.loadImages();
+    this.loadSpritesheets();
+    this.loadAtlases();
+    this.loadAudio();
+    this.loadAudiosprites();
+    this.loadBitmapFonts();
+    this.loadJSON();
+    this.loadXML();
+    this.loadText();
+    this.loadScripts();
+    this.loadShaders();
+    this.loader.start();
   }
 }

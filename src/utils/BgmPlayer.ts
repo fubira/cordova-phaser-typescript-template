@@ -15,8 +15,14 @@ export default class BgmPlayer {
   private audioFading: Howl;
 
   private static playAudio(src: Array<string>, volume = 1.0): Howl {
-    const audio = new Howl({ src, loop: true, autoplay: true, volume: 0 });
-    audio.fade(0.0, volume, 500);
+    const audio = new Howl({
+      src,
+      loop: true,
+      autoplay: true,
+      volume: 0,
+    });
+
+    audio.fade(0.0, volume, 100);
     return audio;
   }
 

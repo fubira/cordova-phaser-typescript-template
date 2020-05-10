@@ -1,61 +1,60 @@
 import * as Assets from "../assets";
 import BgmPlayer from "../utils/BgmPlayer";
 import { AssetLoader } from "../utils/AssetLoader";
+import { LoaderProgress } from "../widget/LoaderProgress";
 
 export default class PreloadScene extends Phaser.Scene {
-  private preloadBarSprite: Phaser.GameObjects.Sprite = null;
-  private preloadFrameSprite: Phaser.GameObjects.Sprite = null;
-
   public init(): void {
     /* */
   }
 
   public preload(): void {
-    this.preloadBarSprite = this.add.sprite(
-      this.cameras.main.centerX,
-      this.cameras.main.centerY,
-      Assets.Images.ImagesProgressBar.getName()
+    this.load.image(
+      Assets.Images.ImagesProgressBar.getName(),
+      Assets.Images.ImagesProgressBar.getPNG()
     );
-    this.preloadBarSprite.setOrigin(0, 0.5);
-    this.preloadBarSprite.x -= this.preloadBarSprite.width * 0.5;
-
-    this.preloadFrameSprite = this.add.sprite(
-      this.cameras.main.centerX,
-      this.cameras.main.centerY,
-      Assets.Images.ImagesProgressFrame.getName()
+    this.load.image(
+      Assets.Images.ImagesProgressFrame.getName(),
+      Assets.Images.ImagesProgressFrame.getPNG()
     );
-    this.preloadFrameSprite.setOrigin(0.5);
-
-    AssetLoader.loadAllAssets(this.load).then(() => {
-      this.onCompleteLoadAll();
-    });
-
-    this.load.on("progress", (value) => {
-      console.log("progress: ", value);
-      this.preloadBarSprite.setScale(value, 1.0);
-    });
-
-    this.load.on("complete", () => {
-      console.log("complete: ");
-      this.onCompleteLoadAll();
-    });
   }
 
   public create(): void {
-    /**/
+    const progressWidget = new LoaderProgress(
+      this,
+      this.add.sprite(0, 0, Assets.Images.ImagesProgressBar.getName()),
+      this.add.sprite(0, 0, Assets.Images.ImagesProgressFrame.getName())
+    );
+    progressWidget.setPosition(
+      this.cameras.main.centerX,
+      this.cameras.main.centerY
+    );
+    this.children.add(progressWidget);
+
+    progressWidget
+      .load(() => {
+        AssetLoader.loadAllAssets(this.load);
+      })
+      .then(() => {
+        this.onCompleteLoadAll();
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  }
+
+  private onCompleteLoadAll(): void {
+    const boot = this.startGame.bind(this);
+    this.cameras.main.fade(100, 0, 0, 0, true, boot, this);
   }
 
   private startGame(): void {
     this.scene.start("TitleScene");
 
     BgmPlayer.instance.init();
-    /*
-    BgmPlayer.instance.play([Assets.Audio.AudioBgm.getMP3(), Assets.Audio.AudioBgm.getOGG()]);
-    */
-  }
-
-  private onCompleteLoadAll(): void {
-    const boot = this.startGame.bind(this);
-    this.cameras.main.fade(100, 0, 0, 0, true, boot, this);
+    BgmPlayer.instance.play([
+      Assets.Audio.AudioBgm.getMP3(),
+      Assets.Audio.AudioBgm.getOGG(),
+    ]);
   }
 }
