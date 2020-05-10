@@ -30,3 +30,6 @@ resources/signing
 
 # environment
 .env
+
+# Local Netlify folder
+.netlify
