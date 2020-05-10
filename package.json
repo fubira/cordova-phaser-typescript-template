@@ -93,7 +93,6 @@
     "jest-canvas-mock": "^2.2.0",
     "js-loader": "^0.1.1",
     "js-logger": "^1.6.0",
-    "json-loader": "^0.5.7",
     "prettier": "^2.0.5",
     "random-js": "^2.1.0",
     "raw-loader": "^4.0.1",
@@ -115,7 +114,9 @@
   "jest": {
     "verbose": true,
     "preset": "ts-jest",
-    "setupFiles": ["jest-canvas-mock"], 
+    "setupFiles": [
+      "jest-canvas-mock"
+    ],
     "modulePathIgnorePatterns": [
       "/plugins/"
     ],

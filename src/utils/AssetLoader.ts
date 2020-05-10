@@ -83,9 +83,7 @@ export class AssetLoader {
           audio.push(asset[type]());
         }
       }
-      // eslint-disable-next-line
-      const json = require("assets/audiosprites/sound.json");
-      console.log(json);
+      console.log(asset.getName(), asset.getJSON());
       this.loader.audioSprite(asset.getName(), asset.getJSON(), audio);
     }
   }

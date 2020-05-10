@@ -54,24 +54,16 @@ module.exports = {
       },
       {
         test: /assets(\/|\\)/,
+        type: 'javascript/auto',
         use: [{
           loader: "file-loader",
-          options: {
-            name: "assets/[hash].[ext]"
-          }
+          options: { name: "assets/[hash].[ext]" }
         }]
-      },
-      {
-        test: /\.json$/,
-        loader: "raw-loader",
-        type: "javascript/auto"
       },
       {
         test: /\.ts$/,
         exclude: "/node_modules/",
-        use: [{
-          loader: "ts-loader"
-        }]
+        use: [{ loader: "ts-loader" }]
       }
     ],
   },
