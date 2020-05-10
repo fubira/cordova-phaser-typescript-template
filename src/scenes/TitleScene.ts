@@ -4,10 +4,19 @@ export default class TitlScene extends Phaser.Scene {
   private titleText: Phaser.GameObjects.Text = null;
   private subtitleText: Phaser.GameObjects.Text = null;
   private tapToStartText: Phaser.GameObjects.Text = null;
+  private sfxAudioSprites:
+    | Phaser.Sound.WebAudioSound
+    | Phaser.Sound.HTML5AudioSound = null;
 
   public init(): void {
     this.cameras.main.backgroundColor = Phaser.Display.Color.HexStringToColor(
       "#483C46"
+    );
+  }
+
+  public preload(): void {
+    this.sfxAudioSprites = this.sound.addAudioSprite(
+      Assets.Audiosprites.AudiospritesSound.getName()
     );
   }
 
@@ -73,6 +82,8 @@ export default class TitlScene extends Phaser.Scene {
   }
 
   private startGame(): void {
-    this.cameras.main.flash(200);
+    this.sfxAudioSprites.play("se_select");
+    this.cameras.main.flash(100);
+    this.cameras.main.shake(100, 0.01);
   }
 }
