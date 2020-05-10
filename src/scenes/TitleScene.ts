@@ -1,3 +1,5 @@
+import * as Assets from "../assets";
+
 export default class TitlScene extends Phaser.Scene {
   private titleText: Phaser.GameObjects.Text = null;
   private subtitleText: Phaser.GameObjects.Text = null;
@@ -28,7 +30,7 @@ export default class TitlScene extends Phaser.Scene {
       this.cameras.main.centerX,
       this.cameras.main.centerY - 60,
       "Cordova Phaser Template",
-      { font: "50px " /*+ Assets.CustomWebFonts.FontsK8x12.getFamily()*/ }
+      { font: "50px " + Assets.CustomWebFonts.FontsK8X12.getFamily() }
     );
 
     this.titleText.setOrigin(0.5, 0.5);
@@ -40,7 +42,7 @@ export default class TitlScene extends Phaser.Scene {
       this.cameras.main.centerX,
       this.cameras.main.centerY + 0,
       "SubTile",
-      { font: "32px " /*+ Assets.CustomWebFonts.FontsK8x12.getFamily()*/ }
+      { font: "32px " + Assets.CustomWebFonts.FontsK8X12.getFamily() }
     );
 
     this.subtitleText.setOrigin(0.5, 0.5);
@@ -52,7 +54,7 @@ export default class TitlScene extends Phaser.Scene {
       this.cameras.main.centerX,
       this.cameras.main.centerY + 100,
       "Tap to start",
-      { font: "32px " /*+ Assets.CustomWebFonts.FontsK8x12.getFamily()*/ }
+      { font: "32px " + Assets.CustomWebFonts.FontsK8X12.getFamily() }
     );
 
     this.tapToStartText.setOrigin(0.5, 0.5);

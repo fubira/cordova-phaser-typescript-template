@@ -3,29 +3,30 @@ import i18next from "i18next";
 import i18nXHRBackend from "i18next-xhr-backend";
 import i18nBrowserLanguageDetector from "i18next-browser-languagedetector";
 import * as WebFontLoader from "webfontloader";
+import * as Assets from "./assets";
 import App from "./app";
 import Device from "./device";
 
 async function loadWebFont(): Promise<void> {
   return new Promise((resolve) => {
-    const webFontLoaderOptions = null;
+    let webFontLoaderOptions = null;
 
-    /*
     if (Object.keys(Assets.CustomWebFonts).length > 0) {
       webFontLoaderOptions = {};
       webFontLoaderOptions.custom = {
         families: [],
-        urls: []
+        urls: [],
       };
-      */
 
-    /*
-      for (const font of Assets.CustomWebFonts) {
-        webFontLoaderOptions.custom.families.push(Assets.CustomWebFonts[font].getFamily());
-        webFontLoaderOptions.custom.urls.push(Assets.CustomWebFonts[font].getCSS());
+      for (const font of Object.keys(Assets.CustomWebFonts)) {
+        webFontLoaderOptions.custom.families.push(
+          Assets.CustomWebFonts[font].getFamily()
+        );
+        webFontLoaderOptions.custom.urls.push(
+          Assets.CustomWebFonts[font].getCSS()
+        );
       }
     }
-    */
 
     if (webFontLoaderOptions === null) {
       resolve();
