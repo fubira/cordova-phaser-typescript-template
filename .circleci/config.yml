@@ -1,0 +1,57 @@
+anchors:
+  cache_key: &cache_key dependency-cache-{{ checksum "package.json" }}
+  container: &container
+    docker:
+      - image: circleci/android:api-28-node
+    working_directory: ~/src
+
+version: 2
+jobs:
+  build_and_test:
+    <<: *container
+    steps:
+      - checkout
+      - run: npm version
+      - run: sudo npm install -g npm
+      - restore_cache:
+          key: *cache_key
+      - run: npm install
+      - save_cache:
+          key: *cache_key
+          paths: 
+            - node_modules
+      - run: npm run webpack
+      - run: npm run test
+  deploy:
+    <<: *container
+    steps:
+      - checkout
+      - run: npm version
+      - run: sudo apt-get install gradle imagemagick
+      - run: sudo npm install -g npm
+      - run: sudo npm install -g cordova cordova-splash cordova-icon
+      - restore_cache:
+          key: *cache_key
+      - run: npm install
+      - save_cache:
+          key: *cache_key
+          paths: 
+            - node_modules
+      - run: release/setup-sign.sh
+      - run: cordova platform rm android && cordova platform add android
+      - run: cordova-splash && cordova-icon
+      - run: npm run webpack:dist && cordova build android --release
+      - store_artifacts:
+          path: platforms/android/build/outputs/apk
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - build_and_test
+      - deploy:
+          requires:
+            - build_and_test
+          filters:
+            branches:
+              only: master
