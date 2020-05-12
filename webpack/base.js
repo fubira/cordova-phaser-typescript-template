@@ -15,6 +15,7 @@ module.exports = {
     extensions: [".ts", ".js"],
     modules: ["node_modules"],
     alias: {
+      "@": path.join(__dirname, "../src/"),
       assets: path.join(__dirname, "../assets/"),
     },
   },
@@ -27,8 +28,8 @@ module.exports = {
   }]),
   new webpack.DefinePlugin({
       DEBUG: true,
-      GAME_WIDTH: 435,
-      GAME_HEIGHT: 720,
+      GAME_WIDTH: 540,
+      GAME_HEIGHT: 960,
     }),
     new DotEnvPlugin(),
   ],

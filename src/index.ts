@@ -2,9 +2,9 @@ import i18next from "i18next";
 import i18nXHRBackend from "i18next-xhr-backend";
 import i18nBrowserLanguageDetector from "i18next-browser-languagedetector";
 import * as WebFontLoader from "webfontloader";
-import * as Assets from "./assets";
-import App from "./app";
-import Device from "./device";
+import * as Assets from "@/assets";
+import App from "@/app";
+import Device from "@/device";
 
 async function loadWebFont(): Promise<void> {
   return new Promise((resolve) => {

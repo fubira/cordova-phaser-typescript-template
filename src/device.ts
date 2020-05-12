@@ -1,8 +1,8 @@
-import logger from "./logger";
+import logger from "@/logger";
 import i18next from "i18next";
-import AdBanner from "./utils/AdBanner";
-import AdInterstitial from "./utils/AdInterstitial";
-import Tracking from "./utils/Tracking";
+import AdBanner from "@/utils/AdBanner";
+import AdInterstitial from "@/utils/AdInterstitial";
+import Tracking from "@/utils/Tracking";
 
 function showExitAppDialog(): void {
   navigator.notification.confirm(

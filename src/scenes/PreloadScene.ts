@@ -1,6 +1,6 @@
-import * as Assets from "../assets";
-import { AssetLoader } from "../utils/AssetLoader";
-import { LoaderProgress } from "../widget/LoaderProgress";
+import * as Assets from "@/assets";
+import { AssetLoader } from "@/utils/AssetLoader";
+import { LoaderProgress } from "@/widget/LoaderProgress";
 
 export default class PreloadScene extends Phaser.Scene {
   public init(): void {
@@ -44,7 +44,7 @@ export default class PreloadScene extends Phaser.Scene {
 
   private onCompleteLoadAll(): void {
     const boot = this.startGame.bind(this);
-    this.cameras.main.fade(500, 0, 0, 0, true, boot, this);
+    this.cameras.main.fade(250, 0, 0, 0, true, boot, this);
   }
 
   private startGame(): void {

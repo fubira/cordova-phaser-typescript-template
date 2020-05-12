@@ -1,4 +1,4 @@
-import logger from "../logger";
+import logger from "@/logger";
 
 export default class GameService {
   private static isSignedIn = false;

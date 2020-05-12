@@ -1,4 +1,4 @@
-import logger from "../logger";
+import logger from "@/logger";
 
 export default class AdBanner {
   private static get isActive(): boolean {

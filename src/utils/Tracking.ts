@@ -1,4 +1,4 @@
-import logger from "../logger";
+import logger from "@/logger";
 import * as firebase from "firebase";
 
 export default class Tracking {

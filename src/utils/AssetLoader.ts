@@ -1,4 +1,4 @@
-import * as Assets from "../assets";
+import * as Assets from "@/assets";
 
 export class AssetLoader {
   private static loader: Phaser.Loader.LoaderPlugin = null;

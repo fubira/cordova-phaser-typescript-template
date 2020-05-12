@@ -1,7 +1,7 @@
 import * as Phaser from "phaser";
-import BootScene from "./scenes/BootScene";
-import PreloadScene from "./scenes/PreloadScene";
-import TitleScene from "./scenes/TitleScene";
+import BootScene from "@/scenes/BootScene";
+import PreloadScene from "@/scenes/PreloadScene";
+import TitleScene from "@/scenes/TitleScene";
 
 export default class App extends Phaser.Game {
   public static start(): App {

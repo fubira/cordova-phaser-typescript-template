@@ -1,5 +1,5 @@
-import * as Assets from "../assets";
-import BgmPlayer from "../utils/BgmPlayer";
+import * as Assets from "@/assets";
+import BgmPlayer from "@/utils/BgmPlayer";
 
 export default class TitlScene extends Phaser.Scene {
   private titleText: Phaser.GameObjects.Text = null;
