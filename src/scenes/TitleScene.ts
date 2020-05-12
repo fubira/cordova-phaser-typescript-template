@@ -1,9 +1,10 @@
+import logger from "@/logger";
 import * as Assets from "@/assets";
 import BgmPlayer from "@/utils/BgmPlayer";
 
 export default class TitlScene extends Phaser.Scene {
   private titleText: Phaser.GameObjects.Text = null;
-  private subtitleText: Phaser.GameObjects.Text = null;
+  private subtitleText: Phaser.GameObjects.BitmapText = null;
   private tapToStartText: Phaser.GameObjects.Text = null;
   private sfxAudioSprites:
     | Phaser.Sound.WebAudioSound
@@ -52,17 +53,14 @@ export default class TitlScene extends Phaser.Scene {
     this.titleText.setStroke("#000000", 5);
     this.titleText.setShadow(4, 4, "rgba(0,0,0,0.3)", 4, true, true);
 
-    this.subtitleText = this.add.text(
+    this.subtitleText = this.add.bitmapText(
       this.cameras.main.centerX,
       this.cameras.main.centerY + 0,
-      "SubTile",
-      { font: "32px " + Assets.CustomWebFonts.FontsK8X12.getFamily() }
+      Assets.BitmapFonts.FontsScore.getName(),
+      "BitmapFont"
     );
 
     this.subtitleText.setOrigin(0.5, 0.5);
-    this.subtitleText.setFill("#EE8855");
-    this.subtitleText.setStroke("#000000", 5);
-    this.subtitleText.setShadow(4, 4, "rgba(0,0,0,0.3)", 4, true, true);
 
     this.tapToStartText = this.add.text(
       this.cameras.main.centerX,

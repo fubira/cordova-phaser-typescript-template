@@ -97,8 +97,9 @@ export class AssetLoader {
       const texture: Array<string> = [];
 
       for (const type of types) {
-        if (!`${asset[type]}`.endsWith("fnt")) {
-          texture.push(asset[type]());
+        const path = asset[type]();
+        if (!`${path}`.endsWith("fnt")) {
+          texture.push(path);
         }
       }
 

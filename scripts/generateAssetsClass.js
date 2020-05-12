@@ -61,10 +61,10 @@ function decideAssetType(name, exts) {
     shader: findExtension(exts, ASSET_TYPE_EXTENSIONS.shader),
   };
 
-  if (type.bitmapFont) {
-    type.bitmapFont = (exts.findIndex((ext) => shell.grep(/^[\s\S]*?<font>/g, `${key}.${ext}`).length > 1) >= 0);
+  if (type.bitmapfont) {
+    type.bitmapfont = (exts.findIndex((ext) => shell.grep(/^[\s\S]*?<font>/g, `${name}.${ext}`).length > 1) >= 0);
   }
-  if (type.bitmapFont && type.image) {
+  if (type.bitmapfont && type.image) {
     return 'bitmapfont';
   }
   if (type.audio && type.json) {

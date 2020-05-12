@@ -97,7 +97,14 @@ export namespace CustomWebFonts {
 }
 
 export namespace BitmapFonts {
-  class IExistSoTypeScriptWillNotComplainAboutAnEmptyNamespace {}
+  const FontsScoreFNT = require("assets/fonts/score.fnt").default;
+  const FontsScorePNG = require("assets/fonts/score.png").default;
+
+  export class FontsScore {
+    static getName(): string { return "score"; }
+    static getFNT(): string { return FontsScoreFNT; }
+    static getPNG(): string { return FontsScorePNG; }
+  }
 }
 
 export namespace JSON {
