@@ -1,5 +1,4 @@
 import * as Assets from "../assets";
-import BgmPlayer from "../utils/BgmPlayer";
 import { AssetLoader } from "../utils/AssetLoader";
 import { LoaderProgress } from "../widget/LoaderProgress";
 
@@ -45,16 +44,10 @@ export default class PreloadScene extends Phaser.Scene {
 
   private onCompleteLoadAll(): void {
     const boot = this.startGame.bind(this);
-    this.cameras.main.fade(100, 0, 0, 0, true, boot, this);
+    this.cameras.main.fade(500, 0, 0, 0, true, boot, this);
   }
 
   private startGame(): void {
     this.scene.start("TitleScene");
-
-    BgmPlayer.instance.init();
-    BgmPlayer.instance.play([
-      Assets.Audio.AudioBgm.getMP3(),
-      Assets.Audio.AudioBgm.getOGG(),
-    ]);
   }
 }

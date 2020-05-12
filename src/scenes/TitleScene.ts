@@ -1,4 +1,5 @@
 import * as Assets from "../assets";
+import BgmPlayer from "../utils/BgmPlayer";
 
 export default class TitlScene extends Phaser.Scene {
   private titleText: Phaser.GameObjects.Text = null;
@@ -18,6 +19,10 @@ export default class TitlScene extends Phaser.Scene {
     this.sfxAudioSprites = this.sound.addAudioSprite(
       Assets.Audiosprites.AudiospritesSound.getName()
     );
+    BgmPlayer.instance.play([
+      Assets.Audio.AudioBgm.getMP3(),
+      Assets.Audio.AudioBgm.getOGG(),
+    ]);
   }
 
   public create(): void {

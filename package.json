@@ -23,7 +23,7 @@
   "license": "MIT",
   "dependencies": {
     "@types/howler": "^2.1.2",
-    "cordova-admob-sdk": "^0.18.0",
+    "@types/pino": "^6.0.1",
     "cordova-android": "^8.1.0",
     "cordova-electron": "^1.1.1",
     "cordova-ios": "^5.1.1",
@@ -31,7 +31,6 @@
     "cordova-plugin-dialogs": "^2.0.2",
     "cordova-plugin-exitapp": "^1.0.0",
     "cordova-plugin-extension": "^1.5.4",
-    "cordova-plugin-firebase": "^2.0.5",
     "cordova-plugin-globalization": "^1.11.0",
     "cordova-plugin-multidex": "^0.1.4",
     "cordova-plugin-native-spinner": "^1.1.3",
@@ -45,9 +44,8 @@
     "i18next": "^19.4.4",
     "i18next-browser-languagedetector": "^4.1.1",
     "i18next-xhr-backend": "^3.2.2",
-    "lycwed-cordova-plugin-admob-free": "^1.1.0",
-    "lycwed-cordova-plugin-games-services": "^1.1.4",
-    "phaser": "^3.23.0"
+    "phaser": "^3.23.0",
+    "pino": "^6.2.1"
   },
   "cordova": {
     "plugins": {
@@ -58,12 +56,7 @@
       "cordova-plugin-native-spinner": {},
       "cordova-plugin-splashscreen": {},
       "cordova-plugin-statusbar": {},
-      "cordova-plugin-wkwebview-engine": {},
-      "lycwed-cordova-plugin-games-services": {
-        "APP_ID": "your_app_id"
-      },
-      "lycwed-cordova-plugin-admob-free": {},
-      "cordova-plugin-firebase": {}
+      "cordova-plugin-wkwebview-engine": {}
     },
     "platforms": [
       "ios",
@@ -92,7 +85,6 @@
     "jest": "^25.5.4",
     "jest-canvas-mock": "^2.2.0",
     "js-loader": "^0.1.1",
-    "js-logger": "^1.6.0",
     "prettier": "^2.0.5",
     "random-js": "^2.1.0",
     "raw-loader": "^4.0.1",

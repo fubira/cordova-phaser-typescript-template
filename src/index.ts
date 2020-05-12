@@ -1,4 +1,3 @@
-import * as Logger from "js-logger";
 import i18next from "i18next";
 import i18nXHRBackend from "i18next-xhr-backend";
 import i18nBrowserLanguageDetector from "i18next-browser-languagedetector";
@@ -53,12 +52,9 @@ async function loadLocales(): Promise<unknown> {
     });
 }
 
-Logger.useDefaults();
-Logger.setLevel(DEBUG ? Logger.DEBUG : Logger.ERROR);
-
 window.onload = async (): Promise<void> => {
+  await Device.init();
   await loadLocales();
   await loadWebFont();
-  await Device.init();
   App.start();
 };

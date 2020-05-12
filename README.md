@@ -24,7 +24,7 @@ application.
 - Firebase analytics (cordova-plugin-firebase)
 - AdMob implementation (lycwed-cordova-plugin-admob-free)
 - GameService/GameCenter support (lycwed-cordova-plugin-game-services)
-- Logger (js-logger)
+- Logger (pino)
 - Globalization (i18n)
 - Testing framework (jest)
 

@@ -83,7 +83,6 @@ export class AssetLoader {
           audio.push(asset[type]());
         }
       }
-      console.log(asset.getName(), asset.getJSON());
       this.loader.audioSprite(asset.getName(), asset.getJSON(), audio);
     }
   }

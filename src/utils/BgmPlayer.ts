@@ -1,5 +1,5 @@
+import logger from "../logger";
 import { Howl } from "howler";
-import { isNullOrUndefined } from "util";
 
 export default class BgmPlayer {
   public static instance_: BgmPlayer;
@@ -8,6 +8,24 @@ export default class BgmPlayer {
       this.instance_ = new BgmPlayer();
     }
     return this.instance_;
+  }
+
+  constructor() {
+    document.addEventListener("pause", () => {
+      logger.log("pause");
+      if (!this.audioPlaying) {
+        this.audioPlaying.pause();
+      }
+      if (!this.audioFading) {
+        this.audioFading.stop();
+      }
+    });
+    document.addEventListener("resume", () => {
+      logger.log("resume");
+      if (!this.audioPlaying && !this.audioPlaying.playing()) {
+        this.audioPlaying.play();
+      }
+    });
   }
 
   public volume = 0.8;
@@ -22,27 +40,8 @@ export default class BgmPlayer {
       volume: 0,
     });
 
-    audio.fade(0.0, volume, 100);
+    audio.fade(0.0, volume, 0);
     return audio;
-  }
-
-  public init(): void {
-    document.addEventListener("pause", () => {
-      if (!isNullOrUndefined(this.audioPlaying)) {
-        this.audioPlaying.pause();
-      }
-      if (!isNullOrUndefined(this.audioFading)) {
-        this.audioFading.stop();
-      }
-    });
-    document.addEventListener("resume", () => {
-      if (
-        !isNullOrUndefined(this.audioPlaying) &&
-        !this.audioPlaying.playing()
-      ) {
-        this.audioPlaying.play();
-      }
-    });
   }
 
   public play(src: Array<string>): void {
@@ -54,7 +53,7 @@ export default class BgmPlayer {
     this.audioFading = this.audioPlaying;
     this.audioPlaying = undefined;
 
-    if (!isNullOrUndefined(this.audioFading) && this.audioFading.playing()) {
+    if (this.audioFading && this.audioFading.playing()) {
       this.audioFading.fade(this.audioFading.volume(), 0.0, 800);
       this.audioFading.once("fade", () => {
         this.audioFading.stop();

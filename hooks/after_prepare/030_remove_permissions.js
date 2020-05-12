@@ -19,7 +19,7 @@ var permissionsToRemove = [ "RECORD_AUDIO", "MODIFY_AUDIO_SETTINGS", "READ_PHONE
 var fs = require('fs');
 var path = require('path');
 var rootdir = process.argv[2];
-var manifestFile = path.join(rootdir, "platforms/android/AndroidManifest.xml");
+var manifestFile = path.join(rootdir, "platforms/android/app/src/main/AndroidManifest.xml");
 
 try {
     fs.readFile( manifestFile, "utf8", function( err, data )

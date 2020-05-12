@@ -1,9 +1,8 @@
-import * as Logger from "js-logger";
-import { isNullOrUndefined } from "util";
+import logger from "../logger";
 
 export default class AdBanner {
   private static get isActive(): boolean {
-    return !isNullOrUndefined(window.cordova) && !isNullOrUndefined(admob);
+    return !window.cordova && !admob;
   }
 
   private static getId(): string {
@@ -15,12 +14,12 @@ export default class AdBanner {
   }
 
   public static init(): void {
-    if (!AdBanner.isActive) {
-      Logger.error("AdBanner.init AdBanner is not active.");
-      return;
-    }
-
     try {
+      if (!AdBanner || !AdBanner.isActive) {
+        logger.error("[AdBanner] init failed: AdBanner is not active.");
+        return;
+      }
+
       admob.banner.config({
         id: AdBanner.getId(),
         overlap: true,
@@ -28,7 +27,7 @@ export default class AdBanner {
       });
       admob.banner.prepare();
     } catch (e) {
-      Logger.error("AdBanner.init failed: " + e);
+      logger.error("[AdBanner] init failed: " + e);
     }
   }
 
@@ -40,7 +39,7 @@ export default class AdBanner {
     try {
       admob.banner.show();
     } catch (e) {
-      Logger.error("AdBanner.showBanner failed: " + e);
+      logger.error("[AdBanner] showBanner failed: " + e);
     }
   }
 
@@ -52,7 +51,7 @@ export default class AdBanner {
     try {
       admob.banner.hide();
     } catch (e) {
-      Logger.error("AdBanner.hideBanner failed: " + e);
+      logger.error("[AdBanner] hideBanner failed: " + e);
     }
   }
 }

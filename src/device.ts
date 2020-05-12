@@ -1,4 +1,4 @@
-import * as Logger from "js-logger";
+import logger from "./logger";
 import i18next from "i18next";
 import AdBanner from "./utils/AdBanner";
 import AdInterstitial from "./utils/AdInterstitial";
@@ -9,7 +9,7 @@ function showExitAppDialog(): void {
     i18next.t("close_dialog_message"),
     (choice) => {
       if (choice === 1) {
-        Logger.info("exitApp");
+        logger.info("exitApp");
         navigator.app.exitApp();
       }
     },
@@ -17,16 +17,13 @@ function showExitAppDialog(): void {
   );
 }
 
-function setDeviceReady(resolve): void {
-  document.addEventListener("deviceready", () => {
-    SpinnerDialog.show(null, "loading ...");
-
+function setup(): Promise<void> {
+  return new Promise((resolve) => {
     AdBanner.init();
     AdInterstitial.init();
     Tracking.auth();
 
     window.StatusBar.styleDefault();
-
     if (
       window.cordova.platformId === "android" ||
       window.cordova.platformId === "ios"
@@ -39,11 +36,11 @@ function setDeviceReady(resolve): void {
     // Setup localization for cordova devices
     navigator.globalization.getPreferredLanguage(
       (language) => {
-        Logger.info("ChangeLanguage: [" + language.value + "]");
+        logger.info("ChangeLanguage: [" + language.value + "]");
         i18next.changeLanguage(language.value);
       },
       (error: GlobalizationError) => {
-        Logger.error("ChangeLanguage Error: " + error);
+        logger.error("ChangeLanguage Error: " + error);
       }
     );
 
@@ -51,22 +48,35 @@ function setDeviceReady(resolve): void {
     document.addEventListener(
       "backbutton",
       (): void => {
+        logger.log("backbutton");
         showExitAppDialog();
       },
       false
     );
 
+    navigator.splashscreen.hide();
     resolve();
   });
 }
 
 const Device = {
-  init: async (): Promise<void> => {
-    return new Promise<void>((resolve) => {
-      if (window.cordova) {
-        setDeviceReady(resolve);
-      } else {
+  init: (): Promise<void> => {
+    return new Promise((resolve) => {
+      if (/^(http|https)/.exec(document.URL)) {
+        logger.log("[Device] Running on Web plaform");
         resolve();
+      } else {
+        logger.log("[Device] Running on Cordova plaform");
+        document.addEventListener("deviceready", () => {
+          setup()
+            .catch((err) => {
+              logger.error("[Device] setup failed: ", err);
+            })
+            .finally(() => {
+              logger.log("[Device] ready");
+              resolve();
+            });
+        });
       }
     });
   },

@@ -1,4 +1,4 @@
-import * as Logger from "js-logger";
+import logger from "../logger";
 import * as firebase from "firebase";
 
 export default class Tracking {
@@ -10,17 +10,19 @@ export default class Tracking {
       };
 
       firebase.initializeApp(config);
-      Logger.info("Tracking::auth");
+      logger.info("[Tracking] auth");
       firebase
         .auth()
         .signInAnonymously()
         .catch((error): void => {
           const errorCode = error.code;
           const errorMessage = error.message;
-          Logger.error("Firebase auth: [" + errorCode + "]: " + errorMessage);
+          logger.error(
+            "[Tracking] Firebase auth: [" + errorCode + "]: " + errorMessage
+          );
         });
     } catch (e) {
-      Logger.error("Tracking::auth failed: " + e);
+      logger.error("[Tracking] auth failed: " + e);
     }
   }
 }

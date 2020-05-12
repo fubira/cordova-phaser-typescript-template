@@ -1,14 +1,10 @@
-import * as Logger from "js-logger";
-import { isNullOrUndefined } from "util";
+import logger from "../logger";
 
 export default class GameService {
   private static isSignedIn = false;
 
   public static get isActive(): boolean {
-    return (
-      !isNullOrUndefined(window.cordova) &&
-      !isNullOrUndefined(window.gamesServices)
-    );
+    return !window.cordova && !window.gamesServices;
   }
 
   private static getLeaderBoardId(): string {
@@ -21,8 +17,8 @@ export default class GameService {
 
   public static auth(): void {
     if (!GameService.isActive) {
-      Logger.warn(
-        "GameService disabled. You can use this api on cordova platform only."
+      logger.warn(
+        "[GameService] You can use this api on cordova platform only."
       );
       return;
     }
@@ -32,7 +28,7 @@ export default class GameService {
         this.isSignedIn = true;
       });
     } catch (e) {
-      Logger.error("GameService:auth failed: " + e);
+      logger.error("[GameService] auth failed: " + e);
     }
   }
 
@@ -50,7 +46,7 @@ export default class GameService {
         leaderboardId: this.getLeaderBoardId(),
       });
     } catch (e) {
-      Logger.error("GameService:showLeaderBoard failed: " + e);
+      logger.error("[GameService] showLeaderBoard failed: " + e);
     }
   }
 
@@ -62,24 +58,24 @@ export default class GameService {
     try {
       this.submitScoreInternal(value);
     } catch (e) {
-      Logger.error("GameService:submitScore failed: " + e);
+      logger.error("[GameService] submitScore failed: " + e);
     }
   }
 
   private static submitScoreInternal(value: number): void {
     const option = { leaderboardId: this.getLeaderBoardId(), score: value };
 
-    if (isNullOrUndefined(option.leaderboardId)) {
-      Logger.warn("GameService: LeaderboardID undefined.");
+    if (option.leaderboardId) {
+      logger.warn("[GameService] LeaderboardID undefined.");
       return;
     }
 
     window.gamesServices.submitScore(
       () => {
-        Logger.debug("GameService: submitScore completed. (" + value + ")");
+        logger.debug("[GameService] submitScore completed. (" + value + ")");
       },
       (result: string) => {
-        Logger.error("GameService: submitScore failed. :" + result + "");
+        logger.error("[GameService] submitScore failed. :" + result + "");
       },
       option
     );

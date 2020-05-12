@@ -1,9 +1,8 @@
-import * as Logger from "js-logger";
-import { isNullOrUndefined } from "util";
+import logger from "../logger";
 
 export default class AdInterstitial {
   private static get isActive(): boolean {
-    return !isNullOrUndefined(window.cordova) && !isNullOrUndefined(admob);
+    return !window.cordova && !admob;
   }
 
   private static getId(): string {
@@ -15,19 +14,19 @@ export default class AdInterstitial {
   }
 
   public static init(): void {
-    if (!AdInterstitial.isActive) {
-      Logger.warn("AdInterstitial.init AdBanner is not active.");
-      return;
-    }
-
     try {
+      if (!AdInterstitial || !AdInterstitial.isActive) {
+        logger.warn("[AdInterstitial] AdInterstitial is not active.");
+        return;
+      }
+
       admob.interstitial.config({
         id: AdInterstitial.getId(),
         overlap: true,
         isTesting: DEBUG,
       });
     } catch (e) {
-      Logger.error("AdInterstitial.init failed: " + e);
+      logger.error("[AdInterstitial] init failed: " + e);
     }
   }
 
@@ -39,7 +38,7 @@ export default class AdInterstitial {
     try {
       admob.interstitial.prepare();
     } catch (e) {
-      Logger.error("AdInterstitial.init failed: " + e);
+      logger.error("[AdInterstitial] preload failed: " + e);
     }
   }
 
@@ -58,7 +57,7 @@ export default class AdInterstitial {
 
       admob.interstitial.show();
     } catch (e) {
-      Logger.error("AdInterstitial.show failed: " + e);
+      logger.error("[AdInterstitial] show failed: " + e);
       onComplete();
     }
   }
