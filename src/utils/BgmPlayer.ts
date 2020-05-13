@@ -12,17 +12,17 @@ export default class BgmPlayer {
 
   constructor() {
     document.addEventListener("pause", () => {
-      logger.log("pause");
-      if (!this.audioPlaying) {
+      logger.log("[BgmPlayer] pause", this.audioPlaying.playing());
+      if (this.audioPlaying) {
         this.audioPlaying.pause();
       }
-      if (!this.audioFading) {
+      if (this.audioFading) {
         this.audioFading.stop();
       }
     });
     document.addEventListener("resume", () => {
-      logger.log("resume");
-      if (!this.audioPlaying && !this.audioPlaying.playing()) {
+      logger.log("[BgmPlayer] resume", this.audioPlaying.playing());
+      if (this.audioPlaying && !this.audioPlaying.playing()) {
         this.audioPlaying.play();
       }
     });
