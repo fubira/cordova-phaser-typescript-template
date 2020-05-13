@@ -1,19 +1,17 @@
-import logger from "@/logger";
 import * as Assets from "@/assets";
 import BgmPlayer from "@/utils/BgmPlayer";
+import { Background, Label, FontSize } from "@/pixelui";
 
 export default class TitlScene extends Phaser.Scene {
   private titleText: Phaser.GameObjects.Text = null;
   private subtitleText: Phaser.GameObjects.BitmapText = null;
-  private tapToStartText: Phaser.GameObjects.Text = null;
+  private tapToStartText: Phaser.GameObjects.GameObject = null;
   private sfxAudioSprites:
     | Phaser.Sound.WebAudioSound
     | Phaser.Sound.HTML5AudioSound = null;
 
   public init(): void {
-    this.cameras.main.backgroundColor = Phaser.Display.Color.HexStringToColor(
-      "#483C46"
-    );
+    this.children.add(new Background(this));
   }
 
   public preload(): void {
@@ -41,38 +39,22 @@ export default class TitlScene extends Phaser.Scene {
       this.startGame();
     });
 
-    this.titleText = this.add.text(
-      this.cameras.main.centerX,
-      this.cameras.main.centerY - 60,
-      "Cordova Phaser Template",
-      { font: "50px " + Assets.CustomWebFonts.FontsK8X12.getFamily() }
+    const posX = this.cameras.main.centerX;
+    const posY = this.cameras.main.centerY;
+
+    this.children.add(
+      new Label(
+        this,
+        posX,
+        posY - 120,
+        "Hello Phaser\nWorld!!\n123456\n345678",
+        FontSize.exlarge
+      )
     );
-
-    this.titleText.setOrigin(0.5, 0.5);
-    this.titleText.setFill("#EE8855");
-    this.titleText.setStroke("#000000", 5);
-    this.titleText.setShadow(4, 4, "rgba(0,0,0,0.3)", 4, true, true);
-
-    this.subtitleText = this.add.bitmapText(
-      this.cameras.main.centerX,
-      this.cameras.main.centerY + 0,
-      Assets.BitmapFonts.FontsScore.getName(),
-      "BitmapFont"
+    this.children.add(new Label(this, posX, posY, "Secondary Label"));
+    this.tapToStartText = this.children.add(
+      new Label(this, posX, posY + 80, "Tap to Start", FontSize.small)
     );
-
-    this.subtitleText.setOrigin(0.5, 0.5);
-
-    this.tapToStartText = this.add.text(
-      this.cameras.main.centerX,
-      this.cameras.main.centerY + 100,
-      "Tap to start",
-      { font: "32px " + Assets.CustomWebFonts.FontsK8X12.getFamily() }
-    );
-
-    this.tapToStartText.setOrigin(0.5, 0.5);
-    this.tapToStartText.setFill("#BEEE62");
-    this.tapToStartText.setStroke("#000000", 5);
-    this.tapToStartText.setShadow(4, 4, "rgba(0,0,0,0.3)", 4, true, true);
 
     this.tweens.add({
       targets: this.tapToStartText,

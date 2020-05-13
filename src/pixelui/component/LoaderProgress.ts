@@ -8,17 +8,19 @@ export class LoaderProgress extends Phaser.GameObjects.Container {
     frame: Phaser.GameObjects.Sprite
   ) {
     super(scene);
+    // align x: left, y: center
     bar.setOrigin(0, 0.5);
     bar.x -= bar.width * 0.5;
     this.barSprite = bar;
     this.add(this.barSprite);
 
+    // align x: center, y: center
     frame.setOrigin(0.5);
     this.frameSprite = frame;
     this.add(this.frameSprite);
   }
 
-  public load(load: Function): Promise<void> {
+  public start(load: Function): Promise<void> {
     this.barSprite.setScale(0, 1.0);
 
     return new Promise((resolve, reject) => {
