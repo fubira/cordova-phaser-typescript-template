@@ -41,7 +41,7 @@ export default class TitlScene extends Phaser.Scene {
     const centerX = this.cameras.main.centerX;
     const centerY = this.cameras.main.centerY;
 
-    PixelUI.add.textlabel(
+    PixelUI.add.textLabel(
       this,
       0,
       0,
@@ -56,10 +56,10 @@ export default class TitlScene extends Phaser.Scene {
     );
 
     PixelUI.add
-      .textlabel(this, centerX, centerY, "おはようございます")
+      .textLabel(this, centerX, centerY, "おはようございます")
       .setOrigin(0.5, 0.5);
 
-    this.tapToStartText = PixelUI.add.textlabel(
+    this.tapToStartText = PixelUI.add.textLabel(
       this,
       0,
       GAME_HEIGHT - 260,

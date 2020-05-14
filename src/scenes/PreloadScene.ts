@@ -1,6 +1,6 @@
 import * as Assets from "@/assets";
+import * as PixelUI from "@/pixelui";
 import { AssetLoader } from "@/utils/AssetLoader";
-import { LoaderProgress } from "@/pixelui";
 
 export default class PreloadScene extends Phaser.Scene {
   public init(): void {
@@ -19,14 +19,11 @@ export default class PreloadScene extends Phaser.Scene {
   }
 
   public create(): void {
-    const progress = new LoaderProgress(
+    const progress = PixelUI.add.loadingProgerss(
       this,
-      this.add.sprite(0, 0, Assets.Images.ImagesProgressBar.getName()),
-      this.add.sprite(0, 0, Assets.Images.ImagesProgressFrame.getName())
+      Assets.Images.ImagesProgressBar.getName(),
+      Assets.Images.ImagesProgressFrame.getName()
     );
-    progress.setPosition(this.cameras.main.centerX, this.cameras.main.centerY);
-    this.children.add(progress);
-
     progress
       .start(() => {
         AssetLoader.loadAllAssets(this.load);
