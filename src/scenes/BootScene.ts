@@ -1,4 +1,4 @@
-import { PixelUI } from "@/pixelui";
+import * as PixelUI from "@/pixelui";
 import * as Assets from "@/assets";
 
 export default class BootScene extends Phaser.Scene {
@@ -16,9 +16,9 @@ export default class BootScene extends Phaser.Scene {
       textShadow: true,
       textStroke: true,
       textFontFamily: Assets.CustomWebFonts.FontsKiniroSs.getFamily(),
-      textSizeSmall: 26,
-      textSizeNormal: 34,
-      textSizeLarge: 42,
+      textSizeSmall: 32,
+      textSizeNormal: 40,
+      textSizeLarge: 54,
     });
     this.scene.start("PreloadScene");
   }

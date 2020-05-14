@@ -29,7 +29,7 @@ module.exports = {
   new webpack.DefinePlugin({
       DEBUG: true,
       GAME_WIDTH: 540,
-      GAME_HEIGHT: 720,
+      GAME_HEIGHT: 960,
     }),
     new DotEnvPlugin(),
   ],

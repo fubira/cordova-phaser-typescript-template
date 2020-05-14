@@ -1,28 +1,4 @@
-export interface ThemeStyles {
-  themeDark?: boolean;
-  textShadow?: boolean;
-  textStroke?: boolean;
-  textType?: string;
-
-  textFontFamily?: string;
-  textSizeXSmall?: number;
-  textSizeSmall?: number;
-  textSizeNormal?: number;
-  textSizeLarge?: number;
-  textSizeXLarge?: number;
-
-  colorMain?: string;
-  colorLightShade?: string;
-  colorLightAccent?: string;
-  colorDarkShade?: string;
-  colorDarkAccent?: string;
-
-  colorPrimary?: string;
-  colorInfo?: string;
-  colorSuccess?: string;
-  colorWarning?: string;
-  colorDanger?: string;
-}
+import { ThemeStyles, TextSize } from "./Types";
 
 export const defaultTheme: ThemeStyles = {
   textShadow: false,
@@ -62,6 +38,24 @@ export class Theme {
 
   public compose(localTheme: ThemeStyles = {}): ThemeStyles {
     return { ...this.themeStyles, ...localTheme };
+  }
+
+  public getTextSize(size: TextSize): number {
+    switch (size) {
+      case "xsmall":
+        return this.styles.textSizeXSmall || 12;
+      case "small":
+        return this.styles.textSizeSmall || this.getTextSize("xsmall");
+      case "normal":
+        return this.styles.textSizeNormal || this.getTextSize("small");
+      case "large":
+        return this.styles.textSizeLarge || this.getTextSize("normal");
+      case "xlarge":
+        return this.styles.textSizeXLarge || this.getTextSize("large");
+      default:
+        break;
+    }
+    return Number.parseInt(size, 10) || 12;
   }
 
   public backgroundColor(localTheme?: ThemeStyles): string {

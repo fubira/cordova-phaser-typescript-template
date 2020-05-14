@@ -1,32 +1,15 @@
-import { PixelUI, ThemeStyles } from "..";
-
-function getFontSize(size: string, theme: ThemeStyles): number {
-  switch (size) {
-    case "xsmall":
-      return theme.textSizeXSmall || 12;
-    case "small":
-      return theme.textSizeSmall || getFontSize("exsmall", theme);
-    case "normal":
-      return theme.textSizeNormal || getFontSize("small", theme);
-    case "large":
-      return theme.textSizeLarge || getFontSize("normal", theme);
-    case "xlarge":
-      return theme.textSizeXLarge || getFontSize("large", theme);
-    default:
-      return Number.parseInt(size, 10) || 12;
-  }
-}
+import * as PixelUI from "../";
 
 export function LabelTextFactory(
   scene: Phaser.Scene,
   x: number,
   y: number,
   text: string | string[],
-  size: "xsmall" | "small" | "large" | "normal" | "xlarge" | null,
+  size: PixelUI.TextSize,
   style: Phaser.Types.GameObjects.Text.TextStyle = {}
 ): Phaser.GameObjects.Text {
   const theme = PixelUI.theme.styles;
-  const fontSize = getFontSize(size, theme);
+  const fontSize = PixelUI.theme.getTextSize(size);
 
   if (!style.color) {
     style.color = theme.textStroke

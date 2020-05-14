@@ -1,6 +1,6 @@
 import * as Assets from "@/assets";
+import * as PixelUI from "@/pixelui";
 import BgmPlayer from "@/utils/BgmPlayer";
-import { PixelUI } from "@/pixelui";
 
 export default class TitlScene extends Phaser.Scene {
   private tapToStartText: Phaser.GameObjects.GameObject = null;

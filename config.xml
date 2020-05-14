@@ -33,7 +33,7 @@
     <preference name="StatusBarOverlaysWebView" value="true" />
     <preference name="AutoHideSplashScreen" value="false" />
     <preference name="Orientation" value="portrait" />
-    <preference name="BackgroundColor" value="0xff000000" />
+    <preference name="BackgroundColor" value="0xFF2A344C" />
     <preference name="WKWebViewOnly" value="true" />
     <plugin name="cordova-plugin-whitelist" spec="^1.3.3" />
     <plugin name="cordova-plugin-dialogs" spec="^2.0.1" />

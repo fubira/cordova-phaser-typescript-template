@@ -1,4 +1,4 @@
-import { PixelUI } from "..";
+import * as PixelUI from "../";
 
 export function BackgroundFactory(
   scene: Phaser.Scene,
