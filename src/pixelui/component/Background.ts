@@ -1,21 +1,17 @@
-import { PixelUI, ThemeOptions } from "..";
+import { PixelUI } from "..";
 
-export class Background extends Phaser.GameObjects.Container {
-  constructor(scene: Phaser.Scene, theme?: ThemeOptions) {
-    super(scene, 0, 0);
+export function BackgroundFactory(
+  scene: Phaser.Scene,
+  color?: string
+): Phaser.GameObjects.Rectangle {
+  const backgroundColor = color || PixelUI.theme.backgroundColor();
+  scene.cameras.main.setBackgroundColor(backgroundColor);
 
-    const themeColorDarkShade = Phaser.Display.Color.HexStringToColor(
-      PixelUI.theme(theme).colorLightShade || "#000000"
-    );
-    scene.cameras.main.setBackgroundColor(themeColorDarkShade.color);
-
-    const rectangle = scene.add.rectangle(
-      0,
-      0,
-      GAME_WIDTH,
-      GAME_HEIGHT,
-      themeColorDarkShade.color
-    );
-    rectangle.setOrigin(0, 0);
-  }
+  return scene.add.rectangle(
+    0,
+    0,
+    GAME_WIDTH,
+    GAME_HEIGHT,
+    Phaser.Display.Color.HexStringToColor(backgroundColor).color
+  );
 }

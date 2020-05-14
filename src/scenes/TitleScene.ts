@@ -1,6 +1,6 @@
 import * as Assets from "@/assets";
 import BgmPlayer from "@/utils/BgmPlayer";
-import { Background, Label, FontSize } from "@/pixelui";
+import { LabelTextSize, PixelUI } from "@/pixelui";
 
 export default class TitlScene extends Phaser.Scene {
   private titleText: Phaser.GameObjects.Text = null;
@@ -11,7 +11,7 @@ export default class TitlScene extends Phaser.Scene {
     | Phaser.Sound.HTML5AudioSound = null;
 
   public init(): void {
-    this.children.add(new Background(this));
+    PixelUI.add.background(this);
   }
 
   public preload(): void {
@@ -42,18 +42,28 @@ export default class TitlScene extends Phaser.Scene {
     const posX = this.cameras.main.centerX;
     const posY = this.cameras.main.centerY;
 
-    this.children.add(
-      new Label(
-        this,
-        posX,
-        posY - 120,
-        "Hello Phaser\nWorld!!\n123456\n345678",
-        FontSize.exlarge
-      )
+    PixelUI.add.label(
+      this,
+      posX,
+      posY - 180,
+      ["Hello Phaser World!!", "Multi Line"],
+      LabelTextSize.large
     );
-    this.children.add(new Label(this, posX, posY, "Secondary Label"));
-    this.tapToStartText = this.children.add(
-      new Label(this, posX, posY + 80, "Tap to Start", FontSize.small)
+
+    PixelUI.add.label(
+      this,
+      posX,
+      posY,
+      "Secondary Label",
+      LabelTextSize.normal
+    );
+
+    this.tapToStartText = PixelUI.add.label(
+      this,
+      posX,
+      posY + 60,
+      "Tap to Start",
+      LabelTextSize.small
     );
 
     this.tweens.add({

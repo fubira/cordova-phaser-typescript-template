@@ -4,8 +4,7 @@ import { LoaderProgress, PixelUI } from "@/pixelui";
 
 export default class PreloadScene extends Phaser.Scene {
   public init(): void {
-    /* */
-    PixelUI.setup({
+    PixelUI.theme.update({
       themeDark: false,
       textShadow: true,
       textStroke: true,
