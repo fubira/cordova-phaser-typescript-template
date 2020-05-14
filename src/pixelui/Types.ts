@@ -31,3 +31,8 @@ export type TextSize =
   | "normal"
   | "xlarge"
   | null;
+
+export interface TextLabelStyle
+  extends Phaser.Types.GameObjects.Text.TextStyle {
+  textSize?: TextSize;
+}

@@ -38,26 +38,37 @@ export default class TitlScene extends Phaser.Scene {
       this.startGame();
     });
 
-    const posX = this.cameras.main.centerX;
-    const posY = this.cameras.main.centerY;
+    const centerX = this.cameras.main.centerX;
+    const centerY = this.cameras.main.centerY;
 
-    PixelUI.add.label(
+    PixelUI.add.textlabel(
       this,
-      posX,
-      posY - 180,
+      0,
+      0,
       ["Hello Phaser!", "Multi Line", "日本語メッセージ"],
-      "large",
-      { color: PixelUI.theme.styles.colorLightAccent, align: "center" }
+      {
+        textSize: "large",
+        color: PixelUI.theme.styles.colorLightAccent,
+        fixedWidth: GAME_WIDTH,
+        align: "left",
+        padding: { x: 20, y: 20 },
+      }
     );
 
-    PixelUI.add.label(this, posX, posY, "おはようございます", "normal");
+    PixelUI.add
+      .textlabel(this, centerX, centerY, "おはようございます")
+      .setOrigin(0.5, 0.5);
 
-    this.tapToStartText = PixelUI.add.label(
+    this.tapToStartText = PixelUI.add.textlabel(
       this,
-      posX,
-      posY + 120,
+      0,
+      GAME_HEIGHT - 260,
       "Tap to Start",
-      "small"
+      {
+        textSize: "small",
+        fixedWidth: GAME_WIDTH,
+        align: "center",
+      }
     );
 
     this.tweens.add({

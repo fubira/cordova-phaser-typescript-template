@@ -55,7 +55,7 @@ export class Theme {
       default:
         break;
     }
-    return Number.parseInt(size, 10) || 12;
+    return Number.parseInt(size, 10) || this.getTextSize("normal");
   }
 
   public backgroundColor(localTheme?: ThemeStyles): string {

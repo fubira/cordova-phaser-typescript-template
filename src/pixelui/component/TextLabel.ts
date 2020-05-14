@@ -1,15 +1,14 @@
 import * as PixelUI from "../";
 
-export function LabelTextFactory(
+export function TextLabelFactory(
   scene: Phaser.Scene,
   x: number,
   y: number,
   text: string | string[],
-  size: PixelUI.TextSize,
-  style: Phaser.Types.GameObjects.Text.TextStyle = {}
+  style: PixelUI.TextLabelStyle = {}
 ): Phaser.GameObjects.Text {
   const theme = PixelUI.theme.styles;
-  const fontSize = PixelUI.theme.getTextSize(size);
+  const textSize = PixelUI.theme.getTextSize(style.textSize);
 
   if (!style.color) {
     style.color = theme.textStroke
@@ -23,7 +22,7 @@ export function LabelTextFactory(
 
   if (!style.stroke && theme.textStroke) {
     style.stroke = "#000000";
-    style.strokeThickness = fontSize / 8;
+    style.strokeThickness = textSize / 8;
   }
 
   if (!style.shadow && theme.textShadow) {
@@ -36,11 +35,13 @@ export function LabelTextFactory(
       fill: true,
     };
   }
-  style.fontSize = `${fontSize}px`;
+  style.fontSize = `${textSize}px`;
 
-  const object = scene.add.text(0, 0, text, style);
-  object.setOrigin(0.5, 0.5);
-  object.setPosition(x, y);
-
+  const object = scene.add.text(
+    x,
+    y,
+    text,
+    style as Phaser.Types.GameObjects.Text.TextStyle
+  );
   return object;
 }
