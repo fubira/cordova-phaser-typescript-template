@@ -87,6 +87,8 @@ export namespace Audiosprites {
 export namespace CustomWebFonts {
   const FontsGkkttCSS = require("!file-loader?name=assets/fonts/[name].[ext]!assets/fonts/gkktt.css").default;
   const FontsGkkttTTF = require("!file-loader?name=assets/fonts/[name].[ext]!assets/fonts/gkktt.ttf").default;
+  const FontsHangyakuCSS = require("!file-loader?name=assets/fonts/[name].[ext]!assets/fonts/hangyaku.css").default;
+  const FontsHangyakuTTF = require("!file-loader?name=assets/fonts/[name].[ext]!assets/fonts/hangyaku.ttf").default;
   const FontsKiniroSsCSS = require("!file-loader?name=assets/fonts/[name].[ext]!assets/fonts/kiniro-ss.css").default;
   const FontsKiniroSsTTF = require("!file-loader?name=assets/fonts/[name].[ext]!assets/fonts/kiniro-ss.ttf").default;
 
@@ -95,6 +97,12 @@ export namespace CustomWebFonts {
     static getFamily(): string { return "gkktt"; }
     static getCSS(): string { return FontsGkkttCSS; }
     static getTTF(): string { return FontsGkkttTTF; }
+  }
+  export class FontsHangyaku {
+    static getName(): string { return "hangyaku"; }
+    static getFamily(): string { return "hangyaku"; }
+    static getCSS(): string { return FontsHangyakuCSS; }
+    static getTTF(): string { return FontsHangyakuTTF; }
   }
   export class FontsKiniroSs {
     static getName(): string { return "kiniro-ss"; }
