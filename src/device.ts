@@ -19,36 +19,52 @@ function showExitAppDialog(): void {
 
 function setup(): Promise<void> {
   return new Promise((resolve) => {
-    AdBanner.init();
-    AdInterstitial.init();
-    Tracking.auth();
-
-    window.StatusBar.styleDefault();
-    if (
-      window.cordova.platformId === "android" ||
-      window.cordova.platformId === "ios"
-    ) {
-      window.StatusBar.overlaysWebView(true);
-      window.StatusBar.backgroundColorByHexString("#A0483C46");
-      window.StatusBar.styleBlackTranslucent();
+    try {
+      AdBanner.init();
+      AdInterstitial.init();
+    } catch (err) {
+      logger.error("[Device] Ad initialize failed");
     }
 
-    // Setup localization for cordova devices
-    navigator.globalization.getPreferredLanguage(
-      (language) => {
-        logger.info("ChangeLanguage: [" + language.value + "]");
-        i18next.changeLanguage(language.value);
-      },
-      (error: GlobalizationError) => {
-        logger.error("ChangeLanguage Error: " + error);
-      }
-    );
+    try {
+      Tracking.auth();
+    } catch (err) {
+      logger.error("[Device] Tracking initialize failed");
+    }
 
-    // hook backbutton event
+    try {
+      window.StatusBar.styleDefault();
+      if (
+        window.cordova.platformId === "android" ||
+        window.cordova.platformId === "ios"
+      ) {
+        window.StatusBar.overlaysWebView(true);
+        window.StatusBar.backgroundColorByHexString("#A0483C46");
+        window.StatusBar.styleBlackTranslucent();
+      }
+    } catch (err) {
+      logger.error("[Device] Statusbar setting failed");
+    }
+
+    try {
+      // Setup localization for cordova devices
+      navigator.globalization.getPreferredLanguage(
+        (language) => {
+          logger.info("ChangeLanguage: [" + language.value + "]");
+          i18next.changeLanguage(language.value);
+        },
+        (error: GlobalizationError) => {
+          logger.error("ChangeLanguage Error: " + error);
+        }
+      );
+    } catch (err) {
+      logger.error("[Device] globalization setting failed");
+    }
+
     document.addEventListener(
       "backbutton",
-      (): void => {
-        logger.log("backbutton");
+      function (e) {
+        e.preventDefault();
         showExitAppDialog();
       },
       false
