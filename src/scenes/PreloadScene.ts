@@ -8,7 +8,7 @@ export default class PreloadScene extends Phaser.Scene {
       themeDark: false,
       textShadow: true,
       textStroke: true,
-      textFontFamily: Assets.CustomWebFonts.FontsK8X12.getFamily(),
+      textFontFamily: Assets.CustomWebFonts.FontsKokugl.getFamily(),
       textSizeSmall: 30,
       textSizeNormal: 40,
       textSizeLarge: 50,

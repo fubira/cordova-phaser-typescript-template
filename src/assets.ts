@@ -87,12 +87,20 @@ export namespace Audiosprites {
 export namespace CustomWebFonts {
   const FontsK8X12CSS = require("!file-loader?name=assets/fonts/[name].[ext]!assets/fonts/k8x12.css").default;
   const FontsK8X12TTF = require("!file-loader?name=assets/fonts/[name].[ext]!assets/fonts/k8x12.ttf").default;
+  const FontsKokuglCSS = require("!file-loader?name=assets/fonts/[name].[ext]!assets/fonts/kokugl.css").default;
+  const FontsKokuglTTF = require("!file-loader?name=assets/fonts/[name].[ext]!assets/fonts/kokugl.ttf").default;
 
   export class FontsK8X12 {
     static getName(): string { return "k8x12"; }
     static getFamily(): string { return "k8x12"; }
     static getCSS(): string { return FontsK8X12CSS; }
     static getTTF(): string { return FontsK8X12TTF; }
+  }
+  export class FontsKokugl {
+    static getName(): string { return "kokugl"; }
+    static getFamily(): string { return "kokugl"; }
+    static getCSS(): string { return FontsKokuglCSS; }
+    static getTTF(): string { return FontsKokuglTTF; }
   }
 }
 
