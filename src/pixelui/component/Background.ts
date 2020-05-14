@@ -8,8 +8,8 @@ export function BackgroundFactory(
   scene.cameras.main.setBackgroundColor(backgroundColor);
 
   return scene.add.rectangle(
-    0,
-    0,
+    scene.cameras.main.centerX,
+    scene.cameras.main.centerY,
     GAME_WIDTH,
     GAME_HEIGHT,
     Phaser.Display.Color.HexStringToColor(backgroundColor).color

@@ -1,6 +1,6 @@
 import * as Assets from "@/assets";
 import BgmPlayer from "@/utils/BgmPlayer";
-import { LabelTextSize, PixelUI } from "@/pixelui";
+import { PixelUI } from "@/pixelui";
 
 export default class TitlScene extends Phaser.Scene {
   private titleText: Phaser.GameObjects.Text = null;
@@ -47,30 +47,24 @@ export default class TitlScene extends Phaser.Scene {
       posX,
       posY - 180,
       ["Hello Phaser World!!", "Multi Line"],
-      LabelTextSize.large
+      { size: "large" }
     );
 
-    PixelUI.add.label(
-      this,
-      posX,
-      posY,
-      "Secondary Label",
-      LabelTextSize.normal
-    );
+    PixelUI.add.label(this, posX, posY, "Secondary Label", { size: "normal" });
 
     this.tapToStartText = PixelUI.add.label(
       this,
       posX,
-      posY + 60,
+      posY + 120,
       "Tap to Start",
-      LabelTextSize.small
+      { size: "small" }
     );
 
     this.tweens.add({
       targets: this.tapToStartText,
       alpha: { from: 0, to: 1 },
       ease: "CubicOut",
-      duration: 500,
+      duration: 800,
       repeat: -1,
       yoyo: true,
     });

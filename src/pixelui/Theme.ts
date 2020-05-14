@@ -5,11 +5,11 @@ export interface ThemeOptions {
   textType?: string;
 
   textFontFamily?: string;
-  textSizeExSmall?: number;
+  textSizeXSmall?: number;
   textSizeSmall?: number;
   textSizeNormal?: number;
   textSizeLarge?: number;
-  textSizeExLarge?: number;
+  textSizeXLarge?: number;
 
   colorMain?: string;
   colorLightShade?: string;

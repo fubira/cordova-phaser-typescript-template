@@ -1,26 +1,27 @@
 import { PixelUI, ThemeOptions } from "..";
 
-export enum LabelTextSize {
-  exsmall,
-  small,
-  normal,
-  large,
-  exlarge,
-}
+type LabelStyle = {
+  align?: string;
+  size?: string;
+  width?: number;
+  height?: number;
+  maxLength?: number;
+};
 
-function getSize(size: LabelTextSize, theme: ThemeOptions): number {
-  if (size === LabelTextSize.exsmall) {
-    return theme.textSizeExSmall || 12;
-  } else if (size === LabelTextSize.small) {
-    return theme.textSizeSmall || getSize(LabelTextSize.exsmall, theme);
-  } else if (size === LabelTextSize.normal) {
-    return theme.textSizeNormal || getSize(LabelTextSize.small, theme);
-  } else if (size === LabelTextSize.large) {
-    return theme.textSizeLarge || getSize(LabelTextSize.normal, theme);
-  } else if (size === LabelTextSize.exlarge) {
-    return theme.textSizeExLarge || getSize(LabelTextSize.large, theme);
-  } else {
-    return 12;
+function getFontSize(size: string, theme: ThemeOptions): number {
+  switch (size) {
+    case "xsmall":
+      return theme.textSizeXSmall || 12;
+    case "small":
+      return theme.textSizeSmall || getFontSize("exsmall", theme);
+    case "normal":
+      return theme.textSizeNormal || getFontSize("small", theme);
+    case "large":
+      return theme.textSizeLarge || getFontSize("normal", theme);
+    case "xlarge":
+      return theme.textSizeXLarge || getFontSize("large", theme);
+    default:
+      return Number.parseInt(size, 10) || 12;
   }
 }
 
@@ -29,8 +30,7 @@ export function LabelTextFactory(
   x: number,
   y: number,
   text: string | string[],
-  size: LabelTextSize = LabelTextSize.normal,
-  style: Phaser.Types.GameObjects.Text.TextStyle = {}
+  style: LabelStyle = {}
 ): Phaser.GameObjects.Text {
   const theme = PixelUI.theme.main;
   const color = theme.textStroke
@@ -38,12 +38,13 @@ export function LabelTextFactory(
     : theme.colorDarkShade || "#000000";
 
   const fontFamily = theme.textFontFamily;
-  const fontSize = `${getSize(size, theme)}px`;
-  const strokeSize = getSize(size, theme) / 8;
+  const fontSize = getFontSize(style.size, theme);
+  const strokeSize = fontSize / 8;
+  console.log(fontSize, style);
 
   const object = scene.add.text(0, 0, text, {
-    fontFamily,
-    fontSize,
+    fontFamily: `${fontFamily}`,
+    fontSize: `${fontSize}px`,
     color,
     ...style,
   });
