@@ -1,18 +1,10 @@
 import * as Assets from "@/assets";
 import { AssetLoader } from "@/utils/AssetLoader";
-import { LoaderProgress, PixelUI } from "@/pixelui";
+import { LoaderProgress } from "@/pixelui";
 
 export default class PreloadScene extends Phaser.Scene {
   public init(): void {
-    PixelUI.theme.update({
-      themeDark: false,
-      textShadow: true,
-      textStroke: true,
-      textFontFamily: Assets.CustomWebFonts.FontsKokugl.getFamily(),
-      textSizeSmall: 30,
-      textSizeNormal: 40,
-      textSizeLarge: 50,
-    });
+    /**/
   }
 
   public preload(): void {

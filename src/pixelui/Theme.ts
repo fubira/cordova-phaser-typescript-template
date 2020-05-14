@@ -1,4 +1,4 @@
-export interface ThemeOptions {
+export interface ThemeStyles {
   themeDark?: boolean;
   textShadow?: boolean;
   textStroke?: boolean;
@@ -24,7 +24,7 @@ export interface ThemeOptions {
   colorDanger?: string;
 }
 
-export const defaultTheme: ThemeOptions = {
+export const defaultTheme: ThemeStyles = {
   textShadow: false,
   textStroke: false,
 
@@ -42,36 +42,36 @@ export const defaultTheme: ThemeOptions = {
 };
 
 export class Theme {
-  private theme: ThemeOptions;
+  private themeStyles: ThemeStyles;
 
   constructor() {
     this.reset();
   }
 
   public reset(): void {
-    this.theme = defaultTheme;
+    this.themeStyles = defaultTheme;
   }
 
-  public update(theme: ThemeOptions): void {
-    this.theme = { ...this.theme, ...theme };
+  public update(theme: ThemeStyles): void {
+    this.themeStyles = { ...this.themeStyles, ...theme };
   }
 
-  public get main(): ThemeOptions {
-    return this.theme;
+  public get styles(): ThemeStyles {
+    return this.themeStyles;
   }
 
-  public compose(localTheme: ThemeOptions = {}): ThemeOptions {
-    return { ...this.theme, ...localTheme };
+  public compose(localTheme: ThemeStyles = {}): ThemeStyles {
+    return { ...this.themeStyles, ...localTheme };
   }
 
-  public backgroundColor(localTheme?: ThemeOptions): string {
+  public backgroundColor(localTheme?: ThemeStyles): string {
     const color = this.compose(localTheme).themeDark
       ? this.compose(localTheme).colorDarkShade
       : this.compose(localTheme).colorLightShade;
     return color || "#000";
   }
 
-  public textColor(localTheme?: ThemeOptions): string {
+  public textColor(localTheme?: ThemeStyles): string {
     const color = this.compose(localTheme).textStroke
       ? this.compose(localTheme).colorLightShade
       : this.compose(localTheme).colorDarkShade;

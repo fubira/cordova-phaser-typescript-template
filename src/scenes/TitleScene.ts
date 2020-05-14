@@ -3,8 +3,6 @@ import BgmPlayer from "@/utils/BgmPlayer";
 import { PixelUI } from "@/pixelui";
 
 export default class TitlScene extends Phaser.Scene {
-  private titleText: Phaser.GameObjects.Text = null;
-  private subtitleText: Phaser.GameObjects.BitmapText = null;
   private tapToStartText: Phaser.GameObjects.GameObject = null;
   private sfxAudioSprites:
     | Phaser.Sound.WebAudioSound
@@ -18,6 +16,7 @@ export default class TitlScene extends Phaser.Scene {
     this.sfxAudioSprites = this.sound.addAudioSprite(
       Assets.Audiosprites.AudiospritesSound.getName()
     );
+
     BgmPlayer.instance.play([
       Assets.Audio.AudioBgm.getMP3(),
       Assets.Audio.AudioBgm.getOGG(),
@@ -46,18 +45,19 @@ export default class TitlScene extends Phaser.Scene {
       this,
       posX,
       posY - 180,
-      ["Hello Phaser World!!", "Multi Line"],
-      { size: "large" }
+      ["Hello Phaser!", "Multi Line", "日本語メッセージ"],
+      "large",
+      { color: PixelUI.theme.styles.colorLightAccent, align: "center" }
     );
 
-    PixelUI.add.label(this, posX, posY, "Secondary Label", { size: "normal" });
+    PixelUI.add.label(this, posX, posY, "おはようございます", "normal");
 
     this.tapToStartText = PixelUI.add.label(
       this,
       posX,
       posY + 120,
       "Tap to Start",
-      { size: "small" }
+      "small"
     );
 
     this.tweens.add({

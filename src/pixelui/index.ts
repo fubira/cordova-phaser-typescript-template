@@ -1,7 +1,7 @@
 import { Factory } from "./Factory";
 import { Theme } from "./Theme";
 
-export { ThemeOptions } from "./Theme";
+export { ThemeStyles } from "./Theme";
 export { LoaderProgress } from "./component/LoaderProgress";
 
 export class PixelUI {

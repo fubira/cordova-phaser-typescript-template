@@ -85,22 +85,22 @@ export namespace Audiosprites {
 }
 
 export namespace CustomWebFonts {
-  const FontsK8X12CSS = require("!file-loader?name=assets/fonts/[name].[ext]!assets/fonts/k8x12.css").default;
-  const FontsK8X12TTF = require("!file-loader?name=assets/fonts/[name].[ext]!assets/fonts/k8x12.ttf").default;
-  const FontsKokuglCSS = require("!file-loader?name=assets/fonts/[name].[ext]!assets/fonts/kokugl.css").default;
-  const FontsKokuglTTF = require("!file-loader?name=assets/fonts/[name].[ext]!assets/fonts/kokugl.ttf").default;
+  const FontsGkkttCSS = require("!file-loader?name=assets/fonts/[name].[ext]!assets/fonts/gkktt.css").default;
+  const FontsGkkttTTF = require("!file-loader?name=assets/fonts/[name].[ext]!assets/fonts/gkktt.ttf").default;
+  const FontsKiniroSsCSS = require("!file-loader?name=assets/fonts/[name].[ext]!assets/fonts/kiniro-ss.css").default;
+  const FontsKiniroSsTTF = require("!file-loader?name=assets/fonts/[name].[ext]!assets/fonts/kiniro-ss.ttf").default;
 
-  export class FontsK8X12 {
-    static getName(): string { return "k8x12"; }
-    static getFamily(): string { return "k8x12"; }
-    static getCSS(): string { return FontsK8X12CSS; }
-    static getTTF(): string { return FontsK8X12TTF; }
+  export class FontsGkktt {
+    static getName(): string { return "gkktt"; }
+    static getFamily(): string { return "gkktt"; }
+    static getCSS(): string { return FontsGkkttCSS; }
+    static getTTF(): string { return FontsGkkttTTF; }
   }
-  export class FontsKokugl {
-    static getName(): string { return "kokugl"; }
-    static getFamily(): string { return "kokugl"; }
-    static getCSS(): string { return FontsKokuglCSS; }
-    static getTTF(): string { return FontsKokuglTTF; }
+  export class FontsKiniroSs {
+    static getName(): string { return "kiniro-ss"; }
+    static getFamily(): string { return "kiniro-ss"; }
+    static getCSS(): string { return FontsKiniroSsCSS; }
+    static getTTF(): string { return FontsKiniroSsTTF; }
   }
 }
 

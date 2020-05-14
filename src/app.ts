@@ -9,12 +9,12 @@ export default class App extends Phaser.Game {
     const gameHeight: number = GAME_HEIGHT;
     const gameConfig: Phaser.Types.Core.GameConfig = {
       render: {
-        pixelArt: false,
+        pixelArt: true,
       },
       width: gameWidth,
       height: gameHeight,
       scale: {
-        mode: Phaser.Scale.FIT,
+        mode: Phaser.Scale.NONE,
         autoCenter: Phaser.Scale.CENTER_BOTH,
       },
       parent: "",
