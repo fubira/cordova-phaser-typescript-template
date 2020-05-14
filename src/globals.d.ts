@@ -4,5 +4,5 @@ declare let GAME_WIDTH: number;
 declare let GAME_HEIGHT: number;
 
 interface Window {
-  cordova: any;
+  cordova: any; // eslint-disable-line
 }

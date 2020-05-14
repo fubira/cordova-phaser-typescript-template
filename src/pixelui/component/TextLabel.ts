@@ -40,7 +40,6 @@ export function LabelTextFactory(
   const fontFamily = theme.textFontFamily;
   const fontSize = getFontSize(style.size, theme);
   const strokeSize = fontSize / 8;
-  console.log(fontSize, style);
 
   const object = scene.add.text(0, 0, text, {
     fontFamily: `${fontFamily}`,
