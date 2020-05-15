@@ -29,7 +29,7 @@ jobs:
       - checkout
       - run: sudo apt-get update && sudo apt-get install -y imagemagick gradle
       - run: sudo npm install -g npm
-      - run: sudo npm install -g cordova cordova-res
+      - run: sudo npm install -g cordova
       - run: node --version
       - run: npm --version
       - restore_cache:
@@ -41,7 +41,7 @@ jobs:
             - node_modules
       - run: echo # release/setup-sign.sh
       - run: cordova platform rm android && cordova platform add android
-      - run: cordova-res
+      - run: echo # cordova-res
       - run: npm run webpack:prod && cordova build android --release
       - store_artifacts:
           path: platforms/android/build/outputs/apk
