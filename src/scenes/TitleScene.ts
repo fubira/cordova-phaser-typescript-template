@@ -9,7 +9,9 @@ export default class TitlScene extends Phaser.Scene {
     | Phaser.Sound.HTML5AudioSound = null;
 
   public init(): void {
-    PixelUI.add.background(this);
+    PixelUI.add.background(this, {
+      texture: Assets.Images.ImagesBackground.getName(),
+    });
   }
 
   public preload(): void {
@@ -57,7 +59,7 @@ export default class TitlScene extends Phaser.Scene {
 
     PixelUI.add
       .textLabel(this, centerX, centerY, "おはようございます")
-      .setOrigin(0.5, 0.5);
+      .setOrigin(0.5);
 
     this.tapToStartText = PixelUI.add.textLabel(
       this,
@@ -79,6 +81,18 @@ export default class TitlScene extends Phaser.Scene {
       repeat: -1,
       yoyo: true,
     });
+
+    PixelUI.add.dialog(
+      this,
+      (e) => {
+        console.log(e);
+      },
+      {}
+    );
+  }
+
+  private showDialog(): void {
+    // PixelUI.add.
   }
 
   private startGame(): void {

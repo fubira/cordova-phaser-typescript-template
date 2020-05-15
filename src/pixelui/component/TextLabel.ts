@@ -43,5 +43,6 @@ export function TextLabelFactory(
     text,
     style as Phaser.Types.GameObjects.Text.TextStyle
   );
+
   return object;
 }

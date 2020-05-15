@@ -1,10 +1,15 @@
 /* AUTO GENERATED FILE. DO NOT MODIFY. YOU WILL LOSE YOUR CHANGES ON BUILD. */
 
 export namespace Images {
+  const ImagesBackgroundJPG = require("assets/images/background.jpg").default;
   const ImagesLogo2PNG = require("assets/images/logo2.png").default;
   const ImagesProgressBarPNG = require("assets/images/progress_bar.png").default;
   const ImagesProgressFramePNG = require("assets/images/progress_frame.png").default;
 
+  export class ImagesBackground {
+    static getName(): string { return "background"; }
+    static getJPG(): string { return ImagesBackgroundJPG; }
+  }
   export class ImagesLogo2 {
     static getName(): string { return "logo2"; }
     static getPNG(): string { return ImagesLogo2PNG; }

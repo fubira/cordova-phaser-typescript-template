@@ -45,6 +45,7 @@
     "i18next-browser-languagedetector": "^4.1.1",
     "i18next-xhr-backend": "^3.2.2",
     "phaser": "^3.23.0",
+    "phaser3-rex-plugins": "^1.1.14",
     "pino": "^6.2.1"
   },
   "cordova": {
