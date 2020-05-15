@@ -27,6 +27,7 @@ jobs:
     <<: *container
     steps:
       - checkout
+      - run: apt-get update && apt-get install -y imagemagick
       - run: node --version
       - run: npm --version
       - run: sudo npm install -g npm
