@@ -42,7 +42,7 @@ jobs:
       - run: echo # release/setup-sign.sh
       - run: cordova platform rm android && cordova platform add android
       - run: echo # cordova-res
-      - run: npm run webpack:prod && cordova build android --release
+      - run: npm run webpack:prod && cordova build android
       - store_artifacts:
           path: platforms/android/app/build/outputs/apk/
           destination: apk
