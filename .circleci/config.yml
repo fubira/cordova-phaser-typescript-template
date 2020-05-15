@@ -11,9 +11,9 @@ jobs:
     <<: *container
     steps:
       - checkout
+      - run: sudo npm install -g npm
       - run: node --version
       - run: npm --version
-      - run: sudo npm install -g npm
       - restore_cache:
           key: *cache_key
       - run: npm install
@@ -28,10 +28,10 @@ jobs:
     steps:
       - checkout
       - run: sudo apt-get update && sudo apt-get install -y imagemagick
-      - run: node --version
-      - run: npm --version
       - run: sudo npm install -g npm
       - run: sudo npm install -g cordova cordova-splash cordova-icon
+      - run: node --version
+      - run: npm --version
       - restore_cache:
           key: *cache_key
       - run: npm install
@@ -42,7 +42,7 @@ jobs:
       - run: echo # release/setup-sign.sh
       - run: cordova platform rm android && cordova platform add android
       - run: cordova-splash && cordova-icon
-      - run: npm run webpack:dist && cordova build android --release
+      - run: npm run webpack:prod && cordova build android --release
       - store_artifacts:
           path: platforms/android/build/outputs/apk
 
