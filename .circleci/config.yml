@@ -28,8 +28,8 @@ jobs:
     steps:
       - checkout
       - run: sudo apt-get update && sudo apt-get install -y imagemagick gradle
-      - run: sudo npm install -g npm
-      - run: sudo npm install -g cordova cordova-res
+      - run: npm install -g npm
+      - run: npm install -g cordova cordova-res
       - run: node --version
       - run: npm --version
       - restore_cache:
