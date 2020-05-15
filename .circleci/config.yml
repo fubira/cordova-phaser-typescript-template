@@ -27,7 +27,7 @@ jobs:
     <<: *container
     steps:
       - checkout
-      - run: sudo apt-get update && sudo apt-get install -y imagemagick gradle
+      - run: sudo apt-get update && sudo apt-get install -y gradle
       - run: sudo npm install -g npm
       - run: sudo npm install -g cordova
       - run: node --version
@@ -44,7 +44,8 @@ jobs:
       - run: echo # cordova-res
       - run: npm run webpack:prod && cordova build android --release
       - store_artifacts:
-          path: platforms/android/build/outputs/apk
+          path: platforms/android/app/build/outputs/apk/
+          destination: apk
 
 workflows:
   version: 2
