@@ -35,4 +35,6 @@ export type TextSize =
 export interface TextLabelStyle
   extends Phaser.Types.GameObjects.Text.TextStyle {
   textSize?: TextSize;
+  noStroke?: boolean;
+  noShadow?: boolean;
 }

@@ -20,21 +20,26 @@ export function TextLabelFactory(
     style.fontFamily = theme.textFontFamily;
   }
 
-  if (!style.stroke && theme.textStroke) {
-    style.stroke = "#000000";
-    style.strokeThickness = textSize / 8;
+  if (!style.noStroke) {
+    if (!style.stroke && theme.textStroke) {
+      style.stroke = "#000000";
+      style.strokeThickness = textSize / 8;
+    }
   }
 
-  if (!style.shadow && theme.textShadow) {
-    style.shadow = {
-      offsetX: 4,
-      offsetY: 4,
-      color: "rgba(0,0,0,0.3)",
-      blur: 2,
-      stroke: true,
-      fill: true,
-    };
+  if (!style.noShadow) {
+    if (!style.shadow && theme.textShadow) {
+      style.shadow = {
+        offsetX: 4,
+        offsetY: 4,
+        color: "rgba(0,0,0,0.3)",
+        blur: 2,
+        stroke: true,
+        fill: true,
+      };
+    }
   }
+
   style.fontSize = `${textSize}px`;
 
   const object = scene.add.text(

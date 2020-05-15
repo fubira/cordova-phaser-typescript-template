@@ -1,4 +1,5 @@
 import * as PixelUI from "..";
+import { TextLabelFactory } from "./TextLabel";
 
 export interface DialogStyle {
   fillColor?: string;
@@ -10,7 +11,7 @@ export function DialogFactory(
   scene: Phaser.Scene,
   callback: Function,
   style: DialogStyle = {}
-): Phaser.GameObjects.Rectangle {
+): Phaser.GameObjects.Group {
   const theme = PixelUI.theme.styles;
   const centerX = scene.cameras.main.centerX;
   const centerY = scene.cameras.main.centerY;
@@ -41,7 +42,7 @@ export function DialogFactory(
     width,
     height,
     fillColor.color,
-    0.8
+    0.95
   );
 
   const edge = scene.add.rectangle(centerX - 1, centerY - 1, width, height);
@@ -52,5 +53,29 @@ export function DialogFactory(
   border.setStrokeStyle(3, borderColor.color, borderColor.alphaGL || 1);
   border.setFillStyle();
 
-  return rect;
+  const textLabel = TextLabelFactory(
+    scene,
+    rect.x,
+    rect.y,
+    ["おはようございます。", "今日も一日頑張りましょう。"],
+    {
+      noShadow: true,
+      textSize: "small",
+      color: theme.colorDarkShade,
+      stroke: theme.colorMain,
+      strokeThickness: 3,
+      fixedWidth: width,
+      fixedHeight: height,
+      align: "center",
+      padding: { x: 20, y: 20 },
+    }
+  );
+  textLabel.setOrigin(0.5, 0.5);
+  console.log(textLabel.updateText().height);
+
+  rect.on("down", () => {
+    console.log("111");
+  });
+
+  return scene.add.group([shadow, rect, edge, border]);
 }
