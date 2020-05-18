@@ -35,6 +35,7 @@ async function loadWebFont(): Promise<void> {
     webFontLoaderOptions.active = (): void => {
       resolve();
     };
+    console.log(webFontLoaderOptions);
     WebFontLoader.load(webFontLoaderOptions);
   });
 }

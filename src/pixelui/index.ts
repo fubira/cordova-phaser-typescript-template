@@ -1,7 +1,31 @@
-import { Factory } from "./Factory";
+/**
+ * PixelUI global theme
+ */
 import { Theme } from "./Theme";
-
-export * from "./Types";
-
 export const theme = new Theme();
-export const add = new Factory();
+
+/**
+ * PixelUI component factory
+ */
+import { TextLabelFactory } from "./component/TextLabel";
+import { BackgroundFactory } from "./component/Background";
+import { LoadingProgressFactory } from "./component/LoadingProgress";
+import { DialogFactory } from "./component/Dialog";
+
+export const add = {
+  textLabel: TextLabelFactory,
+  background: BackgroundFactory,
+  loadingProgerss: LoadingProgressFactory,
+  dialog: DialogFactory,
+};
+
+/**
+ * PixelUI component class and styles
+ */
+export { LoadingProgress } from "./component/LoadingProgress";
+export { Dialog, DialogStyle } from "./component/Dialog";
+
+/**
+ * PixelUI types
+ */
+export * from "./Types";

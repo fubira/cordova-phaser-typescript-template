@@ -17,6 +17,9 @@ export const defaultTheme: ThemeStyles = {
   colorDanger: "#f44336",
 };
 
+/**
+ * PixelUI.Theme
+ */
 export class Theme {
   private themeStyles: ThemeStyles;
 
@@ -24,22 +27,38 @@ export class Theme {
     this.reset();
   }
 
+  /**
+   * Reset to default theme
+   */
   public reset(): void {
     this.themeStyles = defaultTheme;
   }
 
+  /**
+   * Set theme values
+   */
   public update(theme: ThemeStyles): void {
     this.themeStyles = { ...this.themeStyles, ...theme };
   }
 
+  /**
+   * Get current theme styles
+   */
   public get styles(): ThemeStyles {
     return this.themeStyles;
   }
 
+  /**
+   * Get composed theme with global theme and argument theme
+   */
   public compose(localTheme: ThemeStyles = {}): ThemeStyles {
     return { ...this.themeStyles, ...localTheme };
   }
 
+  /**
+   * Get text size of a number
+   * @param size PixelUI.TextSize
+   */
   public getTextSize(size: TextSize): number {
     switch (size) {
       case "xsmall":
@@ -58,6 +77,10 @@ export class Theme {
     return Number.parseInt(size, 10) || this.getTextSize("normal");
   }
 
+  /**
+   * Get the background color specified by the current theme.
+   * @param localTheme PixelUI.ThemeStyles
+   */
   public backgroundColor(localTheme?: ThemeStyles): string {
     const color = this.compose(localTheme).themeDark
       ? this.compose(localTheme).colorDarkShade
@@ -65,6 +88,10 @@ export class Theme {
     return color || "#000";
   }
 
+  /**
+   * Get the text color specified by the current theme.
+   * @param localTheme PixelUI.ThemeStyles
+   */
   public textColor(localTheme?: ThemeStyles): string {
     const color = this.compose(localTheme).textStroke
       ? this.compose(localTheme).colorLightShade
@@ -72,7 +99,22 @@ export class Theme {
     return color || "#fff";
   }
 
-  public textStrokeColor(): string {
-    return "#000";
+  /**
+   * Get the text color for header specified by the current theme
+   * @param localTheme PixelUI.ThemeStyles
+   */
+  public textHeaderColor(localTheme?: ThemeStyles): string {
+    const color = this.compose(localTheme).textStroke
+      ? this.compose(localTheme).colorLightAccent
+      : this.compose(localTheme).colorDarkAccent;
+    return color || "#ff8";
+  }
+
+  /**
+   * Get the text stroke coilor specified by the current theme
+   * @param localTheme PixelUI.ThemeStyles
+   */
+  public textStrokeColor(localTheme?: ThemeStyles): string {
+    return localTheme ? "#000" : "#000";
   }
 }

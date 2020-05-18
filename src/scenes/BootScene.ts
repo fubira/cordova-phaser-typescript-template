@@ -16,9 +16,9 @@ export default class BootScene extends Phaser.Scene {
       textShadow: true,
       textStroke: true,
       textFontFamily: Assets.CustomWebFonts.FontsKiniroSs.getFamily(),
-      textSizeSmall: 36,
-      textSizeNormal: 42,
-      textSizeLarge: 54,
+      textSizeSmall: 30,
+      textSizeNormal: 40,
+      textSizeLarge: 50,
     });
     this.scene.start("PreloadScene");
   }

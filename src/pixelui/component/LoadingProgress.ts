@@ -1,3 +1,8 @@
+/**
+ * PixelUI.LoadingProgress
+ *
+ * A component that hooks up the Phaser to load an asset and displays the progress.
+ */
 export class LoadingProgress extends Phaser.GameObjects.Container {
   private spriteBar: Phaser.GameObjects.Sprite;
   private spriteFrame: Phaser.GameObjects.Sprite;
@@ -21,6 +26,12 @@ export class LoadingProgress extends Phaser.GameObjects.Container {
     this.add([this.spriteBar, this.spriteFrame]);
   }
 
+  /**
+   * Start loading assets and displaying progress.
+   * Promise returns resolve when loading is complete.
+   *
+   * @param load Callback function for loading assets
+   */
   public start(load: Function): Promise<void> {
     this.spriteBar.setScale(0, 1.0);
 
@@ -53,6 +64,14 @@ export class LoadingProgress extends Phaser.GameObjects.Container {
   }
 }
 
+/**
+ * A component that hooks up the Phaser to load an asset and displays
+ * the progress.
+ *
+ * @param scene Phaser.Scene
+ * @param textureBar Progress bar texture image
+ * @param textureFrame Progress bar frame image
+ */
 export function LoadingProgressFactory(
   scene: Phaser.Scene,
   textureBar: string,

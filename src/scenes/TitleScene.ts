@@ -26,10 +26,6 @@ export default class TitlScene extends Phaser.Scene {
   }
 
   public create(): void {
-    if (window.cordova) {
-      SpinnerDialog.hide();
-    }
-
     this.cameras.main.flash(400, 0, 0, 0);
     const spaceKey = this.input.keyboard.addKey("SPACE");
 
@@ -40,9 +36,6 @@ export default class TitlScene extends Phaser.Scene {
       this.startGame();
     });
 
-    const centerX = this.cameras.main.centerX;
-    const centerY = this.cameras.main.centerY;
-
     PixelUI.add.textLabel(
       this,
       0,
@@ -52,14 +45,10 @@ export default class TitlScene extends Phaser.Scene {
         textSize: "large",
         color: PixelUI.theme.styles.colorLightAccent,
         fixedWidth: GAME_WIDTH,
-        align: "left",
+        align: "right",
         padding: { x: 20, y: 20 },
       }
     );
-
-    PixelUI.add
-      .textLabel(this, centerX, centerY, "おはようございます")
-      .setOrigin(0.5);
 
     this.tapToStartText = PixelUI.add.textLabel(
       this,
@@ -74,30 +63,44 @@ export default class TitlScene extends Phaser.Scene {
     );
 
     this.tweens.add({
-      targets: this.tapToStartText,
+      targets: [this.tapToStartText],
       alpha: { from: 0, to: 1 },
       ease: "CubicOut",
       duration: 800,
       repeat: -1,
       yoyo: true,
     });
+  }
 
-    PixelUI.add.dialog(
+  dialog: PixelUI.Dialog = null;
+  private showDialog(): void {
+    if (this.dialog) {
+      this.dialog.close();
+      this.dialog = null;
+      return;
+    }
+
+    this.dialog = PixelUI.add.dialog(
       this,
-      (e) => {
-        console.log(e);
-      },
+      "ダイアログテスト",
+      [
+        "Hello world! The quick brown fox jumps over the lazy dog! 1234567890 ",
+        "",
+        "おはようございます。",
+        "今日も一日頑張りましょう。",
+        "",
+        "どんぐりころころ ドンブリコ お池にはまって さあ大変 どじょうが出て来て 今日は 坊ちゃん一緒に 遊びましょう",
+      ],
       {}
     );
   }
 
-  private showDialog(): void {
-    // PixelUI.add.
-  }
-
   private startGame(): void {
-    this.sfxAudioSprites.play("se_select");
-    this.cameras.main.flash(100);
-    this.cameras.main.shake(100, 0.01);
+    if (this.tapToStartText) {
+      this.tapToStartText.destroy();
+      this.tapToStartText = null;
+    }
+    this.sfxAudioSprites.play("se_button_over");
+    this.showDialog();
   }
 }

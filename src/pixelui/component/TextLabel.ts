@@ -1,5 +1,63 @@
 import * as PixelUI from "../";
 
+export class TextLabel extends Phaser.GameObjects.Text {
+  constructor(
+    scene: Phaser.Scene,
+    x: number,
+    y: number,
+    text: string | string[],
+    style: PixelUI.TextLabelStyle = {}
+  ) {
+    const theme = PixelUI.theme.styles;
+    const textSize = PixelUI.theme.getTextSize(style.textSize);
+
+    if (!style.color) {
+      style.color = theme.textStroke
+        ? theme.colorLightShade || "#FFFFFF"
+        : theme.colorDarkShade || "#000000";
+    }
+
+    if (!style.fontFamily) {
+      style.fontFamily = theme.textFontFamily;
+    }
+
+    if (!style.noStroke) {
+      if (!style.stroke && theme.textStroke) {
+        style.stroke = "#000000";
+        style.strokeThickness = textSize / 8;
+      }
+    }
+
+    if (!style.noShadow) {
+      if (!style.shadow && theme.textShadow) {
+        style.shadow = {
+          offsetX: 4,
+          offsetY: 4,
+          color: "rgba(0,0,0,0.3)",
+          blur: 2,
+          stroke: true,
+          fill: true,
+        };
+      }
+    }
+
+    if (!style.fontSize) {
+      style.fontSize = `${textSize}px`;
+    }
+
+    super(scene, x, y, text, style);
+  }
+}
+
+/**
+ * Create a text display component with a common style by theme.
+ *
+ * @param scene Phaser.Scene
+ * @param x Position x
+ * @param y Position y
+ * @param text Text string[s]
+ * @param style Specifying a style
+ */
 export function TextLabelFactory(
   scene: Phaser.Scene,
   x: number,
@@ -7,47 +65,13 @@ export function TextLabelFactory(
   text: string | string[],
   style: PixelUI.TextLabelStyle = {}
 ): Phaser.GameObjects.Text {
-  const theme = PixelUI.theme.styles;
-  const textSize = PixelUI.theme.getTextSize(style.textSize);
-
-  if (!style.color) {
-    style.color = theme.textStroke
-      ? theme.colorLightShade || "#FFFFFF"
-      : theme.colorDarkShade || "#000000";
-  }
-
-  if (!style.fontFamily) {
-    style.fontFamily = theme.textFontFamily;
-  }
-
-  if (!style.noStroke) {
-    if (!style.stroke && theme.textStroke) {
-      style.stroke = "#000000";
-      style.strokeThickness = textSize / 8;
-    }
-  }
-
-  if (!style.noShadow) {
-    if (!style.shadow && theme.textShadow) {
-      style.shadow = {
-        offsetX: 4,
-        offsetY: 4,
-        color: "rgba(0,0,0,0.3)",
-        blur: 2,
-        stroke: true,
-        fill: true,
-      };
-    }
-  }
-
-  style.fontSize = `${textSize}px`;
-
-  const object = scene.add.text(
+  const label = new TextLabel(
+    scene,
     x,
     y,
     text,
     style as Phaser.Types.GameObjects.Text.TextStyle
   );
-
-  return object;
+  scene.children.add(label);
+  return label;
 }
