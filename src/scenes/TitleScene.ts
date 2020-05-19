@@ -70,17 +70,12 @@ export default class TitlScene extends Phaser.Scene {
       repeat: -1,
       yoyo: true,
     });
+
+    this.showDialog();
   }
 
-  dialog: PixelUI.Dialog = null;
   private showDialog(): void {
-    if (this.dialog) {
-      this.dialog.close();
-      this.dialog = null;
-      return;
-    }
-
-    this.dialog = PixelUI.add.dialog(
+    const dialog = PixelUI.add.dialog(
       this,
       "ダイアログテスト",
       [
@@ -91,8 +86,21 @@ export default class TitlScene extends Phaser.Scene {
         "",
         "どんぐりころころ ドンブリコ お池にはまって さあ大変 どじょうが出て来て 今日は 坊ちゃん一緒に 遊びましょう",
       ],
-      {}
+      {
+        buttons: [
+          { text: "Ok", value: "ok" },
+          { text: "Cancel", value: "cancel" },
+          { text: "???", value: "???" },
+        ],
+        onSelect: (value) => {
+          this.sfxAudioSprites.play("se_button_over");
+          console.log(value);
+          dialog.close();
+          PixelUI.add.dialog(this, null, value).open();
+        },
+      }
     );
+    dialog.open();
   }
 
   private startGame(): void {
@@ -100,7 +108,5 @@ export default class TitlScene extends Phaser.Scene {
       this.tapToStartText.destroy();
       this.tapToStartText = null;
     }
-    this.sfxAudioSprites.play("se_button_over");
-    this.showDialog();
   }
 }

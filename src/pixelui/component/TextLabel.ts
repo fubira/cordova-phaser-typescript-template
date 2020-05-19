@@ -45,7 +45,7 @@ export class TextLabel extends Phaser.GameObjects.Text {
       style.fontSize = `${textSize}px`;
     }
 
-    super(scene, x, y, text, style);
+    super(scene, x, y, text, style as Phaser.Types.GameObjects.Text.TextStyle);
   }
 }
 
@@ -65,13 +65,7 @@ export function TextLabelFactory(
   text: string | string[],
   style: PixelUI.TextLabelStyle = {}
 ): Phaser.GameObjects.Text {
-  const label = new TextLabel(
-    scene,
-    x,
-    y,
-    text,
-    style as Phaser.Types.GameObjects.Text.TextStyle
-  );
+  const label = new TextLabel(scene, x, y, text, style);
   scene.children.add(label);
   return label;
 }

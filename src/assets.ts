@@ -96,8 +96,6 @@ export namespace CustomWebFonts {
   const FontsHangyakuTTF = require("!file-loader?name=assets/fonts/[name].[ext]!assets/fonts/hangyaku.ttf").default;
   const FontsKiniroSsCSS = require("!file-loader?name=assets/fonts/[name].[ext]!assets/fonts/kiniro-ss.css").default;
   const FontsKiniroSsTTF = require("!file-loader?name=assets/fonts/[name].[ext]!assets/fonts/kiniro-ss.ttf").default;
-  const FontsYasasisaCSS = require("!file-loader?name=assets/fonts/[name].[ext]!assets/fonts/yasasisa.css").default;
-  const FontsYasasisaTTF = require("!file-loader?name=assets/fonts/[name].[ext]!assets/fonts/yasasisa.ttf").default;
 
   export class FontsGkktt {
     static getName(): string { return "gkktt"; }
@@ -116,12 +114,6 @@ export namespace CustomWebFonts {
     static getFamily(): string { return "kiniro-ss"; }
     static getCSS(): string { return FontsKiniroSsCSS; }
     static getTTF(): string { return FontsKiniroSsTTF; }
-  }
-  export class FontsYasasisa {
-    static getName(): string { return "yasasisa"; }
-    static getFamily(): string { return "yasasisa"; }
-    static getCSS(): string { return FontsYasasisaCSS; }
-    static getTTF(): string { return FontsYasasisaTTF; }
   }
 }
 

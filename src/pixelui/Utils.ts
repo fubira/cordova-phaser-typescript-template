@@ -7,7 +7,7 @@ import * as PixelUI from ".";
  */
 export function valueToColor(
   value: string | number,
-  defValue: string | number
+  defValue: string | number = 0x000000
 ): Phaser.Display.Color {
   return Phaser.Display.Color.ValueToColor(value || defValue || 0);
 }
