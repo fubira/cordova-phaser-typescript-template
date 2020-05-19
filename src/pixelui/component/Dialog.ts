@@ -1,6 +1,7 @@
 import * as PixelUI from "..";
 import * as Utils from "../Utils";
 import { TextLabelFactory } from "./TextLabel";
+import { ButtonFactory } from "./Button";
 
 export interface DialogStyle {
   /**
@@ -102,13 +103,10 @@ export class Dialog extends Phaser.GameObjects.Container {
       strokeThickness: 6,
     };
 
-    const buttonStyle: PixelUI.TextLabelStyle = {
+    const buttonStyle: PixelUI.ButtonStyle = {
       ...labelStyle,
-      align: textAlign,
+      fillColor: buttonColor,
       textSize,
-      color: buttonColor,
-      stroke: strokeColor,
-      strokeThickness: 6,
     };
 
     /* calc dialog height */
@@ -116,21 +114,20 @@ export class Dialog extends Phaser.GameObjects.Container {
       ? 0
       : Utils.calcTextHeight(scene, title, headerStyle);
     const messageHeight = Utils.calcTextHeight(scene, message, messageStyle);
-    const buttonHeight =
-      !style.buttons || style.buttons.length === 0
-        ? 0
-        : Utils.calcTextHeight(scene, style.buttons[0].text, buttonStyle);
-    const totalHeight = titleHeight + messageHeight + buttonHeight;
+    const totalHeight =
+      titleHeight + messageHeight > maxHeight
+        ? maxHeight
+        : titleHeight + messageHeight;
 
     const dialogWidth = maxWidth;
-    const dialogHeight = totalHeight > maxHeight ? maxHeight : totalHeight;
+    const dialogHeight = totalHeight;
 
     /* add shadow gameobject */
     const shadow = scene.add.rectangle(
-      0 + 4,
-      0 + 4,
-      dialogWidth + 4,
-      dialogHeight + 4,
+      3,
+      3,
+      dialogWidth + 6,
+      dialogHeight + 6,
       shadowColor.color,
       0.3
     );
@@ -142,15 +139,20 @@ export class Dialog extends Phaser.GameObjects.Container {
       dialogWidth,
       dialogHeight,
       fillColor.color,
-      0.3
+      0.5
     );
 
     /* add dialog border and edge */
-    const edge = scene.add.rectangle(-1, -1, dialogWidth, dialogHeight);
+    const edge = scene.add.rectangle(-2, -2, dialogWidth + 2, dialogHeight + 2);
     edge.setStrokeStyle(6, edgeColor.color, edgeColor.alphaGL || 1);
     edge.setFillStyle();
 
-    const border = scene.add.rectangle(-1, -1, dialogWidth, dialogHeight);
+    const border = scene.add.rectangle(
+      -2,
+      -2,
+      dialogWidth + 2,
+      dialogHeight + 2
+    );
     border.setStrokeStyle(3, borderColor.color, borderColor.alphaGL || 1);
     border.setFillStyle();
 
@@ -175,29 +177,29 @@ export class Dialog extends Phaser.GameObjects.Container {
     messageLabel.setOrigin(0.0, 0.0);
 
     /* add buttons */
-    let buttonLabels: Phaser.GameObjects.GameObject[] = [];
+    let buttonObjects: PixelUI.Button[] = [];
     if (style.buttons) {
       const buttonCount = style.buttons.length;
-      const buttonWidth = buttonStyle.fixedWidth / buttonCount - 20;
-      console.log(buttonCount, buttonWidth);
-      buttonLabels = style.buttons.map((button, index) => {
-        const label = TextLabelFactory(
+      const margin = buttonCount === 1 ? maxWidth / 2 : 20;
+      const buttonWidth = maxWidth / buttonCount - margin;
+
+      buttonObjects = style.buttons.map((button, index) => {
+        return ButtonFactory(
           scene,
-          rect.getTopLeft().x + (buttonWidth + 20) * index + 10,
-          rect.getTopLeft().y + titleHeight + messageHeight,
+          rect.getTopLeft().x + (buttonWidth + 20) * index + margin / 2,
+          rect.getTopLeft().y + totalHeight + 20,
           button.text,
-          { ...buttonStyle, fixedWidth: buttonWidth }
-        );
-        label.setInteractive();
-        label.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
-          console.log(pointer);
-          pointer.wasCanceled = true;
-          if (style.onSelect) {
-            style.onSelect(button.value);
+          () => {
+            if (style.onSelect) {
+              style.onSelect(button.value);
+            }
+            this.close();
+          },
+          {
+            ...buttonStyle,
+            fixedWidth: buttonWidth,
           }
-          this.close();
-        });
-        return label;
+        );
       });
     }
 
@@ -209,7 +211,7 @@ export class Dialog extends Phaser.GameObjects.Container {
       border,
       titleLabel,
       messageLabel,
-      ...buttonLabels,
+      ...buttonObjects,
     ]);
 
     if (style.open) {

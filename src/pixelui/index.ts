@@ -2,6 +2,7 @@
  * PixelUI global theme
  */
 import { Theme } from "./Theme";
+export { ThemeStyles } from "./Theme";
 export const theme = new Theme();
 
 /**
@@ -23,7 +24,9 @@ export const add = {
  * PixelUI component class and styles
  */
 export { LoadingProgress } from "./component/LoadingProgress";
+export { TextLabel, TextLabelStyle } from "./component/TextLabel";
 export { Dialog, DialogStyle } from "./component/Dialog";
+export { Button, ButtonStyle } from "./component/Button";
 
 /**
  * PixelUI types

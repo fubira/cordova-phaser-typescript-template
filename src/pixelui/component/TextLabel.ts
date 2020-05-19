@@ -1,5 +1,12 @@
 import * as PixelUI from "../";
 
+export interface TextLabelStyle
+  extends Phaser.Types.GameObjects.Text.TextStyle {
+  textSize?: PixelUI.TextSize;
+  noStroke?: boolean;
+  noShadow?: boolean;
+}
+
 export class TextLabel extends Phaser.GameObjects.Text {
   constructor(
     scene: Phaser.Scene,

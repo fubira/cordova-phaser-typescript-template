@@ -83,14 +83,14 @@ export default class TitlScene extends Phaser.Scene {
         "",
         "おはようございます。",
         "今日も一日頑張りましょう。",
-        "",
-        "どんぐりころころ ドンブリコ お池にはまって さあ大変 どじょうが出て来て 今日は 坊ちゃん一緒に 遊びましょう",
+        // "",
+        // "どんぐりころころ ドンブリコ お池にはまって さあ大変 どじょうが出て来て 今日は 坊ちゃん一緒に 遊びましょう",
       ],
       {
         buttons: [
           { text: "Ok", value: "ok" },
-          { text: "Cancel", value: "cancel" },
-          { text: "???", value: "???" },
+          { text: "キャンセル", value: "cancel" },
+          // { text: "???", value: "???" },
         ],
         onSelect: (value) => {
           this.sfxAudioSprites.play("se_button_over");
