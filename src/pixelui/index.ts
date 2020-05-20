@@ -13,6 +13,7 @@ import { BackgroundFactory } from "./component/Background";
 import { LoadingProgressFactory } from "./component/LoadingProgress";
 import { DialogFactory } from "./component/Dialog";
 import { ButtonFactory } from "./component/Button";
+import { BackdropFactory } from "./component/Backdrop";
 
 export const add = {
   textLabel: TextLabelFactory,
@@ -20,6 +21,7 @@ export const add = {
   loadingProgerss: LoadingProgressFactory,
   dialog: DialogFactory,
   button: ButtonFactory,
+  backdrop: BackdropFactory,
 };
 
 /**
@@ -29,6 +31,7 @@ export { LoadingProgress } from "./component/LoadingProgress";
 export { TextLabel, TextLabelStyle } from "./component/TextLabel";
 export { Dialog, DialogStyle } from "./component/Dialog";
 export { Button, ButtonStyle } from "./component/Button";
+export { Backdrop, BackdropStyle } from "./component/Backdrop";
 
 /**
  * PixelUI types

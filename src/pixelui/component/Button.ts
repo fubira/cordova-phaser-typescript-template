@@ -122,12 +122,11 @@ export class Button extends Phaser.GameObjects.Container {
   }
 
   private actionClick(): void {
-    console.log("actionClick");
     this.scene.tweens.add({
       targets: this,
       ease: "CubicOut",
       y: { from: this.y, to: this.y + 5 },
-      duration: 50,
+      duration: 30,
       yoyo: true,
     });
   }

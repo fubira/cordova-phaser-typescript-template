@@ -2,7 +2,7 @@ import * as Assets from "@/assets";
 import * as PixelUI from "@/pixelui";
 import BgmPlayer from "@/utils/BgmPlayer";
 
-export default class TitlScene extends Phaser.Scene {
+export default class TitleScene extends Phaser.Scene {
   private tapToStartText: Phaser.GameObjects.GameObject = null;
   private sfxAudioSprites:
     | Phaser.Sound.WebAudioSound

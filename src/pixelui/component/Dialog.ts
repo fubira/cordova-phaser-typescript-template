@@ -2,12 +2,19 @@ import * as PixelUI from "..";
 import * as Utils from "../Utils";
 import { TextLabelFactory } from "./TextLabel";
 import { ButtonFactory } from "./Button";
+import { BackdropFactory } from "./Backdrop";
 
 export interface DialogStyle {
   /**
    * Open dialog automatically
+   * @default true
    */
   open?: boolean;
+  /**
+   * If false, the background will not be filled.
+   * @default true
+   */
+  dim?: boolean;
   /**
    * Dialog fill color
    * @default PixelUI.theme.backgroundColor
@@ -52,6 +59,8 @@ export interface DialogStyle {
 }
 
 export class Dialog extends Phaser.GameObjects.Container {
+  private container: Phaser.GameObjects.Container;
+  private backdrop: PixelUI.Backdrop;
   private buttons: PixelUI.Button[];
 
   constructor(
@@ -208,7 +217,7 @@ export class Dialog extends Phaser.GameObjects.Container {
     }
 
     /* generate container */
-    super(scene, x, y, [
+    const container = scene.add.container(x, y, [
       shadow,
       rect,
       edge,
@@ -218,7 +227,13 @@ export class Dialog extends Phaser.GameObjects.Container {
       ...buttons,
     ]);
 
+    const backdrop = BackdropFactory(scene, {});
+
+    super(scene, 0, 0, [backdrop, container]);
+
     this.buttons = buttons;
+    this.container = container;
+    this.backdrop = backdrop;
 
     if (style.open) {
       this.open();
@@ -243,7 +258,7 @@ export class Dialog extends Phaser.GameObjects.Container {
     this.setVisible(true);
     this.setButtonActive(true);
     this.scene.tweens.add({
-      targets: this,
+      targets: this.container,
       alpha: { from: 0, to: 1 },
       scaleY: { from: 0.6, to: 1 },
       ease: Phaser.Math.Easing.Cubic.Out,
@@ -257,17 +272,20 @@ export class Dialog extends Phaser.GameObjects.Container {
   public close(): void {
     this.setButtonActive(false);
     this.scene.tweens.add({
-      targets: this,
+      targets: this.container,
       alpha: { from: 1, to: 0 },
       scaleY: { from: 1, to: 1.035 },
       scaleX: { from: 1, to: 1.035 },
       ease: Phaser.Math.Easing.Cubic.Out,
-      delay: 50,
+      delay: 80,
       duration: 200,
       onComplete: () => {
-        this.destroy(true);
+        this.scene.children.remove(this);
       },
     });
+    setTimeout(() => {
+      this.backdrop.close();
+    }, 100);
   }
 }
 
