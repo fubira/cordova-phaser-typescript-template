@@ -1,5 +1,4 @@
 import * as PixelUI from "../";
-import * as Utils from "../Utils";
 
 export interface BackgroundStyle {
   /**
@@ -27,11 +26,13 @@ export function BackgroundFactory(
   scene: Phaser.Scene,
   style: BackgroundStyle
 ): Phaser.GameObjects.Rectangle {
-  const fillColor = style.fillColor || PixelUI.theme.backgroundColor();
-  const texture = style.texture;
+  const fillColor = Phaser.Display.Color.ValueToColor(
+    style.fillColor || PixelUI.theme.backgroundColor()
+  );
   const fillAlpha = style.texture
     ? style.fillAlpha || 0.5
     : style.fillAlpha || 1.0;
+  const texture = style.texture;
   const centerX = scene.cameras.main.centerX;
   const centerY = scene.cameras.main.centerY;
 
@@ -39,14 +40,14 @@ export function BackgroundFactory(
     scene.add.sprite(centerX, centerY, texture);
   }
 
-  scene.cameras.main.setBackgroundColor(fillColor);
+  scene.cameras.main.setBackgroundColor(fillColor.color);
 
   return scene.add.rectangle(
     centerX,
     centerY,
     GAME_WIDTH,
     GAME_HEIGHT,
-    Utils.valueToColor(fillColor).color,
+    fillColor.color,
     fillAlpha
   );
 }

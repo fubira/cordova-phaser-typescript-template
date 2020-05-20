@@ -53,7 +53,7 @@ export default class TitlScene extends Phaser.Scene {
     this.tapToStartText = PixelUI.add.textLabel(
       this,
       0,
-      GAME_HEIGHT - 260,
+      GAME_HEIGHT - 80,
       "Tap to Start",
       {
         textSize: "small",
