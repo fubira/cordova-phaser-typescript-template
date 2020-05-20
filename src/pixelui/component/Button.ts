@@ -37,8 +37,9 @@ export interface ButtonStyle {
 }
 
 export class Button extends Phaser.GameObjects.Container {
-  private rect: Phaser.GameObjects.Rectangle;
+  private base: Phaser.GameObjects.Rectangle;
   private onClick: Function;
+  private posY: number;
 
   constructor(
     scene: Phaser.Scene,
@@ -85,9 +86,9 @@ export class Button extends Phaser.GameObjects.Container {
     const shadow = scene.add.rectangle(3, 3, width + 6, height + 6);
     shadow.setFillStyle(shadowColor.color, 0.3);
 
-    /* add background rect gameobject */
-    const rect = scene.add.rectangle(0, 0, width, height);
-    rect.setFillStyle(fillColor.color);
+    /* add base rectangle gameobject */
+    const base = scene.add.rectangle(0, 0, width, height);
+    base.setFillStyle(fillColor.color);
 
     /* add dialog border and edge */
     const edge = scene.add.rectangle(-2, -2, width + 2, height + 2);
@@ -100,8 +101,8 @@ export class Button extends Phaser.GameObjects.Container {
     /* add text label */
     const textLabel = TextLabelFactory(
       scene,
-      rect.getTopLeft().x,
-      rect.getTopLeft().y + 4,
+      base.getTopLeft().x,
+      base.getTopLeft().y + 4,
       text,
       { ...labelStyle, fixedWidth: width, fixedHeight: height }
     );
@@ -110,39 +111,58 @@ export class Button extends Phaser.GameObjects.Container {
     /* generate container */
     super(scene, x + width / 2, y + height / 2, [
       shadow,
-      rect,
+      base,
       edge,
       border,
       textLabel,
     ]);
 
-    this.rect = rect;
+    this.base = base;
     this.onClick = onClick;
+    this.posY = this.y;
     this.setActive(true);
   }
 
-  private actionClick(): void {
-    this.scene.tweens.add({
-      targets: this,
-      ease: "CubicOut",
-      y: { from: this.y, to: this.y + 5 },
-      duration: 30,
-      yoyo: true,
-    });
-  }
-
+  /**
+   * Activate/Deactivate button
+   *
+   * @param active
+   */
   public setActive(active: boolean): this {
     if (active) {
-      this.rect.setInteractive({ useHandCursor: true });
-      this.rect.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
-        this.actionClick();
+      this.base.setInteractive({ useHandCursor: true });
+      this.base.on("pointerdown", () => {
+        this.actionDrop();
+      });
+      this.base.on("pointerup", (pointer: Phaser.Input.Pointer) => {
+        this.actionRise();
         this.onClick(pointer);
       });
     } else {
-      this.rect.setInteractive({ useHandCursor: false });
-      this.rect.off("pointerdown");
+      this.base.setInteractive({ useHandCursor: false });
+      this.base.off("pointerup");
+      this.base.off("pointerdown");
     }
     return this;
+  }
+
+  private actionDrop(): void {
+    this.scene.tweens.add({
+      targets: this,
+      ease: Phaser.Math.Easing.Cubic.Out,
+      y: { from: this.y, to: this.posY + 5 },
+      duration: 50,
+      yoyo: false,
+    });
+  }
+  private actionRise(): void {
+    this.scene.tweens.add({
+      targets: this,
+      ease: Phaser.Math.Easing.Cubic.Out,
+      y: { from: this.y, to: this.posY },
+      duration: 50,
+      yoyo: false,
+    });
   }
 }
 
@@ -156,6 +176,5 @@ export function ButtonFactory(
 ): PixelUI.Button {
   const button = new Button(scene, x, y, text, onclick, style);
   scene.children.add(button);
-
   return button;
 }

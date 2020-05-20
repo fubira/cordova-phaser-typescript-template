@@ -115,6 +115,15 @@ export class Theme {
   }
 
   /**
+   * Get the color of the cover that appears on the back of the dialog.
+   * @param localTheme PixelUI.ThemeStyles
+   */
+  public backdropColor(localTheme?: ThemeStyles): string {
+    const color = this.compose(localTheme).colorDarkShade;
+    return color || "#000";
+  }
+
+  /**
    * Get the text color specified by the current theme.
    * @param localTheme PixelUI.ThemeStyles
    */

@@ -10,16 +10,13 @@ export interface DialogStyle {
    * @default true
    */
   open?: boolean;
-  /**
-   * If false, the background will not be filled.
-   * @default true
-   */
-  dim?: boolean;
+
   /**
    * Dialog fill color
    * @default PixelUI.theme.backgroundColor
    */
   fillColor?: string;
+
   /**
    * Dialog border color
    * @default PixelUI.theme.textColor
@@ -89,6 +86,9 @@ export class Dialog extends Phaser.GameObjects.Container {
     );
     const backgroundColor = Phaser.Display.Color.ValueToColor(
       PixelUI.theme.backgroundColor()
+    );
+    const backdropColor = Phaser.Display.Color.ValueToColor(
+      PixelUI.theme.backdropColor()
     );
 
     const borderColor = Phaser.Display.Color.ValueToColor(
@@ -227,7 +227,9 @@ export class Dialog extends Phaser.GameObjects.Container {
       ...buttons,
     ]);
 
-    const backdrop = BackdropFactory(scene, {});
+    const backdrop = BackdropFactory(scene, {
+      fillColor: backdropColor.rgba,
+    });
 
     super(scene, 0, 0, [backdrop, container]);
 
@@ -258,7 +260,7 @@ export class Dialog extends Phaser.GameObjects.Container {
     this.setVisible(true);
     this.setButtonActive(true);
     this.scene.tweens.add({
-      targets: this.container,
+      targets: [this.container, this.backdrop],
       alpha: { from: 0, to: 1 },
       scaleY: { from: 0.6, to: 1 },
       ease: Phaser.Math.Easing.Cubic.Out,
@@ -272,7 +274,7 @@ export class Dialog extends Phaser.GameObjects.Container {
   public close(): void {
     this.setButtonActive(false);
     this.scene.tweens.add({
-      targets: this.container,
+      targets: [this.container, this.backdrop],
       alpha: { from: 1, to: 0 },
       scaleY: { from: 1, to: 1.035 },
       scaleX: { from: 1, to: 1.035 },
@@ -283,9 +285,6 @@ export class Dialog extends Phaser.GameObjects.Container {
         this.scene.children.remove(this);
       },
     });
-    setTimeout(() => {
-      this.backdrop.close();
-    }, 100);
   }
 }
 
