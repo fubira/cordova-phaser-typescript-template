@@ -128,10 +128,14 @@ export class Dialog extends Phaser.GameObjects.Container {
     };
 
     /* calc dialog height */
-    const titleHeight = !title
-      ? 0
-      : Utils.calcTextHeight(scene, title, headerStyle);
-    const messageHeight = Utils.calcTextHeight(scene, message, messageStyle);
+    let titleHeight = 0;
+    if (title) {
+      titleHeight = Utils.calcTextRect(scene, title, headerStyle).height;
+    }
+    let messageHeight = 0;
+    if (message) {
+      messageHeight = Utils.calcTextRect(scene, message, messageStyle).height;
+    }
     const totalHeight = Math.min(titleHeight + messageHeight, maxHeight);
 
     const dialogWidth = maxWidth;
@@ -258,6 +262,7 @@ export class Dialog extends Phaser.GameObjects.Container {
       scaleY: { from: 1, to: 1.035 },
       scaleX: { from: 1, to: 1.035 },
       ease: Phaser.Math.Easing.Cubic.Out,
+      delay: 50,
       duration: 200,
       onComplete: () => {
         this.destroy(true);

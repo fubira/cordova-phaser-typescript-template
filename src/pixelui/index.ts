@@ -12,12 +12,14 @@ import { TextLabelFactory } from "./component/TextLabel";
 import { BackgroundFactory } from "./component/Background";
 import { LoadingProgressFactory } from "./component/LoadingProgress";
 import { DialogFactory } from "./component/Dialog";
+import { ButtonFactory } from "./component/Button";
 
 export const add = {
   textLabel: TextLabelFactory,
   background: BackgroundFactory,
   loadingProgerss: LoadingProgressFactory,
   dialog: DialogFactory,
+  button: ButtonFactory,
 };
 
 /**

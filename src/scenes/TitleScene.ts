@@ -71,10 +71,11 @@ export default class TitlScene extends Phaser.Scene {
       yoyo: true,
     });
 
-    this.showDialog();
+    PixelUI.add.button(this, 180, 180, "Dialog", () => this.showDialog(), {});
   }
 
   private showDialog(): void {
+    this.sfxAudioSprites.play("se_button_over");
     const dialog = PixelUI.add.dialog(
       this,
       "ダイアログテスト",
@@ -96,7 +97,6 @@ export default class TitlScene extends Phaser.Scene {
           this.sfxAudioSprites.play("se_button_over");
           console.log(value);
           dialog.close();
-          PixelUI.add.dialog(this, null, value).open();
         },
       }
     );

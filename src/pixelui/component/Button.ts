@@ -69,7 +69,6 @@ export class Button extends Phaser.GameObjects.Container {
     /* define label styles */
     const labelStyle: PixelUI.TextLabelStyle = {
       noShadow: true,
-      fixedWidth: style.fixedWidth,
       padding: { x: 0, y: 12 },
       align: "center",
       textSize,
@@ -78,9 +77,9 @@ export class Button extends Phaser.GameObjects.Container {
       strokeThickness,
     };
 
-    const width = style.fixedWidth;
-    const height =
-      style.fixedHeight || Utils.calcTextHeight(scene, text, labelStyle);
+    const textRect = Utils.calcTextRect(scene, text, labelStyle);
+    const width = style.fixedWidth || Math.max(textRect.width, 180);
+    const height = style.fixedHeight || textRect.height + 8;
 
     /* add shadow gameobject */
     const shadow = scene.add.rectangle(3, 3, width + 6, height + 6);
@@ -104,7 +103,7 @@ export class Button extends Phaser.GameObjects.Container {
       rect.getTopLeft().x,
       rect.getTopLeft().y + 4,
       text,
-      labelStyle
+      { ...labelStyle, fixedWidth: width, fixedHeight: height }
     );
     textLabel.setOrigin(0.0, 0.0);
 
@@ -119,10 +118,17 @@ export class Button extends Phaser.GameObjects.Container {
 
     this.rect = rect;
     this.onClick = onClick;
-    /* set input callback */
-    this.rect.setInteractive({ useHandCursor: true });
-    this.rect.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
-      this.onClick(pointer);
+    this.setActive(true);
+  }
+
+  private actionClick(): void {
+    console.log("actionClick");
+    this.scene.tweens.add({
+      targets: this,
+      ease: "CubicOut",
+      y: { from: this.y, to: this.y + 5 },
+      duration: 50,
+      yoyo: true,
     });
   }
 
@@ -130,6 +136,7 @@ export class Button extends Phaser.GameObjects.Container {
     if (active) {
       this.rect.setInteractive({ useHandCursor: true });
       this.rect.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
+        this.actionClick();
         this.onClick(pointer);
       });
     } else {
