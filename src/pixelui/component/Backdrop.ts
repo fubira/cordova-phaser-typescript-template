@@ -1,7 +1,14 @@
 import * as PixelUI from "..";
 
 export interface BackdropStyle {
+  /**
+   * Background fill color
+   */
   fillColor?: string;
+  /**
+   * Background alpha
+   */
+  fillAlpha?: number;
   /**
    * Event handler for button selection
    */
@@ -19,7 +26,7 @@ export class Backdrop extends Phaser.GameObjects.Container {
     /* add shadow gameobject */
     const wall = scene.add.rectangle(0, 0, GAME_WIDTH * 2, GAME_HEIGHT * 2);
     wall.setInteractive({ useHandCursor: false });
-    wall.setFillStyle(fillColor.color, 0.3);
+    wall.setFillStyle(fillColor.color, style.fillAlpha || 0.3);
     wall.setOrigin(0);
 
     scene.tweens.add({

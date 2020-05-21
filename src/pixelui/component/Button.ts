@@ -38,6 +38,8 @@ export interface ButtonStyle {
 
 export class Button extends Phaser.GameObjects.Container {
   private base: Phaser.GameObjects.Rectangle;
+  private button: Phaser.GameObjects.Container;
+  private shadow: Phaser.GameObjects.Rectangle;
   private onClick: Function;
   private posY: number;
 
@@ -108,16 +110,13 @@ export class Button extends Phaser.GameObjects.Container {
     );
     textLabel.setOrigin(0.0, 0.0);
 
+    const button = scene.add.container(0, 0, [base, edge, border, textLabel]);
     /* generate container */
-    super(scene, x + width / 2, y + height / 2, [
-      shadow,
-      base,
-      edge,
-      border,
-      textLabel,
-    ]);
+    super(scene, x + width / 2, y + height / 2, [shadow, button]);
 
     this.base = base;
+    this.shadow = shadow;
+    this.button = button;
     this.onClick = onClick;
     this.posY = this.y;
     this.setActive(true);
@@ -131,37 +130,31 @@ export class Button extends Phaser.GameObjects.Container {
   public setActive(active: boolean): this {
     if (active) {
       this.base.setInteractive({ useHandCursor: true });
-      this.base.on("pointerdown", () => {
-        this.actionDrop();
-      });
-      this.base.on("pointerup", (pointer: Phaser.Input.Pointer) => {
-        this.actionRise();
+      this.base.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
+        this.actionPress();
         this.onClick(pointer);
       });
     } else {
       this.base.setInteractive({ useHandCursor: false });
-      this.base.off("pointerup");
       this.base.off("pointerdown");
     }
     return this;
   }
 
-  private actionDrop(): void {
+  private actionPress(): void {
     this.scene.tweens.add({
-      targets: this,
-      ease: Phaser.Math.Easing.Cubic.Out,
-      y: { from: this.y, to: this.posY + 5 },
-      duration: 50,
-      yoyo: false,
+      targets: this.button,
+      ease: Phaser.Math.Easing.Quartic.Out,
+      y: { from: 0, to: 4 },
+      duration: 100,
+      yoyo: true,
     });
-  }
-  private actionRise(): void {
     this.scene.tweens.add({
-      targets: this,
-      ease: Phaser.Math.Easing.Cubic.Out,
-      y: { from: this.y, to: this.posY },
-      duration: 50,
-      yoyo: false,
+      targets: this.shadow,
+      ease: Phaser.Math.Easing.Quartic.Out,
+      x: { from: 3, to: 0 },
+      duration: 100,
+      yoyo: true,
     });
   }
 }
