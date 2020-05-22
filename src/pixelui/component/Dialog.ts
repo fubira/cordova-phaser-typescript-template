@@ -46,13 +46,13 @@ export interface DialogStyle {
     /**
      * The value to be returned when the button is pressed
      */
-    value: string;
+    value: number | string;
   }[];
 
   /**
    * Event handler for button selection
    */
-  onSelect?: (value: string) => void;
+  onSelect?: (value: number | string) => void;
 }
 
 export class Dialog extends Phaser.GameObjects.Container {
