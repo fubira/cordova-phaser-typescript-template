@@ -71,7 +71,20 @@ export default class TitleScene extends Phaser.Scene {
       yoyo: true,
     });
 
-    PixelUI.add.button(this, 180, 180, "Dialog", () => this.showDialog(), {});
+    PixelUI.add.button(
+      this,
+      this.cameras.main.centerX,
+      250,
+      "Information Dialog",
+      () => this.showDialog()
+    );
+    PixelUI.add.button(
+      this,
+      this.cameras.main.centerX,
+      350,
+      "Small Dialog",
+      () => this.showDialogSmall()
+    );
   }
 
   private showDialog(): void {
@@ -84,8 +97,8 @@ export default class TitleScene extends Phaser.Scene {
         "",
         "おはようございます。",
         "今日も一日頑張りましょう。",
-        // "",
-        // "どんぐりころころ ドンブリコ お池にはまって さあ大変 どじょうが出て来て 今日は 坊ちゃん一緒に 遊びましょう",
+        "",
+        "どんぐりころころ ドンブリコ お池にはまって さあ大変 どじょうが出て来て 今日は 坊ちゃん一緒に 遊びましょう",
       ],
       {
         buttons: [
@@ -100,6 +113,17 @@ export default class TitleScene extends Phaser.Scene {
         },
       }
     );
+    dialog.open();
+  }
+
+  private showDialogSmall(): void {
+    this.sfxAudioSprites.play("se_button_over");
+    const dialog = PixelUI.add.dialog(this, null, "Are you Ok?", {
+      buttons: [{ text: "Ok", value: "ok" }],
+      onSelect: () => {
+        this.sfxAudioSprites.play("se_button_over");
+      },
+    });
     dialog.open();
   }
 

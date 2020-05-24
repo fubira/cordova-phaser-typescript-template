@@ -24,8 +24,10 @@ export interface BackgroundStyle {
  */
 export function BackgroundFactory(
   scene: Phaser.Scene,
-  style: BackgroundStyle
+  style?: BackgroundStyle
 ): Phaser.GameObjects.Rectangle {
+  style = style || {};
+
   const fillColor = Phaser.Display.Color.ValueToColor(
     style.fillColor || PixelUI.theme.backgroundColor()
   );

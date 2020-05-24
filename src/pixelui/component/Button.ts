@@ -39,6 +39,12 @@ export interface ButtonStyle {
    * Button height
    */
   fixedHeight?: number;
+
+  /**
+   * Button alignment
+   * @default "center"
+   */
+  align?: string;
 }
 
 export class Button extends Phaser.GameObjects.Container {
@@ -80,6 +86,14 @@ export class Button extends Phaser.GameObjects.Container {
     const edgeColor = borderColor.clone().darken(80);
 
     const textSize = style.textSize || "normal";
+    let align = 0.5;
+
+    if (style.align === "left") {
+      align = 0.0;
+    } else if (style.align === "right") {
+      align = 1.0;
+    }
+
     /* define label styles */
     const labelStyle: PixelUI.TextLabelStyle = {
       noShadow: true,
@@ -92,38 +106,42 @@ export class Button extends Phaser.GameObjects.Container {
     };
 
     const textRect = Utils.calcTextRect(scene, text, labelStyle);
-    const width = style.fixedWidth || Math.max(textRect.width, 180);
+    const width = style.fixedWidth || Math.max(textRect.width + 20, 180);
     const height = style.fixedHeight || textRect.height + 8;
 
     /* add shadow gameobject */
-    const shadow = scene.add.rectangle(3, 3, width + 6, height + 6);
+    const shadow = scene.add.rectangle(5, 5, width + 6, height + 6);
     shadow.setFillStyle(shadowColor.color, 0.3);
+    shadow.setOrigin(align);
 
     /* add base rectangle gameobject */
-    const base = scene.add.rectangle(0, 0, width, height);
+    const base = scene.add.rectangle(2, 2, width, height);
     base.setFillStyle(fillColor.color);
+    base.setOrigin(align);
 
     /* add dialog border and edge */
-    const edge = scene.add.rectangle(-2, -2, width + 2, height + 2);
+    const edge = scene.add.rectangle(0, 0, width, height);
     edge.setStrokeStyle(6, edgeColor.color, edgeColor.alphaGL || 1);
     edge.setFillStyle();
-    const border = scene.add.rectangle(-2, -2, width + 2, height + 2);
+    edge.setOrigin(align);
+
+    const border = scene.add.rectangle(0, 0, width, height);
     border.setStrokeStyle(3, borderColor.color, borderColor.alphaGL || 1);
     border.setFillStyle();
+    border.setOrigin(align);
 
     /* add text label */
-    const textLabel = TextLabelFactory(
-      scene,
-      base.getTopLeft().x,
-      base.getTopLeft().y + 4,
-      text,
-      { ...labelStyle, fixedWidth: width, fixedHeight: height }
-    );
-    textLabel.setOrigin(0.0, 0.0);
+    const textLabel = TextLabelFactory(scene, 0, 4, text, {
+      ...labelStyle,
+      fixedWidth: width,
+      fixedHeight: height,
+    });
+    textLabel.setOrigin(align);
 
     const button = scene.add.container(0, 0, [base, edge, border, textLabel]);
+
     /* generate container */
-    super(scene, x + width / 2, y + height / 2, [shadow, button]);
+    super(scene, x, y, [shadow, button]);
 
     this.base = base;
     this.shadow = shadow;
@@ -186,9 +204,9 @@ export function ButtonFactory(
   y: number,
   text: string,
   onclick: Function,
-  style: PixelUI.ButtonStyle = {}
+  style?: PixelUI.ButtonStyle
 ): PixelUI.Button {
-  const button = new Button(scene, x, y, text, onclick, style);
+  const button = new Button(scene, x, y, text, onclick, style || {});
   scene.children.add(button);
   return button;
 }

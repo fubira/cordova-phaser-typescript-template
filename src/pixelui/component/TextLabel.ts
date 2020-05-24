@@ -70,9 +70,9 @@ export function TextLabelFactory(
   x: number,
   y: number,
   text: string | string[],
-  style: PixelUI.TextLabelStyle = {}
+  style?: PixelUI.TextLabelStyle
 ): Phaser.GameObjects.Text {
-  const label = new TextLabel(scene, x, y, text, style);
+  const label = new TextLabel(scene, x, y, text, style || {});
   scene.children.add(label);
   return label;
 }

@@ -211,7 +211,7 @@ export class Dialog extends Phaser.GameObjects.Container {
             }
             this.close();
           },
-          { ...buttonStyle, fixedWidth: buttonWidth }
+          { ...buttonStyle, fixedWidth: buttonWidth, align: "left" }
         );
       });
     }
@@ -292,11 +292,20 @@ export function DialogFactory(
   scene: Phaser.Scene,
   title: string,
   message: string | string[],
-  style: PixelUI.DialogStyle = {}
+  style?: PixelUI.DialogStyle
 ): PixelUI.Dialog {
   const centerX = scene.cameras.main.centerX;
   const centerY = scene.cameras.main.centerY;
-  const dialog = new Dialog(scene, centerX, centerY, title, message, style);
+
+  const dialog = new Dialog(
+    scene,
+    centerX,
+    centerY,
+    title,
+    message,
+    style || {}
+  );
+
   scene.children.add(dialog);
 
   return dialog;

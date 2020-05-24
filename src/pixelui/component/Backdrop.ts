@@ -50,7 +50,7 @@ export class Backdrop extends Phaser.GameObjects.Container {
 
 export function BackdropFactory(
   scene: Phaser.Scene,
-  style: PixelUI.BackdropStyle = {}
+  style?: PixelUI.BackdropStyle
 ): PixelUI.Backdrop {
-  return new Backdrop(scene, style);
+  return new Backdrop(scene, style || {});
 }
