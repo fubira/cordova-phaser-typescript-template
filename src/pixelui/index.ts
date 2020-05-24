@@ -14,6 +14,7 @@ import { LoadingProgressFactory } from "./component/LoadingProgress";
 import { DialogFactory } from "./component/Dialog";
 import { ButtonFactory } from "./component/Button";
 import { BackdropFactory } from "./component/Backdrop";
+import { ToastFactory } from "./component/Toast";
 
 export const add = {
   textLabel: TextLabelFactory,
@@ -22,6 +23,7 @@ export const add = {
   dialog: DialogFactory,
   button: ButtonFactory,
   backdrop: BackdropFactory,
+  toast: ToastFactory,
 };
 
 /**
@@ -30,6 +32,7 @@ export const add = {
 export { LoadingProgress } from "./component/LoadingProgress";
 export { TextLabel, TextLabelStyle } from "./component/TextLabel";
 export { Dialog, DialogStyle } from "./component/Dialog";
+export { Toast, ToastStyle } from "./component/Toast";
 export { Button, ButtonStyle } from "./component/Button";
 export { Backdrop, BackdropStyle } from "./component/Backdrop";
 

@@ -1,21 +1,25 @@
 import * as PixelUI from "..";
 import * as Utils from "../Utils";
 import { TextLabelFactory } from "./TextLabel";
-import { ButtonFactory } from "./Button";
-import { BackdropFactory } from "./Backdrop";
 
-export interface DialogStyle {
+export interface ToastStyle {
+  /**
+   * Display position of the toast.
+   * @default "top"
+   */
+  position?: "top" | "middle" | "bottom";
+
+  /**
+   * Duration to display the toast.
+   * @default "normal"
+   */
+  duration?: number | "short" | "normal" | "long";
+
   /**
    * If true, dialog will open automatically.
    * @default true
    */
   open?: boolean;
-
-  /**
-   * If true, dialog will be closed when the backdrop is clicked.
-   * @default false
-   */
-  backdropClose?: boolean;
 
   /**
    * Dialog fill color
@@ -40,40 +44,18 @@ export interface DialogStyle {
    * @default "center"
    */
   textAlign?: string;
-
-  /**
-   * Dialog buttons
-   */
-  buttons?: {
-    /**
-     * Display text of the button
-     */
-    text: string;
-    /**
-     * The value to be returned when the button is selected.
-     */
-    value: number | string;
-  }[];
-
-  /**
-   * Event handler for button selection
-   */
-  onSelect?: (value: number | string) => void;
 }
 
-export class Dialog extends Phaser.GameObjects.Container {
+export class Toast extends Phaser.GameObjects.Container {
   private container: Phaser.GameObjects.Container;
-  private backdrop: PixelUI.Backdrop;
-  private buttons: PixelUI.Button[];
+  private duration: number;
   private tween: Phaser.Tweens.Tween;
 
   constructor(
     scene: Phaser.Scene,
-    x?: number,
-    y?: number,
     title?: string,
     message?: string | string[],
-    style?: PixelUI.DialogStyle
+    style?: PixelUI.ToastStyle
   ) {
     const maxWidth = GAME_WIDTH * 0.8;
     const maxHeight = GAME_HEIGHT * 0.8;
@@ -84,18 +66,12 @@ export class Dialog extends Phaser.GameObjects.Container {
     const headerColor = Phaser.Display.Color.ValueToColor(
       PixelUI.theme.textHeaderColor()
     );
-    const buttonColor = Phaser.Display.Color.ValueToColor(
-      PixelUI.theme.styles.colorMain
-    );
 
     const strokeColor = Phaser.Display.Color.ValueToColor(
       PixelUI.theme.textStrokeColor()
     );
     const backgroundColor = Phaser.Display.Color.ValueToColor(
       PixelUI.theme.backgroundColor()
-    );
-    const backdropColor = Phaser.Display.Color.ValueToColor(
-      PixelUI.theme.backdropColor()
     );
 
     const borderColor = Phaser.Display.Color.ValueToColor(
@@ -135,12 +111,6 @@ export class Dialog extends Phaser.GameObjects.Container {
       color: textColor.rgba,
       stroke: strokeColor.rgba,
       strokeThickness,
-    };
-
-    const buttonStyle: PixelUI.ButtonStyle = {
-      ...labelStyle,
-      fillColor: buttonColor.rgba,
-      textSize,
     };
 
     /* calc dialog height */
@@ -200,70 +170,40 @@ export class Dialog extends Phaser.GameObjects.Container {
     );
     messageLabel.setOrigin(0.0, 0.0);
 
-    /* add buttons */
-    let buttons: PixelUI.Button[] = [];
-    if (style.buttons) {
-      const buttonCount = style.buttons.length;
-      const margin = buttonCount === 1 ? maxWidth / 2 : 20;
-      const buttonWidth = maxWidth / buttonCount - margin;
-
-      buttons = style.buttons.map((button, index) => {
-        return ButtonFactory(
-          scene,
-          rect.getTopLeft().x + (buttonWidth + 20) * index + margin / 2,
-          rect.getTopLeft().y + totalHeight + 20,
-          button.text,
-          () => {
-            if (style.onSelect) {
-              style.onSelect(button.value);
-            }
-            this.close();
-          },
-          { ...buttonStyle, fixedWidth: buttonWidth, align: "left" }
-        );
-      });
-    }
-
     /* generate container */
-    const container = scene.add.container(x, y, [
+    const container = scene.add.container(scene.cameras.main.centerX, 60, [
       shadow,
       rect,
       edge,
       border,
       titleLabel,
       messageLabel,
-      ...buttons,
     ]);
 
-    /* generate backdrop */
-    const backdrop = BackdropFactory(scene, {
-      fillColor: backdropColor.rgba,
-      onClick: () => {
-        if (style.backdropClose) {
-          this.close();
-        }
-      },
-    });
-
-    super(scene, 0, 0, [backdrop, container]);
-
-    this.buttons = buttons;
+    super(scene, 0, 0, [container]);
     this.container = container;
-    this.backdrop = backdrop;
+    this.duration = 2000;
+    if (style.duration) {
+      switch (style.duration) {
+        case "long":
+          this.duration = 3000;
+          break;
+        case "normal":
+          this.duration = 2000;
+          break;
+        case "short":
+          this.duration = 1000;
+          break;
+        default:
+          this.duration = Number(style.duration).valueOf();
+          break;
+      }
+    }
 
     if (style.open) {
       this.open();
     } else {
       this.setVisible(false);
-      this.setButtonActive(false);
-    }
-  }
-
-  private setButtonActive(active: boolean): void {
-    if (this.buttons) {
-      for (const button of this.buttons) {
-        button.setActive(active);
-      }
     }
   }
 
@@ -272,33 +212,33 @@ export class Dialog extends Phaser.GameObjects.Container {
    */
   public open(): void {
     this.setVisible(true);
-    this.setButtonActive(true);
 
     if (this.tween && this.tween.isPlaying()) {
       return;
     }
 
     this.tween = this.scene.tweens.add({
-      targets: [this.container, this.backdrop],
+      targets: [this.container],
       alpha: { from: 0, to: 1 },
       scaleY: { from: 0.6, to: 1 },
       ease: Phaser.Math.Easing.Cubic.Out,
       duration: 100,
     });
+    setTimeout(() => {
+      this.close();
+    }, this.duration);
   }
 
   /**
    * Close dialog with a tween animation
    */
   public close(): void {
-    this.setButtonActive(false);
-
     if (this.tween && this.tween.isPlaying()) {
       return;
     }
 
     this.tween = this.scene.tweens.add({
-      targets: [this.container, this.backdrop],
+      targets: [this.container],
       alpha: { from: 1, to: 0 },
       scaleY: { from: 1, to: 1.035 },
       scaleX: { from: 1, to: 1.035 },
@@ -312,25 +252,15 @@ export class Dialog extends Phaser.GameObjects.Container {
   }
 }
 
-export function DialogFactory(
+export function ToastFactory(
   scene: Phaser.Scene,
   title: string,
   message: string | string[],
-  style?: PixelUI.DialogStyle
-): PixelUI.Dialog {
-  const centerX = scene.cameras.main.centerX;
-  const centerY = scene.cameras.main.centerY;
+  style?: PixelUI.ToastStyle
+): PixelUI.Toast {
+  const toast = new Toast(scene, title, message, style || {});
 
-  const dialog = new Dialog(
-    scene,
-    centerX,
-    centerY,
-    title,
-    message,
-    style || {}
-  );
+  scene.children.add(toast);
 
-  scene.children.add(dialog);
-
-  return dialog;
+  return toast;
 }

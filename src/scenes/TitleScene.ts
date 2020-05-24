@@ -85,6 +85,9 @@ export default class TitleScene extends Phaser.Scene {
       "Small Dialog",
       () => this.showDialogSmall()
     );
+    PixelUI.add.button(this, this.cameras.main.centerX, 450, "Toast", () =>
+      this.showToast()
+    );
   }
 
   private showDialog(): void {
@@ -126,6 +129,16 @@ export default class TitleScene extends Phaser.Scene {
       },
     });
     dialog.open();
+  }
+
+  private showToast(): void {
+    const toast = PixelUI.add.toast(
+      this,
+      null,
+      "Hi! this is toast message!",
+      {}
+    );
+    toast.open();
   }
 
   private startGame(): void {
