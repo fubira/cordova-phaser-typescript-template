@@ -14,6 +14,11 @@ export interface ButtonStyle {
    */
   fillColor?: string;
   /**
+   * Button hover color
+   * @default PixelUI.theme.lightAccentColor
+   */
+  hoverColor?: string;
+  /**
    * Buttonborder color
    * @default PixelUI.theme.textColor
    */
@@ -40,8 +45,11 @@ export class Button extends Phaser.GameObjects.Container {
   private base: Phaser.GameObjects.Rectangle;
   private button: Phaser.GameObjects.Container;
   private shadow: Phaser.GameObjects.Rectangle;
+  private border: Phaser.GameObjects.Rectangle;
+
+  private borderColor: Phaser.Display.Color;
+  private hoverColor: Phaser.Display.Color;
   private onClick: Function;
-  private posY: number;
 
   constructor(
     scene: Phaser.Scene,
@@ -61,6 +69,9 @@ export class Button extends Phaser.GameObjects.Container {
 
     const fillColor = Phaser.Display.Color.ValueToColor(
       style.fillColor || PixelUI.theme.backgroundColor()
+    );
+    const hoverColor = Phaser.Display.Color.ValueToColor(
+      style.hoverColor || PixelUI.theme.styles.colorLightAccent
     );
     const borderColor = Phaser.Display.Color.ValueToColor(
       style.borderColor || textColor.color
@@ -117,8 +128,10 @@ export class Button extends Phaser.GameObjects.Container {
     this.base = base;
     this.shadow = shadow;
     this.button = button;
+    this.border = border;
+    this.borderColor = borderColor;
+    this.hoverColor = hoverColor;
     this.onClick = onClick;
-    this.posY = this.y;
     this.setActive(true);
   }
 
@@ -134,9 +147,17 @@ export class Button extends Phaser.GameObjects.Container {
         this.actionPress();
         this.onClick(pointer);
       });
+      this.base.on("pointerover", () => {
+        this.border.strokeColor = this.hoverColor.color;
+      });
+      this.base.on("pointerout", () => {
+        this.border.strokeColor = this.borderColor.color;
+      });
     } else {
       this.base.setInteractive({ useHandCursor: false });
       this.base.off("pointerdown");
+      this.base.off("pointerover");
+      this.base.off("pointerout");
     }
     return this;
   }
