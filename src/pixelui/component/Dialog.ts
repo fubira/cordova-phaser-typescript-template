@@ -6,10 +6,16 @@ import { BackdropFactory } from "./Backdrop";
 
 export interface DialogStyle {
   /**
-   * Open dialog automatically
+   * If true, dialog will open automatically.
    * @default true
    */
   open?: boolean;
+
+  /**
+   * If true, dialog will be closed when the backdrop is clicked.
+   * @default false
+   */
+  backdropClose?: boolean;
 
   /**
    * Dialog fill color
@@ -44,7 +50,7 @@ export interface DialogStyle {
      */
     text: string;
     /**
-     * The value to be returned when the button is pressed
+     * The value to be returned when the button is selected.
      */
     value: number | string;
   }[];
@@ -227,9 +233,16 @@ export class Dialog extends Phaser.GameObjects.Container {
       ...buttons,
     ]);
 
+    /* generate backdrop */
     const backdrop = BackdropFactory(scene, {
       fillColor: backdropColor.rgba,
+      onClick: () => {
+        if (style.backdropClose) {
+          this.close();
+        }
+      },
     });
+    rect.setInteractive({ useHandCursor: false });
 
     super(scene, 0, 0, [backdrop, container]);
 
@@ -259,13 +272,15 @@ export class Dialog extends Phaser.GameObjects.Container {
   public open(): void {
     this.setVisible(true);
     this.setButtonActive(true);
-    this.scene.tweens.add({
-      targets: [this.container, this.backdrop],
-      alpha: { from: 0, to: 1 },
-      scaleY: { from: 0.6, to: 1 },
-      ease: Phaser.Math.Easing.Cubic.Out,
-      duration: 100,
-    });
+    if (this.container.alpha === 0) {
+      this.scene.tweens.add({
+        targets: [this.container, this.backdrop],
+        alpha: { from: 0, to: 1 },
+        scaleY: { from: 0.6, to: 1 },
+        ease: Phaser.Math.Easing.Cubic.Out,
+        duration: 100,
+      });
+    }
   }
 
   /**
@@ -273,18 +288,20 @@ export class Dialog extends Phaser.GameObjects.Container {
    */
   public close(): void {
     this.setButtonActive(false);
-    this.scene.tweens.add({
-      targets: [this.container, this.backdrop],
-      alpha: { from: 1, to: 0 },
-      scaleY: { from: 1, to: 1.035 },
-      scaleX: { from: 1, to: 1.035 },
-      ease: Phaser.Math.Easing.Cubic.Out,
-      delay: 80,
-      duration: 200,
-      onComplete: () => {
-        this.scene.children.remove(this);
-      },
-    });
+    if (this.container.alpha === 1) {
+      this.scene.tweens.add({
+        targets: [this.container, this.backdrop],
+        alpha: { from: 1, to: 0 },
+        scaleY: { from: 1, to: 1.035 },
+        scaleX: { from: 1, to: 1.035 },
+        ease: Phaser.Math.Easing.Cubic.Out,
+        delay: 80,
+        duration: 200,
+        onComplete: () => {
+          this.scene.children.remove(this);
+        },
+      });
+    }
   }
 }
 

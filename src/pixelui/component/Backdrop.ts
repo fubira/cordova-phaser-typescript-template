@@ -29,6 +29,12 @@ export class Backdrop extends Phaser.GameObjects.Container {
     wall.setFillStyle(fillColor.color, style.fillAlpha || 0.3);
     wall.setOrigin(0);
 
+    if (style.onClick) {
+      wall.on("pointerdown", () => {
+        style.onClick("value");
+      });
+    }
+
     scene.tweens.add({
       targets: wall,
       alpha: { from: 0, to: 1 },

@@ -106,7 +106,7 @@ export class Button extends Phaser.GameObjects.Container {
     };
 
     const textRect = Utils.calcTextRect(scene, text, labelStyle);
-    const width = style.fixedWidth || Math.max(textRect.width + 20, 180);
+    const width = style.fixedWidth || Math.max(textRect.width + 16, 180);
     const height = style.fixedHeight || textRect.height + 8;
 
     /* add shadow gameobject */

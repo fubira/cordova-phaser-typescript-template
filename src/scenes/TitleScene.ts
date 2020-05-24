@@ -120,6 +120,7 @@ export default class TitleScene extends Phaser.Scene {
     this.sfxAudioSprites.play("se_button_over");
     const dialog = PixelUI.add.dialog(this, null, "Are you Ok?", {
       buttons: [{ text: "Ok", value: "ok" }],
+      backdropClose: true,
       onSelect: () => {
         this.sfxAudioSprites.play("se_button_over");
       },
