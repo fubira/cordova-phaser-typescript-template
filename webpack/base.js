@@ -39,6 +39,7 @@ module.exports = {
     compress: true,
     port: 9000,
     inline: true,
+    open: true,
     watchContentBase: true,
     watchOptions: {
       aggregateTimeout: 300,

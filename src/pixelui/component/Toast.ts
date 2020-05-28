@@ -1,13 +1,20 @@
 import * as PixelUI from "..";
 import * as Utils from "../Utils";
 import { TextLabelFactory } from "./TextLabel";
+import { ComponentBase, ComponentBaseStyle } from "../ComponentBase";
 
-export interface ToastStyle {
+export interface ToastStyle extends ComponentBaseStyle {
   /**
    * Display position of the toast.
    * @default "top"
    */
-  position?: "top" | "middle" | "bottom";
+  verticalAlign?: "top" | "middle" | "bottom";
+
+  /**
+   * Display position of the toast.
+   * @default "information"
+   */
+  type?: "information" | "success" | "warning" | "error";
 
   /**
    * Duration to display the toast.
@@ -46,10 +53,32 @@ export interface ToastStyle {
   textAlign?: string;
 }
 
-export class Toast extends Phaser.GameObjects.Container {
-  private container: Phaser.GameObjects.Container;
+class ToastController {
+  private staticToastList: Toast[] = [];
+
+  private relocateAll(): void {
+    let yBase = 0;
+    this.staticToastList.forEach((toast: Toast, index: number) => {
+      yBase += toast.height + 16;
+      toast.relocate(yBase, index);
+    });
+  }
+
+  public add(toast: Toast): void {
+    this.staticToastList.unshift(toast);
+    this.relocateAll();
+  }
+
+  public remove(toast: Toast): void {
+    this.staticToastList = this.staticToastList.filter((t) => t !== toast);
+    this.relocateAll();
+  }
+}
+export const staticToastController = new ToastController();
+
+export class Toast extends ComponentBase {
   private duration: number;
-  private tween: Phaser.Tweens.Tween;
+  private verticalAlign: "top" | "middle" | "bottom";
 
   constructor(
     scene: Phaser.Scene,
@@ -57,7 +86,7 @@ export class Toast extends Phaser.GameObjects.Container {
     message?: string | string[],
     style?: PixelUI.ToastStyle
   ) {
-    const maxWidth = GAME_WIDTH * 0.8;
+    const maxWidth = GAME_WIDTH * 0.9;
     const maxHeight = GAME_HEIGHT * 0.8;
 
     const textColor = Phaser.Display.Color.ValueToColor(
@@ -66,54 +95,40 @@ export class Toast extends Phaser.GameObjects.Container {
     const headerColor = Phaser.Display.Color.ValueToColor(
       PixelUI.theme.textHeaderColor()
     );
-
     const strokeColor = Phaser.Display.Color.ValueToColor(
       PixelUI.theme.textStrokeColor()
     );
-    const backgroundColor = Phaser.Display.Color.ValueToColor(
-      PixelUI.theme.backgroundColor()
-    );
-
     const borderColor = Phaser.Display.Color.ValueToColor(
-      style.borderColor || textColor.color
-    );
-    const fillColor = Phaser.Display.Color.ValueToColor(
-      style.fillColor || backgroundColor.color
-    );
-    const shadowColor = Phaser.Display.Color.ValueToColor(0);
-    const edgeColor = borderColor.clone().darken(80);
+      PixelUI.theme.styles.colorDanger
+    ).lighten(50);
 
-    const textSize = style.textSize || "normal";
-    const textAlign = style.textAlign || "center";
-    const strokeThickness = 6;
+    const textSize = style.textSize || "small";
+    const textAlign = style.textAlign || "left";
+    const strokeThickness = PixelUI.theme.getTextSize(style.textSize) / 8;
 
     /* define label styles */
     const labelStyle: PixelUI.TextLabelStyle = {
       noShadow: true,
+      textSize,
+      stroke: strokeColor.rgba,
+      strokeThickness,
+      align: textAlign,
       fixedWidth: maxWidth,
       wordWrap: { width: maxWidth - 20 },
-      padding: { x: 10, y: 10 },
+      padding: { x: 6, y: 6 },
     };
 
     const headerStyle: PixelUI.TextLabelStyle = {
       ...labelStyle,
-      align: textAlign,
-      textSize,
       color: headerColor.rgba,
-      stroke: strokeColor.rgba,
-      strokeThickness,
     };
 
     const messageStyle: PixelUI.TextLabelStyle = {
       ...labelStyle,
-      align: textAlign,
-      textSize,
       color: textColor.rgba,
-      stroke: strokeColor.rgba,
-      strokeThickness,
     };
 
-    /* calc dialog height */
+    /* calc text height */
     let titleHeight = 0;
     if (title) {
       titleHeight = Utils.calcTextRect(scene, title, headerStyle).height;
@@ -124,64 +139,41 @@ export class Toast extends Phaser.GameObjects.Container {
     }
     const totalHeight = Math.min(titleHeight + messageHeight, maxHeight);
 
-    const dialogWidth = maxWidth;
-    const dialogHeight = totalHeight;
-
-    /* add shadow gameobject */
-    const shadow = scene.add.rectangle(3, 3, dialogWidth + 6, dialogHeight + 6);
-    shadow.setFillStyle(shadowColor.color, 0.3);
-
-    /* add background rect gameobject */
-    const rect = scene.add.rectangle(0, 0, dialogWidth, dialogHeight);
-    rect.setFillStyle(fillColor.color, 0.5);
-    rect.setInteractive({ useHandCursor: false }); // hooking a click event in rect
-
-    /* add dialog border and edge */
-    const edge = scene.add.rectangle(-2, -2, dialogWidth + 2, dialogHeight + 2);
-    edge.setStrokeStyle(6, edgeColor.color, edgeColor.alphaGL || 1);
-    edge.setFillStyle();
-
-    const border = scene.add.rectangle(
-      -2,
-      -2,
-      dialogWidth + 2,
-      dialogHeight + 2
-    );
-    border.setStrokeStyle(3, borderColor.color, borderColor.alphaGL || 1);
-    border.setFillStyle();
+    const fixedWidth = maxWidth;
+    const fixedHeight = totalHeight;
 
     /* add title label */
     const titleLabel = TextLabelFactory(
       scene,
-      rect.getTopLeft().x,
-      rect.getTopLeft().y,
+      0,
+      -titleHeight / 2,
       title,
       headerStyle
     );
-    titleLabel.setOrigin(0.0, 0.0);
+    titleLabel.setOrigin(0.5, 0.5);
 
     /* add message label */
     const messageLabel = TextLabelFactory(
       scene,
-      rect.getTopLeft().x,
-      rect.getTopLeft().y + titleHeight,
+      0,
+      titleHeight / 2,
       message,
       messageStyle
     );
-    messageLabel.setOrigin(0.0, 0.0);
+    messageLabel.setOrigin(0.5, 0.5);
 
     /* generate container */
-    const container = scene.add.container(scene.cameras.main.centerX, 60, [
-      shadow,
-      rect,
-      edge,
-      border,
-      titleLabel,
-      messageLabel,
-    ]);
+    super(scene, 0, 0, [titleLabel, messageLabel], {
+      borderColor: borderColor.rgba,
+      fixedWidth,
+      fixedHeight,
+    });
+    this.width = fixedWidth;
+    this.height = fixedHeight;
+    this.verticalAlign = style.verticalAlign || "top";
+    this.relocate();
 
-    super(scene, 0, 0, [container]);
-    this.container = container;
+    /* set duration */
     this.duration = 2000;
     if (style.duration) {
       switch (style.duration) {
@@ -200,55 +192,56 @@ export class Toast extends Phaser.GameObjects.Container {
       }
     }
 
-    if (style.open) {
+    if (style.open !== undefined ? style.open : true) {
       this.open();
+      setTimeout(() => {
+        this.close();
+      }, this.duration);
     } else {
       this.setVisible(false);
     }
   }
 
-  /**
-   * Open a dialog with a tween animation
-   */
-  public open(): void {
-    this.setVisible(true);
+  private getAlignedPosition(yBase?: number): { x: number; y: number } {
+    const position = {
+      x: this.scene.cameras.main.centerX,
+      y: yBase ? yBase : 0 + 60,
+    };
 
-    if (this.tween && this.tween.isPlaying()) {
-      return;
+    switch (this.verticalAlign) {
+      case "bottom":
+        position.y = this.scene.cameras.main.displayHeight - position.y;
+        break;
+      case "middle":
+        position.y = this.scene.cameras.main.centerY + position.y;
+        break;
     }
-
-    this.tween = this.scene.tweens.add({
-      targets: [this.container],
-      alpha: { from: 0, to: 1 },
-      scaleY: { from: 0.6, to: 1 },
-      ease: Phaser.Math.Easing.Cubic.Out,
-      duration: 100,
-    });
-    setTimeout(() => {
-      this.close();
-    }, this.duration);
+    return position;
   }
 
-  /**
-   * Close dialog with a tween animation
-   */
-  public close(): void {
-    if (this.tween && this.tween.isPlaying()) {
-      return;
-    }
+  public relocate(yBase?: number, index?: number): void {
+    const position = this.getAlignedPosition(yBase);
 
-    this.tween = this.scene.tweens.add({
-      targets: [this.container],
-      alpha: { from: 1, to: 0 },
-      scaleY: { from: 1, to: 1.035 },
-      scaleX: { from: 1, to: 1.035 },
-      ease: Phaser.Math.Easing.Cubic.Out,
-      delay: 80,
-      duration: 200,
-      onComplete: () => {
-        this.scene.children.remove(this);
-      },
-    });
+    if (!index) {
+      this.setPosition(position.x, position.y);
+    } else {
+      this.scene.tweens.add({
+        targets: [this],
+        x: { from: this.x, to: position.x },
+        y: { from: this.y, to: position.y },
+        duration: 100,
+      });
+    }
+  }
+
+  public open(): void {
+    staticToastController.add(this);
+    super.open();
+  }
+
+  public close(): void {
+    staticToastController.remove(this);
+    super.close();
   }
 }
 

@@ -131,14 +131,15 @@ export default class TitleScene extends Phaser.Scene {
     dialog.open();
   }
 
+  index = 0;
   private showToast(): void {
-    const toast = PixelUI.add.toast(
+    this.index += 1;
+    PixelUI.add.toast(
       this,
-      null,
-      "Hi! this is toast message!",
-      {}
+      undefined,
+      `Hi! this is toast message! (${this.index})`,
+      { verticalAlign: "top" }
     );
-    toast.open();
   }
 
   private startGame(): void {
