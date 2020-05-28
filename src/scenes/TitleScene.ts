@@ -144,7 +144,7 @@ export default class TitleScene extends Phaser.Scene {
     if (this.index % 3 === 1) {
       PixelUI.add.toast(
         this,
-        undefined,
+        "Success",
         `Hi! this is toast success! (${this.index})`,
         { verticalAlign: "top", type: "success" }
       );
@@ -152,7 +152,7 @@ export default class TitleScene extends Phaser.Scene {
     if (this.index % 3 === 2) {
       PixelUI.add.toast(
         this,
-        undefined,
+        "Error",
         `Hi! this is toast danger! (${this.index})`,
         { verticalAlign: "top", type: "error" }
       );

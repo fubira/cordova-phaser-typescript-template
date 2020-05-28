@@ -75,7 +75,7 @@ export class ComponentBase extends Phaser.GameObjects.Container {
     /* Colors */
     const fillColor = Phaser.Display.Color.ValueToColor(
       style.fillColor || PixelUI.theme.backgroundColor()
-    );
+    ).darken(5);
     const borderMainColor = Phaser.Display.Color.ValueToColor(
       style.borderColor || PixelUI.theme.textColor()
     );
@@ -115,8 +115,8 @@ export class ComponentBase extends Phaser.GameObjects.Container {
 
     /* Base rectangle */
     const fill = scene.add.rectangle(
-      2,
-      2,
+      0,
+      0,
       width,
       height,
       fillColor.color,

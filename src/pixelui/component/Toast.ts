@@ -53,32 +53,55 @@ export interface ToastStyle extends ComponentBaseStyle {
   textAlign?: string;
 }
 
-class ToastController {
-  private staticToastList: Toast[] = [];
+class ToastQueue {
+  private queue: Toast[] = [];
 
   private relocateAll(): void {
     let yBase = 0;
-    this.staticToastList.forEach((toast: Toast, index: number) => {
-      yBase += toast.height + 16;
+
+    const topToast = this.queue.filter(
+      (toast: Toast) => toast.verticalAlign === "top"
+    );
+    yBase = 0;
+    topToast.forEach((toast: Toast, index: number) => {
       toast.relocate(yBase, index);
+      yBase += toast.height + 16;
+    });
+
+    const middleToast = this.queue.filter(
+      (toast: Toast) => toast.verticalAlign === "middle"
+    );
+    yBase = 0;
+    middleToast.forEach((toast: Toast, index: number) => {
+      toast.relocate(yBase, index);
+      yBase += toast.height + 16;
+    });
+
+    const bottomToast = this.queue.filter(
+      (toast: Toast) => toast.verticalAlign === "bottom"
+    );
+    yBase = 0;
+    bottomToast.forEach((toast: Toast, index: number) => {
+      toast.relocate(yBase, index);
+      yBase += toast.height + 16;
     });
   }
 
   public add(toast: Toast): void {
-    this.staticToastList.unshift(toast);
+    this.queue.unshift(toast);
     this.relocateAll();
   }
 
   public remove(toast: Toast): void {
-    this.staticToastList = this.staticToastList.filter((t) => t !== toast);
+    this.queue = this.queue.filter((t) => t !== toast);
     this.relocateAll();
   }
 }
-export const staticToastController = new ToastController();
+export const staticToastQueue = new ToastQueue();
 
 export class Toast extends ComponentBase {
-  private duration: number;
-  private verticalAlign: "top" | "middle" | "bottom";
+  public duration: number;
+  public verticalAlign: "top" | "middle" | "bottom";
 
   constructor(
     scene: Phaser.Scene,
@@ -169,10 +192,10 @@ export class Toast extends ComponentBase {
 
     /* add type bar rectangle */
     const typeBar = scene.add.rectangle(
-      -fixedWidth / 2 + 4,
+      -fixedWidth / 2 + 6,
       -4,
       16,
-      fixedHeight,
+      fixedHeight - 4,
       typeColor.color,
       typeColor.alphaGL
     );
@@ -242,15 +265,20 @@ export class Toast extends ComponentBase {
   private getAlignedPosition(yBase?: number): { x: number; y: number } {
     const position = {
       x: this.scene.cameras.main.centerX,
-      y: yBase ? yBase : 0 + 32,
+      y: yBase ? yBase : 0,
     };
 
     switch (this.verticalAlign) {
       case "bottom":
         position.y = this.scene.cameras.main.displayHeight - position.y;
+        position.y -= this.height / 2;
         break;
       case "middle":
         position.y = this.scene.cameras.main.centerY + position.y;
+        position.y += this.height / 2 + 32;
+        break;
+      default:
+        position.y += this.height / 2 + 32;
         break;
     }
     return position;
@@ -272,12 +300,12 @@ export class Toast extends ComponentBase {
   }
 
   public open(): void {
-    staticToastController.add(this);
+    staticToastQueue.add(this);
     super.open();
   }
 
   public close(): void {
-    staticToastController.remove(this);
+    staticToastQueue.remove(this);
     super.close();
   }
 }
