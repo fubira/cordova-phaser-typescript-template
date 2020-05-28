@@ -86,7 +86,7 @@ export class Toast extends ComponentBase {
     message?: string | string[],
     style?: PixelUI.ToastStyle
   ) {
-    const maxWidth = GAME_WIDTH * 0.9;
+    const maxWidth = GAME_WIDTH * 0.95;
     const maxHeight = GAME_HEIGHT * 0.8;
 
     const textColor = Phaser.Display.Color.ValueToColor(
@@ -99,8 +99,33 @@ export class Toast extends ComponentBase {
       PixelUI.theme.textStrokeColor()
     );
     const borderColor = Phaser.Display.Color.ValueToColor(
-      PixelUI.theme.styles.colorDanger
+      PixelUI.theme.styles.colorLightShade
     ).lighten(50);
+
+    let typeColor = Phaser.Display.Color.ValueToColor(
+      PixelUI.theme.styles.colorMain
+    );
+
+    switch (style.type) {
+      case "success": {
+        typeColor = Phaser.Display.Color.ValueToColor(
+          PixelUI.theme.styles.colorSuccess
+        );
+        break;
+      }
+      case "error": {
+        typeColor = Phaser.Display.Color.ValueToColor(
+          PixelUI.theme.styles.colorDanger
+        );
+        break;
+      }
+      case "warning": {
+        typeColor = Phaser.Display.Color.ValueToColor(
+          PixelUI.theme.styles.colorWarning
+        );
+        break;
+      }
+    }
 
     const textSize = style.textSize || "small";
     const textAlign = style.textAlign || "left";
@@ -142,10 +167,22 @@ export class Toast extends ComponentBase {
     const fixedWidth = maxWidth;
     const fixedHeight = totalHeight;
 
+    /* add type bar rectangle */
+    const typeBar = scene.add.rectangle(
+      -fixedWidth / 2 + 4,
+      -4,
+      16,
+      fixedHeight,
+      typeColor.color,
+      typeColor.alphaGL
+    );
+    typeBar.setInteractive({ useHandCursor: false });
+    typeBar.setOrigin(0.5, 0.5);
+
     /* add title label */
     const titleLabel = TextLabelFactory(
       scene,
-      0,
+      16,
       -titleHeight / 2,
       title,
       headerStyle
@@ -155,7 +192,7 @@ export class Toast extends ComponentBase {
     /* add message label */
     const messageLabel = TextLabelFactory(
       scene,
-      0,
+      16,
       titleHeight / 2,
       message,
       messageStyle
@@ -163,7 +200,7 @@ export class Toast extends ComponentBase {
     messageLabel.setOrigin(0.5, 0.5);
 
     /* generate container */
-    super(scene, 0, 0, [titleLabel, messageLabel], {
+    super(scene, 0, 0, [typeBar, titleLabel, messageLabel], {
       borderColor: borderColor.rgba,
       fixedWidth,
       fixedHeight,
@@ -205,7 +242,7 @@ export class Toast extends ComponentBase {
   private getAlignedPosition(yBase?: number): { x: number; y: number } {
     const position = {
       x: this.scene.cameras.main.centerX,
-      y: yBase ? yBase : 0 + 60,
+      y: yBase ? yBase : 0 + 32,
     };
 
     switch (this.verticalAlign) {

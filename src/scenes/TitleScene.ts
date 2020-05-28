@@ -133,13 +133,31 @@ export default class TitleScene extends Phaser.Scene {
 
   index = 0;
   private showToast(): void {
+    if (this.index % 3 === 0) {
+      PixelUI.add.toast(
+        this,
+        undefined,
+        `Hi! this is toast message! (${this.index})`,
+        { verticalAlign: "top" }
+      );
+    }
+    if (this.index % 3 === 1) {
+      PixelUI.add.toast(
+        this,
+        undefined,
+        `Hi! this is toast success! (${this.index})`,
+        { verticalAlign: "top", type: "success" }
+      );
+    }
+    if (this.index % 3 === 2) {
+      PixelUI.add.toast(
+        this,
+        undefined,
+        `Hi! this is toast danger! (${this.index})`,
+        { verticalAlign: "top", type: "error" }
+      );
+    }
     this.index += 1;
-    PixelUI.add.toast(
-      this,
-      undefined,
-      `Hi! this is toast message! (${this.index})`,
-      { verticalAlign: "top" }
-    );
   }
 
   private startGame(): void {
