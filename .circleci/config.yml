@@ -46,10 +46,10 @@ jobs:
       - run:
           name: Upload apk to DeployGate
           command: |
-            URL="https://deploygate.com/api/users/${DEPLOYGATE_USERNAME}/apps"
-            APK_PATH=platforms/android/app/build/outputs/apk/app-debug.apk
-            MESSAGE=$(git log --format="[%h] commited by %cN at %ci" -n 1)
-            curl -F "file=@${APK_PATH}" -F "token=${DEPLOYGATE_API_KEY}" -F "message=${MESSAGE}" ${URL}
+            export URL="https://deploygate.com/api/users/${DEPLOYGATE_USERNAME}/apps"
+            export ARTIFACT="platforms/android/app/build/outputs/apk/app-debug.apk"
+            export MESSAGE=$(git log --format="[%h] commited by %cN at %ci" -n 1)
+            curl -F "file=@${ARTIFACT}" -F "token=${DEPLOYGATE_API_KEY}" -F "message=${MESSAGE}" ${URL}
 
       - store_artifacts:
           path: platforms/android/app/build/outputs/apk/
