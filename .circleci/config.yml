@@ -39,10 +39,18 @@ jobs:
           key: *cache_key
           paths: 
             - node_modules
-      - run: echo # release/setup-sign.sh
+      - run: bash setup-keystore.sh
       - run: cordova platform rm android && cordova platform add android
       - run: echo # cordova-res
       - run: npm run webpack:prod && cordova build android
+      - run:
+          name: Upload apk to DeployGate
+          command: |
+            URL="https://deploygate.com/api/users/${DEPLOYGATE_USERNAME}/apps"
+            APK_PATH=platforms/android/app/build/outputs/apk/app-debug.apk
+            MESSAGE=$(git log --format="[%h] commited by %cN at %ci" -n 1)
+            curl -F "file=@${APK_PATH}" -F "token=${DEPLOYGATE_API_KEY}" -F "message=${MESSAGE}" ${URL}
+
       - store_artifacts:
           path: platforms/android/app/build/outputs/apk/
           destination: apk

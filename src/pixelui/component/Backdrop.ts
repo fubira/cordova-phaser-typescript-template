@@ -43,6 +43,8 @@ export class Backdrop extends Phaser.GameObjects.Container {
     /* generate container */
     super(scene, 0, 0, [wall]);
     this.wall = wall;
+    this.wall.setVisible(true);
+    this.wall.setActive(true);
   }
 
   public close(): void {

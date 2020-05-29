@@ -9,15 +9,29 @@ export class LoadingProgress extends Phaser.GameObjects.Container {
 
   constructor(
     scene: Phaser.Scene,
-    textureBar: string,
-    textureFrame: string,
+    spriteBar: string | Phaser.GameObjects.Sprite,
+    spriteFrame: string | Phaser.GameObjects.Sprite,
     x?: number,
     y?: number
   ) {
     super(scene, x, y);
 
-    this.spriteBar = new Phaser.GameObjects.Sprite(scene, 0, 0, textureBar);
-    this.spriteFrame = new Phaser.GameObjects.Sprite(scene, 0, 0, textureFrame);
+    if (spriteBar instanceof Phaser.GameObjects.Sprite) {
+      this.spriteBar = spriteBar;
+    } else {
+      this.spriteBar = new Phaser.GameObjects.Sprite(scene, 0, 0, spriteBar);
+    }
+
+    if (spriteFrame instanceof Phaser.GameObjects.Sprite) {
+      this.spriteFrame = spriteFrame;
+    } else {
+      this.spriteFrame = new Phaser.GameObjects.Sprite(
+        scene,
+        0,
+        0,
+        spriteFrame
+      );
+    }
 
     this.spriteBar.setOrigin(0, 0.5);
     this.spriteBar.x -= this.spriteBar.width * 0.5;
