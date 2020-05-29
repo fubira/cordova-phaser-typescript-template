@@ -29,18 +29,6 @@ export interface ToastStyle extends ComponentBaseStyle {
   open?: boolean;
 
   /**
-   * Dialog fill color
-   * @default PixelUI.theme.backgroundColor
-   */
-  fillColor?: string;
-
-  /**
-   * Dialog border color
-   * @default PixelUI.theme.textColor
-   */
-  borderColor?: string;
-
-  /**
    * Text size
    * @default "normal"
    */
@@ -51,6 +39,11 @@ export interface ToastStyle extends ComponentBaseStyle {
    * @default "center"
    */
   textAlign?: string;
+
+  /**
+   * Close when toast is clicked.
+   */
+  closeOnClick?: boolean;
 }
 
 class ToastQueue {
@@ -227,6 +220,11 @@ export class Toast extends ComponentBase {
       borderColor: borderColor.rgba,
       fixedWidth,
       fixedHeight,
+      onClick: () => {
+        if (style.closeOnClick !== false) {
+          this.close();
+        }
+      },
     });
     this.width = fixedWidth;
     this.height = fixedHeight;
@@ -248,6 +246,9 @@ export class Toast extends ComponentBase {
           break;
         default:
           this.duration = Number(style.duration).valueOf();
+          if (this.duration === 0) {
+            style.closeOnClick = true;
+          }
           break;
       }
     }

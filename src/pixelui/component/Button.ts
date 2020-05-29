@@ -1,28 +1,14 @@
 import * as PixelUI from "..";
 import * as Utils from "../Utils";
 import { TextLabelFactory } from "./TextLabel";
+import { ComponentBase, ComponentBaseStyle } from "../ComponentBase";
 
-export interface ButtonStyle {
+export interface ButtonStyle extends ComponentBaseStyle {
   /**
    * Button text color
    * @default PixelUI.theme.textColor
    */
   color?: string;
-  /**
-   * Button fill color
-   * @default PixelUI.theme.backgroundColor
-   */
-  fillColor?: string;
-  /**
-   * Button hover color
-   * @default PixelUI.theme.lightAccentColor
-   */
-  hoverColor?: string;
-  /**
-   * Buttonborder color
-   * @default PixelUI.theme.textColor
-   */
-  borderColor?: string;
 
   /**
    * Text size
@@ -31,32 +17,13 @@ export interface ButtonStyle {
   textSize?: PixelUI.TextSize;
 
   /**
-   * Button width
-   */
-  fixedWidth?: number;
-
-  /**
-   * Button height
-   */
-  fixedHeight?: number;
-
-  /**
    * Button alignment
    * @default "center"
    */
   align?: string;
 }
 
-export class Button extends Phaser.GameObjects.Container {
-  private base: Phaser.GameObjects.Rectangle;
-  private button: Phaser.GameObjects.Container;
-  private shadow: Phaser.GameObjects.Rectangle;
-  private border: Phaser.GameObjects.Rectangle;
-
-  private borderColor: Phaser.Display.Color;
-  private hoverColor: Phaser.Display.Color;
-  private onClick: Function;
-
+export class Button extends ComponentBase {
   constructor(
     scene: Phaser.Scene,
     x: number,
@@ -72,19 +39,6 @@ export class Button extends Phaser.GameObjects.Container {
       PixelUI.theme.textStrokeColor()
     );
     const strokeThickness = 6;
-
-    const fillColor = Phaser.Display.Color.ValueToColor(
-      style.fillColor || PixelUI.theme.backgroundColor()
-    );
-    const hoverColor = Phaser.Display.Color.ValueToColor(
-      style.hoverColor || PixelUI.theme.styles.colorLightAccent
-    );
-    const borderColor = Phaser.Display.Color.ValueToColor(
-      style.borderColor || textColor.color
-    );
-    const shadowColor = Phaser.Display.Color.ValueToColor("#000");
-    const edgeColor = borderColor.clone().darken(80);
-
     const textSize = style.textSize || "normal";
     let align = 0.5;
 
@@ -109,27 +63,6 @@ export class Button extends Phaser.GameObjects.Container {
     const width = style.fixedWidth || Math.max(textRect.width + 16, 180);
     const height = style.fixedHeight || textRect.height + 8;
 
-    /* add shadow gameobject */
-    const shadow = scene.add.rectangle(5, 5, width + 6, height + 6);
-    shadow.setFillStyle(shadowColor.color, 0.3);
-    shadow.setOrigin(align);
-
-    /* add base rectangle gameobject */
-    const base = scene.add.rectangle(2, 2, width, height);
-    base.setFillStyle(fillColor.color);
-    base.setOrigin(align);
-
-    /* add dialog border and edge */
-    const edge = scene.add.rectangle(0, 0, width, height);
-    edge.setStrokeStyle(6, edgeColor.color, edgeColor.alphaGL || 1);
-    edge.setFillStyle();
-    edge.setOrigin(align);
-
-    const border = scene.add.rectangle(0, 0, width, height);
-    border.setStrokeStyle(3, borderColor.color, borderColor.alphaGL || 1);
-    border.setFillStyle();
-    border.setOrigin(align);
-
     /* add text label */
     const textLabel = TextLabelFactory(scene, 0, 4, text, {
       ...labelStyle,
@@ -138,63 +71,19 @@ export class Button extends Phaser.GameObjects.Container {
     });
     textLabel.setOrigin(align);
 
-    const button = scene.add.container(0, 0, [base, edge, border, textLabel]);
-
     /* generate container */
-    super(scene, x, y, [shadow, button]);
+    super(scene, x, y, [textLabel], {
+      onClick: (pointer: Phaser.Input.Pointer) => {
+        onClick(pointer);
+      },
+      fixedWidth: width,
+      fixedHeight: height,
+      pressDownOnClick: true,
+      highlightOnHover: true,
+    });
 
-    this.base = base;
-    this.shadow = shadow;
-    this.button = button;
-    this.border = border;
-    this.borderColor = borderColor;
-    this.hoverColor = hoverColor;
-    this.onClick = onClick;
     this.setActive(true);
-  }
-
-  /**
-   * Activate/Deactivate button
-   *
-   * @param active
-   */
-  public setActive(active: boolean): this {
-    if (active) {
-      this.base.setInteractive({ useHandCursor: true });
-      this.base.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
-        this.actionPress();
-        this.onClick(pointer);
-      });
-      this.base.on("pointerover", () => {
-        this.border.strokeColor = this.hoverColor.color;
-      });
-      this.base.on("pointerout", () => {
-        this.border.strokeColor = this.borderColor.color;
-      });
-    } else {
-      this.base.setInteractive({ useHandCursor: false });
-      this.base.off("pointerdown");
-      this.base.off("pointerover");
-      this.base.off("pointerout");
-    }
-    return this;
-  }
-
-  private actionPress(): void {
-    this.scene.tweens.add({
-      targets: this.button,
-      ease: Phaser.Math.Easing.Quartic.Out,
-      y: { from: 0, to: 4 },
-      duration: 100,
-      yoyo: true,
-    });
-    this.scene.tweens.add({
-      targets: this.shadow,
-      ease: Phaser.Math.Easing.Quartic.Out,
-      x: { from: 3, to: 0 },
-      duration: 100,
-      yoyo: true,
-    });
+    this.enable();
   }
 }
 

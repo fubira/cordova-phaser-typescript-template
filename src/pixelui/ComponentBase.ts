@@ -32,6 +32,18 @@ export interface ComponentBaseStyle {
   fixedHeight?: number;
 
   /**
+   * Highlight when the cursor is on a component
+   * @default false
+   */
+  highlightOnHover?: boolean;
+
+  /**
+   * Animating the press down when clicked
+   * @default false
+   */
+  pressDownOnClick?: boolean;
+
+  /**
    * Component alignment
    * @default "center"
    */
@@ -40,7 +52,7 @@ export interface ComponentBaseStyle {
   /**
    * Event handler for button selection
    */
-  onClick?: (value: number | string) => void;
+  onClick?: (position: Phaser.Input.Pointer) => void;
 
   onHover?: (start: boolean) => void;
 
@@ -51,17 +63,14 @@ export interface ComponentBaseStyle {
 
 export class ComponentBase extends Phaser.GameObjects.Container {
   private fill: Phaser.GameObjects.Rectangle;
-  private shadow: Phaser.GameObjects.Rectangle;
+  public base: Phaser.GameObjects.Container;
+  public shadow: Phaser.GameObjects.Rectangle;
   private borderMain: Phaser.GameObjects.Rectangle;
-  private borderEdge: Phaser.GameObjects.Rectangle;
+
+  private style: ComponentBaseStyle;
 
   private borderMainColor: Phaser.Display.Color;
   private borderHoverColor: Phaser.Display.Color;
-  private borderActiveColor: Phaser.Display.Color;
-  private onClick: Function;
-  private onHover: Function;
-  private onOpen: Function;
-  private onClose: Function;
 
   private tween: Phaser.Tweens.Tween;
 
@@ -83,7 +92,7 @@ export class ComponentBase extends Phaser.GameObjects.Container {
       style.borderEdgeColor || borderMainColor.clone().darken(50).rgba
     );
     const borderHoverColor = Phaser.Display.Color.ValueToColor(
-      style.borderHoverColor || borderMainColor.clone().lighten(50).rgba
+      style.borderHoverColor || PixelUI.theme.styles.colorLightAccent
     );
     const shadowColor = Phaser.Display.Color.ValueToColor("#000");
     const shadowAlpha = 0.3;
@@ -126,9 +135,9 @@ export class ComponentBase extends Phaser.GameObjects.Container {
     fill.setOrigin(align);
 
     /* add dialog border and edge */
-    const borderEdge = scene.add.rectangle(0, 0, width + 4, height + 4);
+    const borderEdge = scene.add.rectangle(0, 0, width + 6, height + 6);
     borderEdge.setStrokeStyle(
-      2,
+      4,
       borderEdgeColor.color,
       borderEdgeColor.alphaGL || 1.0
     );
@@ -136,7 +145,7 @@ export class ComponentBase extends Phaser.GameObjects.Container {
 
     const borderMain = scene.add.rectangle(0, 0, width, height);
     borderMain.setStrokeStyle(
-      3,
+      4,
       borderMainColor.color,
       borderMainColor.alphaGL || 1.0
     );
@@ -145,26 +154,21 @@ export class ComponentBase extends Phaser.GameObjects.Container {
 
     const base = scene.add.container(0, 0, [
       fill,
+      scene.add.container(4, 4, children),
       borderEdge,
       borderMain,
-      scene.add.container(4, 4, children),
     ]);
 
     /* generate container */
     super(scene, x, y, [shadow, base]);
 
+    this.style = style;
     this.fill = fill;
+    this.base = base;
     this.shadow = shadow;
     this.borderMain = borderMain;
-    this.borderEdge = borderEdge;
     this.borderMainColor = borderMainColor;
     this.borderHoverColor = borderHoverColor;
-
-    this.onClick = style.onClick;
-    this.onHover = style.onHover;
-    this.onOpen = style.onOpen;
-    this.onClose = style.onClose;
-
     this.setActive(true);
   }
 
@@ -174,15 +178,28 @@ export class ComponentBase extends Phaser.GameObjects.Container {
   public enable(): this {
     this.fill.setInteractive({ useHandCursor: true });
     this.fill.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
-      this.onClick(pointer);
+      if (this.style.pressDownOnClick) {
+        this.pressDown();
+      }
+      if (this.style.onClick) {
+        this.style.onClick(pointer);
+      }
     });
     this.fill.on("pointerover", () => {
-      this.borderMain.strokeColor = this.borderHoverColor.color;
-      this.onHover(true);
+      if (this.style.highlightOnHover) {
+        this.highlight(true);
+      }
+      if (this.style.onHover) {
+        this.style.onHover(true);
+      }
     });
     this.fill.on("pointerout", () => {
-      this.borderMain.strokeColor = this.borderMainColor.color;
-      this.onHover(false);
+      if (this.style.highlightOnHover) {
+        this.highlight(false);
+      }
+      if (this.style.onHover) {
+        this.style.onHover(false);
+      }
     });
     return this;
   }
@@ -203,6 +220,7 @@ export class ComponentBase extends Phaser.GameObjects.Container {
    */
   public open(): void {
     this.setVisible(true);
+    this.enable();
     if (this.tween && this.tween.isPlaying()) {
       return;
     }
@@ -220,6 +238,7 @@ export class ComponentBase extends Phaser.GameObjects.Container {
    * Close dialog with a tween animation
    */
   public close(): void {
+    this.disable();
     if (this.tween && this.tween.isPlaying()) {
       return;
     }
@@ -236,5 +255,28 @@ export class ComponentBase extends Phaser.GameObjects.Container {
         this.scene.children.remove(this);
       },
     });
+  }
+
+  public pressDown(): void {
+    this.scene.tweens.add({
+      targets: this.base,
+      ease: Phaser.Math.Easing.Quartic.Out,
+      y: { from: 0, to: 4 },
+      duration: 100,
+      yoyo: true,
+    });
+    this.scene.tweens.add({
+      targets: this.shadow,
+      ease: Phaser.Math.Easing.Quartic.Out,
+      x: { from: 4, to: 0 },
+      duration: 100,
+      yoyo: true,
+    });
+  }
+
+  public highlight(hover: boolean): void {
+    this.borderMain.strokeColor = hover
+      ? this.borderHoverColor.color
+      : this.borderMainColor.color;
   }
 }
