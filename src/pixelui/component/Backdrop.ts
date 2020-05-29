@@ -27,7 +27,7 @@ export class Backdrop extends Phaser.GameObjects.Container {
     const wall = scene.add.rectangle(0, 0, GAME_WIDTH * 2, GAME_HEIGHT * 2);
     wall.setInteractive({ useHandCursor: false });
     wall.setFillStyle(fillColor.color, style.fillAlpha || 0.3);
-    wall.setOrigin(0);
+    wall.setOrigin(0.5);
 
     if (style.onClick) {
       wall.on("pointerdown", () => {

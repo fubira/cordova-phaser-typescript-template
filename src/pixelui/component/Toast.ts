@@ -300,14 +300,14 @@ export class Toast extends ComponentBase {
     }
   }
 
-  public open(): void {
+  public open(): Promise<void> {
     staticToastQueue.add(this);
-    super.open();
+    return super.open();
   }
 
-  public close(): void {
+  public close(): Promise<void> {
     staticToastQueue.remove(this);
-    super.close();
+    return super.close();
   }
 }
 

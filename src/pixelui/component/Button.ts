@@ -76,6 +76,7 @@ export class Button extends ComponentBase {
       onClick: (pointer: Phaser.Input.Pointer) => {
         onClick(pointer);
       },
+      ...style,
       fixedWidth: width,
       fixedHeight: height,
       pressDownOnClick: true,

@@ -107,7 +107,7 @@ export default class TitleScene extends Phaser.Scene {
         buttons: [
           { text: "Ok", value: "ok" },
           { text: "キャンセル", value: "cancel" },
-          // { text: "???", value: "???" },
+          { text: "???", value: "???" },
         ],
         onSelect: (value) => {
           this.sfxAudioSprites.play("se_button_over");

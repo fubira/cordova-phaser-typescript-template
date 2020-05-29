@@ -50,7 +50,7 @@ export interface ComponentBaseStyle {
   align?: string;
 
   /**
-   * Event handler for button selection
+   * Event handler
    */
   onClick?: (position: Phaser.Input.Pointer) => void;
 
@@ -84,12 +84,12 @@ export class ComponentBase extends Phaser.GameObjects.Container {
     /* Colors */
     const fillColor = Phaser.Display.Color.ValueToColor(
       style.fillColor || PixelUI.theme.backgroundColor()
-    ).darken(5);
+    );
     const borderMainColor = Phaser.Display.Color.ValueToColor(
       style.borderColor || PixelUI.theme.textColor()
     );
     const borderEdgeColor = Phaser.Display.Color.ValueToColor(
-      style.borderEdgeColor || borderMainColor.clone().darken(50).rgba
+      style.borderEdgeColor || borderMainColor.clone().darken(60).rgba
     );
     const borderHoverColor = Phaser.Display.Color.ValueToColor(
       style.borderHoverColor || PixelUI.theme.styles.colorLightAccent
@@ -218,42 +218,51 @@ export class ComponentBase extends Phaser.GameObjects.Container {
   /**
    * Open a dialog with a tween animation
    */
-  public open(): void {
+  public open(): Promise<void> {
     this.setVisible(true);
     this.enable();
-    if (this.tween && this.tween.isPlaying()) {
-      return;
-    }
+    return new Promise((resolve) => {
+      if (this.tween && this.tween.isPlaying()) {
+        return resolve();
+      }
 
-    this.tween = this.scene.tweens.add({
-      targets: [this],
-      alpha: { from: 0, to: 1 },
-      scaleY: { from: 0.6, to: 1 },
-      ease: Phaser.Math.Easing.Cubic.Out,
-      duration: 100,
+      this.tween = this.scene.tweens.add({
+        targets: [this],
+        alpha: { from: 0, to: 1 },
+        scaleY: { from: 0.6, to: 1 },
+        ease: Phaser.Math.Easing.Cubic.Out,
+        duration: 100,
+        onComplete: () => {
+          resolve();
+        },
+      });
     });
   }
 
   /**
    * Close dialog with a tween animation
    */
-  public close(): void {
+  public close(): Promise<void> {
     this.disable();
-    if (this.tween && this.tween.isPlaying()) {
-      return;
-    }
 
-    this.tween = this.scene.tweens.add({
-      targets: [this],
-      alpha: { from: 1, to: 0 },
-      scaleY: { from: 1, to: 1.035 },
-      scaleX: { from: 1, to: 1.035 },
-      ease: Phaser.Math.Easing.Cubic.Out,
-      delay: 80,
-      duration: 200,
-      onComplete: () => {
-        this.scene.children.remove(this);
-      },
+    return new Promise((resolve) => {
+      if (this.tween && this.tween.isPlaying()) {
+        return;
+      }
+
+      this.tween = this.scene.tweens.add({
+        targets: [this],
+        alpha: { from: 1, to: 0 },
+        scaleY: { from: 1, to: 1.035 },
+        scaleX: { from: 1, to: 1.035 },
+        ease: Phaser.Math.Easing.Cubic.Out,
+        delay: 80,
+        duration: 200,
+        onComplete: () => {
+          this.scene.children.remove(this);
+          resolve();
+        },
+      });
     });
   }
 

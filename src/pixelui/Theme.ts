@@ -111,7 +111,7 @@ export class Theme {
     const color = this.compose(localTheme).themeDark
       ? this.compose(localTheme).colorDarkShade
       : this.compose(localTheme).colorLightShade;
-    return color || "#000";
+    return Phaser.Display.Color.ValueToColor(color || "#000").darken(10).rgba;
   }
 
   /**

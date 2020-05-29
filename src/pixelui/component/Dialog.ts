@@ -3,8 +3,9 @@ import * as Utils from "../Utils";
 import { TextLabelFactory } from "./TextLabel";
 import { ButtonFactory } from "./Button";
 import { BackdropFactory } from "./Backdrop";
+import { ComponentBase, ComponentBaseStyle } from "../ComponentBase";
 
-export interface DialogStyle {
+export interface DialogStyle extends ComponentBaseStyle {
   /**
    * If true, dialog will open automatically.
    * @default true
@@ -16,18 +17,6 @@ export interface DialogStyle {
    * @default false
    */
   backdropClose?: boolean;
-
-  /**
-   * Dialog fill color
-   * @default PixelUI.theme.backgroundColor
-   */
-  fillColor?: string;
-
-  /**
-   * Dialog border color
-   * @default PixelUI.theme.textColor
-   */
-  borderColor?: string;
 
   /**
    * Text size
@@ -62,10 +51,9 @@ export interface DialogStyle {
 }
 
 export class Dialog extends Phaser.GameObjects.Container {
-  private container: Phaser.GameObjects.Container;
+  private dialog: ComponentBase;
   private backdrop: PixelUI.Backdrop;
   private buttons: PixelUI.Button[];
-  private tween: Phaser.Tweens.Tween;
 
   constructor(
     scene: Phaser.Scene,
@@ -91,21 +79,9 @@ export class Dialog extends Phaser.GameObjects.Container {
     const strokeColor = Phaser.Display.Color.ValueToColor(
       PixelUI.theme.textStrokeColor()
     );
-    const backgroundColor = Phaser.Display.Color.ValueToColor(
-      PixelUI.theme.backgroundColor()
-    );
     const backdropColor = Phaser.Display.Color.ValueToColor(
       PixelUI.theme.backdropColor()
     );
-
-    const borderColor = Phaser.Display.Color.ValueToColor(
-      style.borderColor || textColor.color
-    );
-    const fillColor = Phaser.Display.Color.ValueToColor(
-      style.fillColor || backgroundColor.color
-    );
-    const shadowColor = Phaser.Display.Color.ValueToColor(0);
-    const edgeColor = borderColor.clone().darken(80);
 
     const textSize = style.textSize || "normal";
     const textAlign = style.textAlign || "center";
@@ -114,6 +90,7 @@ export class Dialog extends Phaser.GameObjects.Container {
     /* define label styles */
     const labelStyle: PixelUI.TextLabelStyle = {
       noShadow: true,
+      align: textAlign,
       fixedWidth: maxWidth,
       wordWrap: { width: maxWidth - 20 },
       padding: { x: 10, y: 10 },
@@ -121,7 +98,6 @@ export class Dialog extends Phaser.GameObjects.Container {
 
     const headerStyle: PixelUI.TextLabelStyle = {
       ...labelStyle,
-      align: textAlign,
       textSize,
       color: headerColor.rgba,
       stroke: strokeColor.rgba,
@@ -130,7 +106,6 @@ export class Dialog extends Phaser.GameObjects.Container {
 
     const messageStyle: PixelUI.TextLabelStyle = {
       ...labelStyle,
-      align: textAlign,
       textSize,
       color: textColor.rgba,
       stroke: strokeColor.rgba,
@@ -157,44 +132,18 @@ export class Dialog extends Phaser.GameObjects.Container {
     const dialogWidth = maxWidth;
     const dialogHeight = totalHeight;
 
-    /* add shadow gameobject */
-    const shadow = scene.add.rectangle(3, 3, dialogWidth + 6, dialogHeight + 6);
-    shadow.setFillStyle(shadowColor.color, 0.3);
-
-    /* add background rect gameobject */
-    const rect = scene.add.rectangle(0, 0, dialogWidth, dialogHeight);
-    rect.setFillStyle(fillColor.color, 0.5);
-    rect.setInteractive({ useHandCursor: false }); // hooking a click event in rect
-
-    /* add dialog border and edge */
-    const edge = scene.add.rectangle(-2, -2, dialogWidth + 2, dialogHeight + 2);
-    edge.setStrokeStyle(6, edgeColor.color, edgeColor.alphaGL || 1);
-    edge.setFillStyle();
-
-    const border = scene.add.rectangle(
-      -2,
-      -2,
-      dialogWidth + 2,
-      dialogHeight + 2
-    );
-    border.setStrokeStyle(3, borderColor.color, borderColor.alphaGL || 1);
-    border.setFillStyle();
+    const px = -dialogWidth / 2;
+    const py = -dialogHeight / 2;
 
     /* add title label */
-    const titleLabel = TextLabelFactory(
-      scene,
-      rect.getTopLeft().x,
-      rect.getTopLeft().y,
-      title,
-      headerStyle
-    );
+    const titleLabel = TextLabelFactory(scene, px, py, title, headerStyle);
     titleLabel.setOrigin(0.0, 0.0);
 
     /* add message label */
     const messageLabel = TextLabelFactory(
       scene,
-      rect.getTopLeft().x,
-      rect.getTopLeft().y + titleHeight,
+      px,
+      py + titleHeight,
       message,
       messageStyle
     );
@@ -204,14 +153,14 @@ export class Dialog extends Phaser.GameObjects.Container {
     let buttons: PixelUI.Button[] = [];
     if (style.buttons) {
       const buttonCount = style.buttons.length;
-      const margin = buttonCount === 1 ? maxWidth / 2 : 20;
-      const buttonWidth = maxWidth / buttonCount - margin;
+      const buttonMargin = buttonCount === 1 ? maxWidth / 2 : 16;
+      const buttonWidth = maxWidth / buttonCount - buttonMargin;
 
       buttons = style.buttons.map((button, index) => {
         return ButtonFactory(
           scene,
-          rect.getTopLeft().x + (buttonWidth + 20) * index + margin / 2,
-          rect.getTopLeft().y + totalHeight + 20,
+          px + (buttonWidth + buttonMargin) * (index + 0.5),
+          py + dialogHeight + 60,
           button.text,
           () => {
             if (style.onSelect) {
@@ -219,21 +168,10 @@ export class Dialog extends Phaser.GameObjects.Container {
             }
             this.close();
           },
-          { ...buttonStyle, fixedWidth: buttonWidth, align: "left" }
+          { ...buttonStyle, fixedWidth: buttonWidth }
         );
       });
     }
-
-    /* generate container */
-    const container = scene.add.container(x, y, [
-      shadow,
-      rect,
-      edge,
-      border,
-      titleLabel,
-      messageLabel,
-      ...buttons,
-    ]);
 
     /* generate backdrop */
     const backdrop = BackdropFactory(scene, {
@@ -245,11 +183,19 @@ export class Dialog extends Phaser.GameObjects.Container {
       },
     });
 
-    super(scene, 0, 0, [backdrop, container]);
+    const dialog = new ComponentBase(
+      scene,
+      0,
+      0,
+      [titleLabel, messageLabel, ...buttons],
+      { fixedWidth: dialogWidth, fixedHeight: dialogHeight }
+    );
 
-    this.buttons = buttons;
-    this.container = container;
+    super(scene, x, y, [backdrop, dialog]);
+
+    this.dialog = dialog;
     this.backdrop = backdrop;
+    this.buttons = buttons;
 
     if (style.open) {
       this.open();
@@ -259,56 +205,32 @@ export class Dialog extends Phaser.GameObjects.Container {
     }
   }
 
+  public async open(): Promise<void> {
+    this.setVisible(true);
+    this.setButtonActive(true);
+    await this.dialog.open();
+  }
+
+  public async close(): Promise<void> {
+    this.scene.tweens.add({
+      targets: [this.backdrop],
+      alpha: { from: 1, to: 0 },
+      ease: Phaser.Math.Easing.Cubic.Out,
+      delay: 80,
+      duration: 200,
+    });
+
+    await this.dialog.close();
+    this.setVisible(false);
+    this.setButtonActive(false);
+  }
+
   private setButtonActive(active: boolean): void {
     if (this.buttons) {
       for (const button of this.buttons) {
         button.setActive(active);
       }
     }
-  }
-
-  /**
-   * Open a dialog with a tween animation
-   */
-  public open(): void {
-    this.setVisible(true);
-    this.setButtonActive(true);
-
-    if (this.tween && this.tween.isPlaying()) {
-      return;
-    }
-
-    this.tween = this.scene.tweens.add({
-      targets: [this.container, this.backdrop],
-      alpha: { from: 0, to: 1 },
-      scaleY: { from: 0.6, to: 1 },
-      ease: Phaser.Math.Easing.Cubic.Out,
-      duration: 100,
-    });
-  }
-
-  /**
-   * Close dialog with a tween animation
-   */
-  public close(): void {
-    this.setButtonActive(false);
-
-    if (this.tween && this.tween.isPlaying()) {
-      return;
-    }
-
-    this.tween = this.scene.tweens.add({
-      targets: [this.container, this.backdrop],
-      alpha: { from: 1, to: 0 },
-      scaleY: { from: 1, to: 1.035 },
-      scaleX: { from: 1, to: 1.035 },
-      ease: Phaser.Math.Easing.Cubic.Out,
-      delay: 80,
-      duration: 200,
-      onComplete: () => {
-        this.scene.children.remove(this);
-      },
-    });
   }
 }
 
