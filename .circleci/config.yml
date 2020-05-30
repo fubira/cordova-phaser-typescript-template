@@ -48,7 +48,7 @@ jobs:
           command: |
             export URL="https://deploygate.com/api/users/${DEPLOYGATE_USERNAME}/apps"
             export ARTIFACT="platforms/android/app/build/outputs/apk/debug/app-debug.apk"
-            export MESSAGE=$(git log --format="[%h] commited by %cN at %ci" -n 1)
+            export MESSAGE=$(git log --format="[%h] %s %n(commited by %cN) at %ci" -n 1)
             echo curl -F "file=@${ARTIFACT}" -F "token=${DEPLOYGATE_API_KEY}" -F "message=${MESSAGE}" ${URL}
             curl -F "file=@${ARTIFACT}" -F "token=${DEPLOYGATE_API_KEY}" -F "message=${MESSAGE}" ${URL}
 
