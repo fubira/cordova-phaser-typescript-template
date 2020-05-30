@@ -42,7 +42,7 @@ jobs:
       - run: bash setup-keystore.sh debug
       - run: cordova platform rm android && cordova platform add android
       - run: echo # cordova-res
-      - run: npm run webpack:prod && cordova build android --debug --buildConfig ./build.json
+      - run: npm run webpack:prod && cordova build android --debug --buildConfig=build.json
       - run:
           name: Upload apk to DeployGate
           command: |
