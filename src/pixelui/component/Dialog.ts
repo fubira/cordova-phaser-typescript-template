@@ -164,11 +164,11 @@ export class Dialog extends Phaser.GameObjects.Container {
           px + (buttonWidth + buttonMargin) * (index + 0.5),
           py + dialogHeight + 60,
           button.text,
-          () => {
+          async () => {
             if (style.onSelect) {
               style.onSelect(button.value);
             }
-            this.close();
+            await this.close();
           },
           { ...buttonStyle, fixedWidth: buttonWidth }
         );

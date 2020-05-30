@@ -1,5 +1,7 @@
 import * as PixelUI from "..";
 import * as Utils from "../Utils";
+import logger from "@/logger";
+
 import { TextLabelFactory } from "./TextLabel";
 import { ComponentBase, ComponentBaseStyle } from "../ComponentBase";
 
@@ -29,7 +31,7 @@ export class Button extends ComponentBase {
     x: number,
     y: number,
     text: string,
-    onClick: Function,
+    onClick: (pointer: Phaser.Input.Pointer) => Promise<void>,
     style?: PixelUI.ButtonStyle
   ) {
     const textColor = Phaser.Display.Color.ValueToColor(
@@ -73,8 +75,15 @@ export class Button extends ComponentBase {
 
     /* generate container */
     super(scene, x, y, [textLabel], {
-      onClick: (pointer: Phaser.Input.Pointer) => {
-        onClick(pointer);
+      onClick: async (pointer: Phaser.Input.Pointer) => {
+        if (this.state === "click") {
+          logger.warn("[PixelUI] Detecting multiple clicks");
+          return;
+        }
+
+        this.state = "click";
+        await onClick(pointer);
+        this.state = "ready";
       },
       ...style,
       fixedWidth: width,
@@ -83,8 +92,9 @@ export class Button extends ComponentBase {
       highlightOnHover: true,
     });
 
+    this.state = "ready";
     this.setActive(true);
-    this.enable();
+    this.enableAction();
   }
 }
 
@@ -93,7 +103,7 @@ export function ButtonFactory(
   x: number,
   y: number,
   text: string,
-  onclick: Function,
+  onclick: (pointer: Phaser.Input.Pointer) => Promise<void>,
   style?: PixelUI.ButtonStyle
 ): PixelUI.Button {
   const button = new Button(scene, x, y, text, onclick, style || {});

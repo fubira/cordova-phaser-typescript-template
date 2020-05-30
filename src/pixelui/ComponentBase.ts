@@ -52,13 +52,13 @@ export interface ComponentBaseStyle {
   /**
    * Event handler
    */
-  onClick?: (position: Phaser.Input.Pointer) => void;
+  onClick?: (position: Phaser.Input.Pointer) => Promise<void>;
 
-  onHover?: (start: boolean) => void;
+  onHover?: (start: boolean) => Promise<void>;
 
-  onOpen?: () => void;
+  onOpen?: () => Promise<void>;
 
-  onClose?: () => void;
+  onClose?: () => Promise<void>;
 }
 
 export class ComponentBase extends Phaser.GameObjects.Container {
@@ -175,7 +175,7 @@ export class ComponentBase extends Phaser.GameObjects.Container {
   /**
    * Enabling a component
    */
-  public enable(): this {
+  public enableAction(): this {
     this.fill.setInteractive({ useHandCursor: true });
     this.fill.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
       if (this.style.pressDownOnClick) {
@@ -207,7 +207,7 @@ export class ComponentBase extends Phaser.GameObjects.Container {
   /**
    * Disabling a component
    */
-  public disable(): this {
+  public disableAction(): this {
     this.fill.setInteractive({ useHandCursor: false });
     this.fill.off("pointerdown");
     this.fill.off("pointerover");
@@ -220,7 +220,7 @@ export class ComponentBase extends Phaser.GameObjects.Container {
    */
   public open(): Promise<void> {
     this.setVisible(true);
-    this.enable();
+    this.enableAction();
     return new Promise((resolve) => {
       if (this.tween && this.tween.isPlaying()) {
         return resolve();
@@ -233,7 +233,13 @@ export class ComponentBase extends Phaser.GameObjects.Container {
         ease: Phaser.Math.Easing.Cubic.Out,
         duration: 100,
         onComplete: () => {
-          resolve();
+          if (this.style.onOpen) {
+            this.style.onOpen().then(() => {
+              resolve();
+            });
+          } else {
+            resolve();
+          }
         },
       });
     });
@@ -243,7 +249,7 @@ export class ComponentBase extends Phaser.GameObjects.Container {
    * Close dialog with a tween animation
    */
   public close(): Promise<void> {
-    this.disable();
+    this.disableAction();
 
     return new Promise((resolve) => {
       if (this.tween && this.tween.isPlaying()) {
@@ -260,7 +266,13 @@ export class ComponentBase extends Phaser.GameObjects.Container {
         duration: 200,
         onComplete: () => {
           this.scene.children.remove(this);
-          resolve();
+          if (this.style.onClose) {
+            this.style.onClose().then(() => {
+              resolve();
+            });
+          } else {
+            resolve();
+          }
         },
       });
     });

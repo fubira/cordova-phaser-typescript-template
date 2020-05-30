@@ -76,21 +76,25 @@ export default class TitleScene extends Phaser.Scene {
       this.cameras.main.centerX,
       250,
       "Information Dialog",
-      () => this.showDialog()
+      async () => await this.showDialog()
     );
     PixelUI.add.button(
       this,
       this.cameras.main.centerX,
       350,
       "Small Dialog",
-      () => this.showDialogSmall()
+      async () => await this.showDialogSmall()
     );
-    PixelUI.add.button(this, this.cameras.main.centerX, 450, "Toast", () =>
-      this.showToast()
+    PixelUI.add.button(
+      this,
+      this.cameras.main.centerX,
+      450,
+      "Toast",
+      async () => await this.showToast()
     );
   }
 
-  private showDialog(): void {
+  private async showDialog(): Promise<void> {
     this.sfxAudioSprites.play("se_button_over");
     const dialog = PixelUI.add.dialog(
       this,
@@ -115,10 +119,10 @@ export default class TitleScene extends Phaser.Scene {
         },
       }
     );
-    dialog.open();
+    await dialog.open();
   }
 
-  private showDialogSmall(): void {
+  private async showDialogSmall(): Promise<void> {
     this.sfxAudioSprites.play("se_button_over");
     const dialog = PixelUI.add.dialog(this, null, "Are you Ok?", {
       buttons: [{ text: "Ok", value: "ok" }],
@@ -127,11 +131,11 @@ export default class TitleScene extends Phaser.Scene {
         this.sfxAudioSprites.play("se_button_over");
       },
     });
-    dialog.open();
+    await dialog.open();
   }
 
   index = 0;
-  private showToast(): void {
+  private async showToast(): Promise<void> {
     if (this.index % 3 === 0) {
       PixelUI.add.toast(
         this,
@@ -157,6 +161,7 @@ export default class TitleScene extends Phaser.Scene {
       );
     }
     this.index += 1;
+    return Promise.resolve();
   }
 
   private startGame(): void {

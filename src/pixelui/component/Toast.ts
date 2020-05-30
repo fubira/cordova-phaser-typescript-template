@@ -220,9 +220,9 @@ export class Toast extends ComponentBase {
       borderColor: borderColor.rgba,
       fixedWidth,
       fixedHeight,
-      onClick: () => {
+      onClick: async (): Promise<void> => {
         if (style.closeOnClick !== false) {
-          this.close();
+          await this.close();
         }
       },
     });
