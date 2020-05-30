@@ -21,6 +21,7 @@ npm-debug.log
 /platforms
 /plugins
 build.json
+build.keystore
 
 # Android
 .gradle/

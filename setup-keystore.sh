@@ -20,4 +20,4 @@ cat << EOS > ./build.json
   }
 }
 EOS
-keytool -list -v -keystore /tmp/build.keystore -storepass $ANDROID_KEYSTORE_PASSWORD
+keytool -list -v -keystore ./build.keystore -storepass $ANDROID_KEYSTORE_PASSWORD
