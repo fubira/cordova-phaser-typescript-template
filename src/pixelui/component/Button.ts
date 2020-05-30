@@ -66,10 +66,11 @@ export class Button extends ComponentBase {
     const height = style.fixedHeight || textRect.height + 8;
 
     /* add text label */
-    const textLabel = TextLabelFactory(scene, 0, 4, text, {
+    const textLabel = TextLabelFactory(scene, 0, 8, text, {
       ...labelStyle,
       fixedWidth: width,
       fixedHeight: height,
+      align: "center",
     });
     textLabel.setOrigin(align);
 
@@ -93,6 +94,7 @@ export class Button extends ComponentBase {
     });
 
     this.state = "ready";
+    this.setSize(width, height);
     this.setActive(true);
     this.enableAction();
   }

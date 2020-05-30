@@ -109,9 +109,50 @@ export class Theme {
    */
   public backgroundColor(localTheme?: ThemeStyles): string {
     const color = this.compose(localTheme).themeDark
-      ? this.compose(localTheme).colorDarkShade
-      : this.compose(localTheme).colorLightShade;
-    return Phaser.Display.Color.ValueToColor(color || "#000").darken(10).rgba;
+      ? Phaser.Display.Color.ValueToColor(
+          this.compose(localTheme).colorDarkShade
+        ).lighten(10)
+      : Phaser.Display.Color.ValueToColor(
+          this.compose(localTheme).colorLightShade
+        ).darken(10);
+    return color.rgba;
+  }
+
+  /**
+   * Get a border color based on the current theme.
+   * @param localTheme PixelUI.ThemeStyles
+   */
+  public borderColor(localTheme?: ThemeStyles): string {
+    const color = Phaser.Display.Color.ValueToColor(
+      this.compose(localTheme).colorLightShade
+    );
+    return color.rgba;
+  }
+
+  /**
+   * Get a border edge color based on the current theme.
+   * @param localTheme PixelUI.ThemeStyles
+   */
+  public borderEdgeColor(localTheme?: ThemeStyles): string {
+    const color = Phaser.Display.Color.ValueToColor(
+      this.compose(localTheme).colorLightShade
+    ).darken(60);
+    return color.rgba;
+  }
+
+  /**
+   * Get a border hover color based on the current theme.
+   * @param localTheme PixelUI.ThemeStyles
+   */
+  public borderHoverColor(localTheme?: ThemeStyles): string {
+    const color = this.compose(localTheme).themeDark
+      ? Phaser.Display.Color.ValueToColor(
+          this.compose(localTheme).colorDarkAccent
+        ).lighten(50)
+      : Phaser.Display.Color.ValueToColor(
+          this.compose(localTheme).colorLightAccent
+        );
+    return color.rgba;
   }
 
   /**

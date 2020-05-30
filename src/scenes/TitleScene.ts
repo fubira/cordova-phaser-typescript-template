@@ -74,21 +74,21 @@ export default class TitleScene extends Phaser.Scene {
     PixelUI.add.button(
       this,
       this.cameras.main.centerX,
-      250,
+      350,
       "Information Dialog",
       async () => await this.showDialog()
     );
     PixelUI.add.button(
       this,
       this.cameras.main.centerX,
-      350,
+      450,
       "Small Dialog",
       async () => await this.showDialogSmall()
     );
     PixelUI.add.button(
       this,
       this.cameras.main.centerX,
-      450,
+      550,
       "Toast",
       async () => await this.showToast()
     );

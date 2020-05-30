@@ -185,10 +185,11 @@ export class Dialog extends Phaser.GameObjects.Container {
       },
     });
 
+    const buttonHeight = buttons ? buttons[0].height : 0;
     const dialog = new ComponentBase(
       scene,
       0,
-      0,
+      -buttonHeight / 2,
       [titleLabel, messageLabel, ...buttons],
       { fixedWidth: dialogWidth, fixedHeight: dialogHeight }
     );

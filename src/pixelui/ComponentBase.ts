@@ -86,13 +86,13 @@ export class ComponentBase extends Phaser.GameObjects.Container {
       style.fillColor || PixelUI.theme.backgroundColor()
     );
     const borderMainColor = Phaser.Display.Color.ValueToColor(
-      style.borderColor || PixelUI.theme.textColor()
+      style.borderColor || PixelUI.theme.borderColor()
     );
     const borderEdgeColor = Phaser.Display.Color.ValueToColor(
-      style.borderEdgeColor || borderMainColor.clone().darken(60).rgba
+      style.borderEdgeColor || PixelUI.theme.borderEdgeColor()
     );
     const borderHoverColor = Phaser.Display.Color.ValueToColor(
-      style.borderHoverColor || PixelUI.theme.styles.colorLightAccent
+      style.borderHoverColor || PixelUI.theme.borderHoverColor()
     );
     const shadowColor = Phaser.Display.Color.ValueToColor("#000");
     const shadowAlpha = 0.3;
@@ -152,9 +152,9 @@ export class ComponentBase extends Phaser.GameObjects.Container {
     borderMain.setFillStyle();
     borderMain.setOrigin(align);
 
-    const base = scene.add.container(0, 0, [
+    const base = scene.add.container(-4, 0, [
       fill,
-      scene.add.container(4, 4, children),
+      scene.add.container(0, 0, children),
       borderEdge,
       borderMain,
     ]);
