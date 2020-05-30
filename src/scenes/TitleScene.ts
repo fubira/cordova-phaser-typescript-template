@@ -112,7 +112,6 @@ export default class TitleScene extends Phaser.Scene {
         onSelect: (value) => {
           this.sfxAudioSprites.play("se_button_over");
           console.log(value);
-          dialog.close();
         },
       }
     );

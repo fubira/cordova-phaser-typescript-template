@@ -1,5 +1,7 @@
 import * as PixelUI from "..";
 import * as Utils from "../Utils";
+import logger from "@/logger";
+
 import { TextLabelFactory } from "./TextLabel";
 import { ButtonFactory } from "./Button";
 import { BackdropFactory } from "./Backdrop";
@@ -177,7 +179,7 @@ export class Dialog extends Phaser.GameObjects.Container {
     const backdrop = BackdropFactory(scene, {
       fillColor: backdropColor.rgba,
       onClick: () => {
-        if (style.backdropClose) {
+        if (style.backdropClose && this.state === "open") {
           this.close();
         }
       },
@@ -196,6 +198,7 @@ export class Dialog extends Phaser.GameObjects.Container {
     this.dialog = dialog;
     this.backdrop = backdrop;
     this.buttons = buttons;
+    this.state = "close";
 
     if (style.open) {
       this.open();
@@ -206,23 +209,32 @@ export class Dialog extends Phaser.GameObjects.Container {
   }
 
   public async open(): Promise<void> {
+    if (this.state === "open") {
+      logger.warn("[PixelUI] This dialog is already opened.");
+      return;
+    }
+
     this.setVisible(true);
-    this.setButtonActive(true);
+
     await this.dialog.open();
+    this.setButtonActive(true);
+
+    this.state = "open";
   }
 
   public async close(): Promise<void> {
-    this.scene.tweens.add({
-      targets: [this.backdrop],
-      alpha: { from: 1, to: 0 },
-      ease: Phaser.Math.Easing.Cubic.Out,
-      delay: 80,
-      duration: 200,
-    });
+    if (this.state === "close") {
+      logger.warn("[PixelUI] This dialog is already closed.");
+      return;
+    }
 
-    await this.dialog.close();
-    this.setVisible(false);
+    this.state = "close";
     this.setButtonActive(false);
+
+    this.backdrop.close();
+    await this.dialog.close();
+
+    this.setVisible(false);
   }
 
   private setButtonActive(active: boolean): void {
