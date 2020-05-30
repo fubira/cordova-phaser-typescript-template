@@ -156,7 +156,7 @@ export class Toast extends ComponentBase {
       align: textAlign,
       fixedWidth: maxWidth,
       wordWrap: { width: maxWidth - 20 },
-      padding: { x: 6, y: 6 },
+      padding: { x: 4, y: 4 },
     };
 
     const headerStyle: PixelUI.TextLabelStyle = {
@@ -186,9 +186,9 @@ export class Toast extends ComponentBase {
     /* add type bar rectangle */
     const typeBar = scene.add.rectangle(
       -fixedWidth / 2 + 6,
-      -4,
+      0,
       16,
-      fixedHeight - 4,
+      fixedHeight,
       typeColor.color,
       typeColor.alphaGL
     );
@@ -198,8 +198,8 @@ export class Toast extends ComponentBase {
     /* add title label */
     const titleLabel = TextLabelFactory(
       scene,
-      16,
-      -titleHeight / 2,
+      20,
+      -titleHeight / 2 + 4,
       title,
       headerStyle
     );
@@ -208,8 +208,8 @@ export class Toast extends ComponentBase {
     /* add message label */
     const messageLabel = TextLabelFactory(
       scene,
-      16,
-      titleHeight / 2,
+      20,
+      titleHeight / 2 + 4,
       message,
       messageStyle
     );
