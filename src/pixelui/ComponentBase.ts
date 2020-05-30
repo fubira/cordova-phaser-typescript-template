@@ -115,8 +115,8 @@ export class ComponentBase extends Phaser.GameObjects.Container {
     const shadow = scene.add.rectangle(
       4,
       4,
-      width + 6,
-      height + 6,
+      width + 8,
+      height + 8,
       shadowColor.color,
       shadowAlpha
     );
@@ -152,7 +152,7 @@ export class ComponentBase extends Phaser.GameObjects.Container {
     borderMain.setFillStyle();
     borderMain.setOrigin(align);
 
-    const base = scene.add.container(-4, 0, [
+    const base = scene.add.container(0, 0, [
       fill,
       scene.add.container(0, 0, children),
       borderEdge,
