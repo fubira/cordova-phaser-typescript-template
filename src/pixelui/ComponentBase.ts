@@ -7,6 +7,11 @@ export interface ComponentBaseStyle {
    */
   fillColor?: string;
   /**
+   * Component fill lock color
+   * @default PixelUI.theme.colorMain
+   */
+  fillLockColor?: string;
+  /**
    * Component border color
    * @default PixelUI.theme.textColor
    */
@@ -38,12 +43,6 @@ export interface ComponentBaseStyle {
   highlightOnHover?: boolean;
 
   /**
-   * Animating the press down when clicked
-   * @default false
-   */
-  pressDownOnClick?: boolean;
-
-  /**
    * Component alignment
    * @default "center"
    */
@@ -69,6 +68,8 @@ export class ComponentBase extends Phaser.GameObjects.Container {
 
   private style: ComponentBaseStyle;
 
+  private fillColor: Phaser.Display.Color;
+  private fillLockColor: Phaser.Display.Color;
   private borderMainColor: Phaser.Display.Color;
   private borderHoverColor: Phaser.Display.Color;
 
@@ -84,6 +85,9 @@ export class ComponentBase extends Phaser.GameObjects.Container {
     /* Colors */
     const fillColor = Phaser.Display.Color.ValueToColor(
       style.fillColor || PixelUI.theme.backgroundColor()
+    );
+    const fillLockColor = Phaser.Display.Color.ValueToColor(
+      style.fillLockColor || PixelUI.theme.styles.colorMain
     );
     const borderMainColor = Phaser.Display.Color.ValueToColor(
       style.borderColor || PixelUI.theme.borderColor()
@@ -164,6 +168,8 @@ export class ComponentBase extends Phaser.GameObjects.Container {
 
     this.style = style;
     this.fill = fill;
+    this.fillColor = fillColor;
+    this.fillLockColor = fillLockColor;
     this.base = base;
     this.shadow = shadow;
     this.borderMain = borderMain;
@@ -178,9 +184,6 @@ export class ComponentBase extends Phaser.GameObjects.Container {
   public enableAction(): this {
     this.fill.setInteractive({ useHandCursor: true });
     this.fill.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
-      if (this.style.pressDownOnClick) {
-        this.pressDown();
-      }
       if (this.style.onClick) {
         this.style.onClick(pointer);
       }
@@ -278,20 +281,52 @@ export class ComponentBase extends Phaser.GameObjects.Container {
     });
   }
 
-  public pressDown(): void {
-    this.scene.tweens.add({
-      targets: this.base,
-      ease: Phaser.Math.Easing.Quartic.Out,
-      y: { from: 0, to: 4 },
-      duration: 100,
-      yoyo: true,
+  public actionLock(): Promise<void> {
+    this.fill.fillColor = this.fillLockColor.color;
+    return Promise.resolve();
+  }
+  public actionUnlock(): Promise<void> {
+    this.fill.fillColor = this.fillColor.color;
+    return Promise.resolve();
+  }
+
+  public actionDown(): Promise<void> {
+    return new Promise((resolve) => {
+      this.scene.tweens.add({
+        targets: this.shadow,
+        ease: Phaser.Math.Easing.Quartic.Out,
+        x: { from: 4, to: 0 },
+        duration: 50,
+      });
+      this.scene.tweens.add({
+        targets: this.base,
+        ease: Phaser.Math.Easing.Quartic.Out,
+        y: { from: 0, to: 4 },
+        duration: 50,
+        onComplete: () => {
+          resolve();
+        },
+      });
     });
-    this.scene.tweens.add({
-      targets: this.shadow,
-      ease: Phaser.Math.Easing.Quartic.Out,
-      x: { from: 4, to: 0 },
-      duration: 100,
-      yoyo: true,
+  }
+
+  public actionUp(): Promise<void> {
+    return new Promise((resolve) => {
+      this.scene.tweens.add({
+        targets: this.shadow,
+        ease: Phaser.Math.Easing.Quartic.Out,
+        x: { from: 0, to: 4 },
+        duration: 50,
+      });
+      this.scene.tweens.add({
+        targets: this.base,
+        ease: Phaser.Math.Easing.Quartic.Out,
+        y: { from: 4, to: 0 },
+        duration: 50,
+        onComplete: () => {
+          resolve();
+        },
+      });
     });
   }
 

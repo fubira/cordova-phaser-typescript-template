@@ -92,6 +92,16 @@ export default class TitleScene extends Phaser.Scene {
       "Toast",
       async () => await this.showToast()
     );
+    PixelUI.add.toggleButton(
+      this,
+      this.cameras.main.centerX,
+      650,
+      "ToggleButton",
+      async (toggle: boolean) => {
+        console.log(toggle);
+        await this.showToggleState(toggle);
+      }
+    );
   }
 
   private async showDialog(): Promise<void> {
@@ -161,6 +171,13 @@ export default class TitleScene extends Phaser.Scene {
       );
     }
     this.index += 1;
+    return Promise.resolve();
+  }
+
+  private async showToggleState(toggle: boolean): Promise<void> {
+    PixelUI.add.toast(this, undefined, `Toggled! (${toggle})`, {
+      verticalAlign: "top",
+    });
     return Promise.resolve();
   }
 

@@ -5,7 +5,7 @@ import logger from "@/logger";
 import { TextLabelFactory } from "./TextLabel";
 import { ComponentBase, ComponentBaseStyle } from "../ComponentBase";
 
-export interface ButtonStyle extends ComponentBaseStyle {
+export interface ToggleButtonStyle extends ComponentBaseStyle {
   /**
    * Button text color
    * @default PixelUI.theme.textColor
@@ -25,13 +25,16 @@ export interface ButtonStyle extends ComponentBaseStyle {
   align?: string;
 }
 
-export class Button extends ComponentBase {
+export class ToggleButton extends ComponentBase {
+  private toggle: boolean;
+
   constructor(
     scene: Phaser.Scene,
     x: number,
     y: number,
     text: string,
-    onClick: (pointer: Phaser.Input.Pointer) => Promise<void>,
+    onToggle: (state: boolean) => Promise<void>,
+    toggle?: boolean,
     style?: PixelUI.ButtonStyle
   ) {
     const textColor = Phaser.Display.Color.ValueToColor(
@@ -76,16 +79,23 @@ export class Button extends ComponentBase {
 
     /* generate container */
     super(scene, x, y, [textLabel], {
-      onClick: async (pointer: Phaser.Input.Pointer) => {
+      onClick: async () => {
         if (this.state === "click") {
           logger.warn("[PixelUI] Detecting multiple clicks");
           return;
         }
 
+        this.toggle = !this.toggle;
+        if (this.toggle) {
+          this.actionDown();
+          this.actionLock();
+        } else {
+          this.actionUp();
+          this.actionUnlock();
+        }
+
         this.state = "click";
-        await this.actionDown();
-        await onClick(pointer);
-        await this.actionUp();
+        await onToggle(this.toggle);
         this.state = "ready";
       },
       ...style,
@@ -95,21 +105,31 @@ export class Button extends ComponentBase {
     });
 
     this.state = "ready";
+    this.toggle = false;
     this.setSize(width, height);
     this.setActive(true);
     this.enableAction();
   }
 }
 
-export function ButtonFactory(
+export function ToggleButtonFactory(
   scene: Phaser.Scene,
   x: number,
   y: number,
   text: string,
-  onclick: (pointer: Phaser.Input.Pointer) => Promise<void>,
+  onToggle: (toggle: boolean) => Promise<void>,
+  toggle?: boolean,
   style?: PixelUI.ButtonStyle
-): PixelUI.Button {
-  const button = new Button(scene, x, y, text, onclick, style || {});
+): PixelUI.ToggleButton {
+  const button = new ToggleButton(
+    scene,
+    x,
+    y,
+    text,
+    onToggle,
+    toggle,
+    style || {}
+  );
   scene.children.add(button);
   return button;
 }

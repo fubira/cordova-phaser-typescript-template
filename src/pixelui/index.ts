@@ -15,6 +15,7 @@ import { DialogFactory } from "./component/Dialog";
 import { ButtonFactory } from "./component/Button";
 import { BackdropFactory } from "./component/Backdrop";
 import { ToastFactory } from "./component/Toast";
+import { ToggleButtonFactory } from "./component/Toggle";
 
 export const add = {
   textLabel: TextLabelFactory,
@@ -22,6 +23,7 @@ export const add = {
   loadingProgerss: LoadingProgressFactory,
   dialog: DialogFactory,
   button: ButtonFactory,
+  toggleButton: ToggleButtonFactory,
   backdrop: BackdropFactory,
   toast: ToastFactory,
 };
@@ -35,6 +37,7 @@ export { Dialog, DialogStyle } from "./component/Dialog";
 export { Toast, ToastStyle } from "./component/Toast";
 export { Button, ButtonStyle } from "./component/Button";
 export { Backdrop, BackdropStyle } from "./component/Backdrop";
+export { ToggleButton, ToggleButtonStyle } from "./component/Toggle";
 
 /**
  * PixelUI types

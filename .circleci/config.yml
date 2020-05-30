@@ -39,7 +39,7 @@ jobs:
           key: *cache_key
           paths: 
             - node_modules
-      - run: bash setup-keystore.sh debug
+      - run: bash setup-keystore.sh
       - run: cordova platform rm android && cordova platform add android
       - run: echo # cordova-res
       - run: npm run webpack:prod && cordova build android --debug --buildConfig=build.json
