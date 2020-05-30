@@ -6,12 +6,12 @@ if [ "x$ANDROID_KEYSTORE_BASE64" = "x" ]; then
 fi
 
 echo Setup Android keystore...
-echo $ANDROID_KEYSTORE_BASE64 | base64 -d > "/tmp/build.keystore"
+echo $ANDROID_KEYSTORE_BASE64 | base64 -d > "./build.keystore"
 cat << EOS > ./build.json
 {  
   "android":{  
     "release":{  
-      "keystore":"/tmp/build.keystore",
+      "keystore":"./build.keystore",
       "storePassword":"$ANDROID_KEYSTORE_PASSWORD",
       "alias":"$ANDROID_KEY_ALIAS",
       "password":"$ANDROID_KEY_PASSWORD",
@@ -20,5 +20,4 @@ cat << EOS > ./build.json
   }
 }
 EOS
-cat ./build.json
 keytool -list -v -keystore /tmp/build.keystore -storepass $ANDROID_KEYSTORE_PASSWORD
