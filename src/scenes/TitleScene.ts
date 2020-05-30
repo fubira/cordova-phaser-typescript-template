@@ -97,10 +97,8 @@ export default class TitleScene extends Phaser.Scene {
       this.cameras.main.centerX,
       650,
       "ToggleButton",
-      async (toggle: boolean) => {
-        console.log(toggle);
-        await this.showToggleState(toggle);
-      }
+      async (toggle: boolean) => await this.showToggleState(toggle),
+      true
     );
   }
 

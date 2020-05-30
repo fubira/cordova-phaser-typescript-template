@@ -26,15 +26,16 @@ export interface ToggleButtonStyle extends ComponentBaseStyle {
 }
 
 export class ToggleButton extends ComponentBase {
-  private toggle: boolean;
+  private value: boolean;
+  private onToggle: (value: boolean) => Promise<void>;
 
   constructor(
     scene: Phaser.Scene,
     x: number,
     y: number,
     text: string,
-    onToggle: (state: boolean) => Promise<void>,
-    toggle?: boolean,
+    onToggle: (value: boolean) => Promise<void>,
+    defaultValue?: boolean,
     style?: PixelUI.ButtonStyle
   ) {
     const textColor = Phaser.Display.Color.ValueToColor(
@@ -77,27 +78,20 @@ export class ToggleButton extends ComponentBase {
     });
     textLabel.setOrigin(align);
 
+    /* Event handler when a component is clicked */
+    const onClickHandler = async (): Promise<void> => {
+      if (this.state === "click") {
+        logger.warn("[PixelUI] Detecting multiple clicks");
+        return;
+      }
+      this.state = "click";
+      await this.doToggle();
+      this.state = "ready";
+    };
+
     /* generate container */
     super(scene, x, y, [textLabel], {
-      onClick: async () => {
-        if (this.state === "click") {
-          logger.warn("[PixelUI] Detecting multiple clicks");
-          return;
-        }
-
-        this.toggle = !this.toggle;
-        if (this.toggle) {
-          this.actionDown();
-          this.actionLock();
-        } else {
-          this.actionUp();
-          this.actionUnlock();
-        }
-
-        this.state = "click";
-        await onToggle(this.toggle);
-        this.state = "ready";
-      },
+      onClick: onClickHandler,
       ...style,
       fixedWidth: width,
       fixedHeight: height,
@@ -105,10 +99,33 @@ export class ToggleButton extends ComponentBase {
     });
 
     this.state = "ready";
-    this.toggle = false;
     this.setSize(width, height);
     this.setActive(true);
     this.enableAction();
+    this.onToggle = onToggle;
+    this.doToggle(defaultValue);
+  }
+
+  /**
+   * Toggle the value and take action accordingly.
+   * @param value forced value
+   */
+  public async doToggle(value?: boolean): Promise<void> {
+    if (value !== undefined) {
+      this.value = value;
+    } else {
+      this.value = !this.value;
+    }
+
+    if (this.value) {
+      this.actionDown();
+      this.actionLock();
+    } else {
+      this.actionUp();
+      this.actionUnlock();
+    }
+
+    await this.onToggle(this.value);
   }
 }
 
