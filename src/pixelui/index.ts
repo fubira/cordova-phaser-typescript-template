@@ -8,6 +8,7 @@ export const theme = new Theme();
 /**
  * PixelUI component factory
  */
+import { DebugInfoFactory } from "./component/DebugInfo";
 import { TextLabelFactory } from "./component/TextLabel";
 import { BackgroundFactory } from "./component/Background";
 import { LoadingProgressFactory } from "./component/LoadingProgress";
@@ -18,6 +19,7 @@ import { ToastFactory } from "./component/Toast";
 import { ToggleButtonFactory } from "./component/ToggleButton";
 
 export const add = {
+  debugInfo: DebugInfoFactory,
   textLabel: TextLabelFactory,
   background: BackgroundFactory,
   loadingProgerss: LoadingProgressFactory,
@@ -31,6 +33,7 @@ export const add = {
 /**
  * PixelUI component class and styles
  */
+export { DebugInfo } from "./component/DebugInfo";
 export { LoadingProgress } from "./component/LoadingProgress";
 export { TextLabel, TextLabelStyle } from "./component/TextLabel";
 export { Dialog, DialogStyle } from "./component/Dialog";

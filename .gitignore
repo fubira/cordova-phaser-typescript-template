@@ -35,4 +35,4 @@ resources/signing
 # Local Netlify folder
 .netlify
 
-.bak
+*.bak

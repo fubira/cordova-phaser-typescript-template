@@ -4,6 +4,7 @@ import BgmPlayer from "@/utils/BgmPlayer";
 
 export default class TitleScene extends Phaser.Scene {
   private tapToStartText: Phaser.GameObjects.GameObject = null;
+  private debugInfo: PixelUI.DebugInfo;
   private sfxAudioSprites:
     | Phaser.Sound.WebAudioSound
     | Phaser.Sound.HTML5AudioSound = null;
@@ -35,6 +36,8 @@ export default class TitleScene extends Phaser.Scene {
     this.input.on("pointerdown", () => {
       this.startGame();
     });
+
+    this.debugInfo = PixelUI.add.debugInfo(this);
 
     PixelUI.add.textLabel(
       this,
@@ -100,6 +103,10 @@ export default class TitleScene extends Phaser.Scene {
       async (toggle: boolean) => await this.showToggleState(toggle),
       true
     );
+  }
+
+  public update(): void {
+    this.debugInfo.update();
   }
 
   private async showDialog(): Promise<void> {
