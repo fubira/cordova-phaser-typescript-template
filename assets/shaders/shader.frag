@@ -5,14 +5,12 @@ precision mediump float;
 #endif
 
 #extension GL_OES_standard_derivatives : enable
-
-uniform float time;
-uniform vec2 mouse;
+uniform highp float time;
 uniform vec2 resolution;
 
 float snow(vec2 uv,float scale)
 {
-	float w=smoothstep(1.,0.,-uv.y*(scale/10.));if(w<.1)return 0.;
+	highp float w=smoothstep(1.,0.,-uv.y*(scale/10.));if(w<.1)return 0.;
 	uv+=scale;uv.y+=time*2./scale;uv.x+=sin(uv.y+time*.5)/scale;
 	uv*=scale;
   highp vec2 s=floor(uv),f=fract(uv),p;
