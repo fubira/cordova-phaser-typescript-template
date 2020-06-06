@@ -10,9 +10,7 @@ export default class TitleScene extends Phaser.Scene {
     | Phaser.Sound.HTML5AudioSound = null;
 
   public init(): void {
-    PixelUI.add.background(this, {
-      texture: Assets.Images.ImagesBackground.getName(),
-    });
+    //
   }
 
   public preload(): void {
@@ -28,6 +26,16 @@ export default class TitleScene extends Phaser.Scene {
 
   public create(): void {
     this.cameras.main.flash(400, 0, 0, 0);
+    const shaderWidth = this.cameras.main.width;
+    const shaderHeight = this.cameras.main.height;
+    this.add.shader(
+      Assets.Shaders.ShadersShader.getName(),
+      this.cameras.main.centerX,
+      this.cameras.main.centerY,
+      shaderWidth,
+      shaderHeight
+    );
+
     const spaceKey = this.input.keyboard.addKey("SPACE");
 
     spaceKey.on("down", () => {

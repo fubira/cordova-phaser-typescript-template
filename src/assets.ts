@@ -129,6 +129,11 @@ export namespace Scripts {
 }
 
 export namespace Shaders {
-  class IExistSoTypeScriptWillNotComplainAboutAnEmptyNamespace {}
+  const ShadersShaderFRAG = require("assets/shaders/shader.frag").default;
+
+  export class ShadersShader {
+    static getName(): string { return "shader"; }
+    static getFRAG(): string { return ShadersShaderFRAG; }
+  }
 }
 

@@ -8,7 +8,7 @@ export default class App extends Phaser.Game {
     const gameWidth: number = GAME_WIDTH;
     const gameHeight: number = GAME_HEIGHT;
     const gameConfig: Phaser.Types.Core.GameConfig = {
-      type: Phaser.CANVAS,
+      type: Phaser.AUTO,
       render: {
         pixelArt: false,
         antialias: true,
