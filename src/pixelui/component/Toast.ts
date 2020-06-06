@@ -1,5 +1,4 @@
 import * as PixelUI from "..";
-import * as Utils from "../Utils";
 import { TextLabelFactory } from "./TextLabel";
 import { ComponentBase, ComponentBaseStyle } from "../ComponentBase";
 
@@ -169,26 +168,12 @@ export class Toast extends ComponentBase {
       color: textColor.rgba,
     };
 
-    /* calc text height */
-    let titleHeight = 0;
-    if (title) {
-      titleHeight = Utils.calcTextRect(scene, title, headerStyle).height;
-    }
-    let messageHeight = 0;
-    if (message) {
-      messageHeight = Utils.calcTextRect(scene, message, messageStyle).height;
-    }
-    const totalHeight = Math.min(titleHeight + messageHeight, maxHeight);
-
-    const fixedWidth = maxWidth;
-    const fixedHeight = totalHeight;
-
     /* add type bar rectangle */
     const typeBar = scene.add.rectangle(
-      -fixedWidth / 2 + 6,
+      0,
       0,
       16,
-      fixedHeight,
+      16,
       typeColor.color,
       typeColor.alphaGL
     );
@@ -196,24 +181,26 @@ export class Toast extends ComponentBase {
     typeBar.setOrigin(0.5, 0.5);
 
     /* add title label */
-    const titleLabel = TextLabelFactory(
-      scene,
-      20,
-      -titleHeight / 2 + 4,
-      title,
-      headerStyle
-    );
+    const titleLabel = TextLabelFactory(scene, 0, 0, title, headerStyle);
     titleLabel.setOrigin(0.5, 0.5);
 
     /* add message label */
-    const messageLabel = TextLabelFactory(
-      scene,
-      20,
-      titleHeight / 2 + 4,
-      message,
-      messageStyle
-    );
+    const messageLabel = TextLabelFactory(scene, 0, 0, message, messageStyle);
     messageLabel.setOrigin(0.5, 0.5);
+
+    /* calc text height */
+    const titleHeight = title ? titleLabel.height : 0;
+    const messageHeight = message ? messageLabel.height : 0;
+    const totalHeight = Math.min(titleHeight + messageHeight, maxHeight);
+
+    const fixedWidth = maxWidth;
+    const fixedHeight = totalHeight;
+
+    titleLabel.setPosition(20, -titleHeight / 2 + 4);
+    messageLabel.setPosition(20, titleHeight / 2 + 4);
+
+    typeBar.setSize(16, fixedHeight);
+    typeBar.setPosition(-fixedWidth / 2 + 6, -fixedHeight / 2 + 6);
 
     /* generate container */
     super(scene, 0, 0, [typeBar, titleLabel, messageLabel], {

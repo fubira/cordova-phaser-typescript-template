@@ -1,5 +1,4 @@
 import * as PixelUI from "..";
-import * as Utils from "../Utils";
 import logger from "@/logger";
 
 import { TextLabelFactory } from "./TextLabel";
@@ -65,18 +64,18 @@ export class ToggleButton extends ComponentBase {
       strokeThickness,
     };
 
-    const textRect = Utils.calcTextRect(scene, text, labelStyle);
-    const width = style.fixedWidth || Math.max(textRect.width + 16, 180);
-    const height = style.fixedHeight || textRect.height + 8;
+    // const textRect = Utils.calcTextRect(scene, text, labelStyle);
 
     /* add text label */
     const textLabel = TextLabelFactory(scene, 0, 8, text, {
       ...labelStyle,
-      fixedWidth: width,
-      fixedHeight: height,
       align: "center",
     });
     textLabel.setOrigin(align);
+
+    const width = style.fixedWidth || Math.max(textLabel.width + 16, 180);
+    const height = style.fixedHeight || textLabel.height + 8;
+    textLabel.setFixedSize(width, height);
 
     /* Event handler when a component is clicked */
     const onClickHandler = async (): Promise<void> => {

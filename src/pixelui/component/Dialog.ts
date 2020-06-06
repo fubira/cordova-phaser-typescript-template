@@ -1,5 +1,4 @@
 import * as PixelUI from "..";
-import * as Utils from "../Utils";
 import logger from "@/logger";
 
 import { TextLabelFactory } from "./TextLabel";
@@ -120,15 +119,18 @@ export class Dialog extends Phaser.GameObjects.Container {
       textSize,
     };
 
-    /* calc dialog height */
+    /* add title label */
+    const titleLabel = TextLabelFactory(scene, 0, 0, title, headerStyle);
     let titleHeight = 0;
     if (title) {
-      titleHeight = Utils.calcTextRect(scene, title, headerStyle).height;
+      titleHeight = titleLabel.height;
     }
-    let messageHeight = 0;
-    if (message) {
-      messageHeight = Utils.calcTextRect(scene, message, messageStyle).height;
-    }
+
+    /* add message label */
+    const messageLabel = TextLabelFactory(scene, 0, 0, message, messageStyle);
+    const messageHeight = messageLabel.height;
+
+    /* calc dialog height */
     const totalHeight = Math.min(titleHeight + messageHeight, maxHeight);
 
     const dialogWidth = maxWidth;
@@ -137,19 +139,10 @@ export class Dialog extends Phaser.GameObjects.Container {
     const px = -dialogWidth / 2;
     const py = -dialogHeight / 2;
 
-    /* add title label */
-    const titleLabel = TextLabelFactory(scene, px, py, title, headerStyle);
     titleLabel.setOrigin(0.0, 0.0);
-
-    /* add message label */
-    const messageLabel = TextLabelFactory(
-      scene,
-      px,
-      py + titleHeight,
-      message,
-      messageStyle
-    );
+    titleLabel.setPosition(px, py);
     messageLabel.setOrigin(0.0, 0.0);
+    messageLabel.setPosition(px, py + titleHeight);
 
     /* add buttons */
     let buttons: PixelUI.Button[] = [];
