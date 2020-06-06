@@ -1,29 +1,29 @@
 //--- hatsuyuki ---
 // by Catzpaw 2016
 #ifdef GL_ES
-precision mediump float;
+precision highp float;
 #endif
 
 #extension GL_OES_standard_derivatives : enable
-uniform highp float time;
-uniform vec2 resolution;
+uniform float time;
+uniform mediump vec2 resolution;
 
-float snow(vec2 uv,float scale)
+float snow(vec2 uv, mediump float scale)
 {
-	highp float w=smoothstep(1.,0.,-uv.y*(scale/10.));if(w<.1)return 0.;
+	float w=smoothstep(1.,0.,-uv.y*(scale/10.));if(w<.1)return 0.;
 	uv+=scale;uv.y+=time*2./scale;uv.x+=sin(uv.y+time*.5)/scale;
 	uv*=scale;
-  highp vec2 s=floor(uv),f=fract(uv),p;
-  highp float k=3.,d;
+  vec2 s=floor(uv),f=fract(uv),p;
+  float k=3.,d;
 	p=.5+.35*sin(11.*fract(sin((s+p+scale)*mat2(7,3,6,5))*5.))-f;d=length(p);k=min(d,k);
 	k=smoothstep(0.,k,sin(f.x+f.y)*0.01);
   return k*w;
 }
 
 void main(void){
-	vec2 uv=(gl_FragCoord.xy*2.-resolution.xy)/min(resolution.x,resolution.y); 
-	vec3 finalColor=vec3(0);
-	highp float c=smoothstep(1.,0.3,clamp(uv.y*.3+.8,0.,.75));
+	mediump vec2 uv=(gl_FragCoord.xy*2.-resolution.xy)/min(resolution.x,resolution.y); 
+	mediump vec3 finalColor=vec3(0);
+	float c=smoothstep(1.,0.3,clamp(uv.y*.3+.8,0.,.75));
 	c+=snow(uv,30.)*.3;
 	c+=snow(uv,20.)*.5;
 	c+=snow(uv,15.)*.8;
