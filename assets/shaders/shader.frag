@@ -1,7 +1,7 @@
 //--- hatsuyuki ---
 // by Catzpaw 2016
 #ifdef GL_ES
-precision mediump float;
+precision highp float;
 #endif
 
 #extension GL_OES_standard_derivatives : enable
