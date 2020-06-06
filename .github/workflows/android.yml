@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v1.4.2
+
+      - name: Checkout project
+        uses: actions/checkout@v2
+
+      - name: Setup Android Keystore
+        run: | 
+          ANDROID_KEYSTORE_BASE64=${{ secrets.ANDROID_KEYSTORE_BASE64 }} \
+          ANDROID_KEYSTORE_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }} \
+          ANDROID_KEY_PASSWORD=${{ secrets.ANDROID_KEY_PASSWORD }} \
+          ANDROID_KEY_ALIAS=${{ secrets.ANDROID_KEY_ALIAS }} \
+          bash setup-keystore.sh
+
+      - name: Setup Cordova
+        run: npm install -g cordova
+
+      - name: Setup Node Project
+        run: npm install
+
+      - name: Webpack Build & Test
+        run: npm run webpack:prod && npm run test
+
+      - name: Cordova Build
+        run: cordova platform add android && cordova build android --debug --buildConfig=build.json
+
+      - name: Upload to deploygate
+        run: |
+          curl \
+            -F "file=@platforms/android/app/build/outputs/apk/debug/app-debug.apk" \
+            -F "token=${{ secrets.DEPLOYGATE_API_KEY }}" \
+            -F "message=$(git log --format="[%h] %s %n(commited by %cN) at %ci" -n 1)" \
+            "https://deploygate.com/api/users/${{ secrets.DEPLOYGATE_USERNAME }}/apps"
